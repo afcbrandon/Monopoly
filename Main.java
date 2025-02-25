@@ -4,7 +4,8 @@ public class Main {
   }
 
   private void go() {
-    GameBoard.Board();
+    GameBoard gameBoard = new GameBoard();
+    gameBoard.Board();
     Player player1 = new Player("Bill", 1200);
     player1.rollAndMove();
     player1.rollAndMove();
