@@ -1,3 +1,4 @@
+import javax.swing.*;
 import java.util.Random;
 
 public class Player {
@@ -5,9 +6,9 @@ public class Player {
     private int money;
     private int position;
 
-    public Player(String name, int initialMoney) {
+    public Player(String name) {
         this.name = name;
-        this.money = initialMoney;
+        this.money = 1500;
         this.position = 0; // Starting at position 0 (Go space)
     }
 
@@ -37,10 +38,10 @@ public class Player {
         int diceOne = rand.nextInt(6) + 1;
         int diceTwo = rand.nextInt(6) + 1;
         int result = diceOne + diceTwo;
+        JOptionPane.showMessageDialog(null, this.name + " rolled a "  + diceOne + " and a " + diceTwo + " summing up for a total of " + result,"Dice Roll", JOptionPane.INFORMATION_MESSAGE);
 
-        String message = this.name + " rolled a " + diceOne + " and a " + diceTwo + " summing up for a total of " + result;
-        System.out.println(message);
         this.move(result);
-        System.out.println(this.name + " new location is at slot " + this.getPosition());
+
+
     }
 }
