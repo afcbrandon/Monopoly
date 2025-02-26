@@ -9,6 +9,7 @@ public class GameGUI extends JFrame {
     private JPanel playersPanel;
     private JButton rollButton;
     private JButton endTurnButton;
+    private JButton quitButton;//just for testing player elimination
     private int currentPlayerIndex;
 
     public GameGUI(Player[] players) {
@@ -43,6 +44,21 @@ public class GameGUI extends JFrame {
             }
         });
 
+        quitButton = new JButton("Quit");
+quitButton.addActionListener(new ActionListener() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        Player currentPlayer = players[currentPlayerIndex];
+        // Force elimination by subtracting enough money
+        currentPlayer.updateMoney(-2000);
+        updatePlayerPanel(currentPlayer);
+        JOptionPane.showMessageDialog(GameGUI.this, currentPlayer.getName() + " has quit and is eliminated!");
+        checkWinner(); // Check if only one player remains
+        endTurn();     // Move to the next player's turn
+    }
+});
+
+
         // Create a panel to display all players' profiles
         playersPanel = new JPanel();
         playersPanel.setLayout(new GridLayout(players.length, 1));
@@ -51,7 +67,7 @@ public class GameGUI extends JFrame {
             JPanel playerPanel = createPlayerProfilePanel(player);
             playersPanel.add(playerPanel);
             playerPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            setSize(200, 300);
+            setSize(300, 300);
             setLocationRelativeTo(null);
         }
 
@@ -60,6 +76,8 @@ public class GameGUI extends JFrame {
         controlPanel.setLayout(new FlowLayout());
         controlPanel.add(rollButton);
         controlPanel.add(endTurnButton);
+        controlPanel.add(quitButton);// quit button
+
 
         add(playersPanel, BorderLayout.CENTER);
         add(controlPanel, BorderLayout.SOUTH);
@@ -101,10 +119,31 @@ public class GameGUI extends JFrame {
         }
     }
 
+    private void checkWinner() {
+        int activePlayers = 0;
+        Player winner = null;
+    
+        for (Player player : players) {
+            if (!player.isEliminated()) {
+                activePlayers++;
+                winner = player;
+            }
+        }
+    
+        if (activePlayers == 1) {
+            JOptionPane.showMessageDialog(this, winner.getName() + " is the winner!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+            System.exit(0); // End the game
+        }
+    }
+    
+
     //  handles the "End Turn" button
     private void endTurn() {
+        do {
         // Move to the next player
         currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
+    } while (players[currentPlayerIndex].isEliminated());
+    checkWinner(); // Check if only one player remains
 
         // Update the GUI to reflect the current player's turn
         Player currentPlayer = players[currentPlayerIndex];
