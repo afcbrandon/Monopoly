@@ -9,7 +9,7 @@ public class Player {
     public Player(String name) {
         this.name = name;
         this.money = 1500;
-        this.position = 0; // Starting at position 0 (Go space)
+        this.position = 1; // Starting at position 1 (Go space)
     }
 
     public String getName() {
