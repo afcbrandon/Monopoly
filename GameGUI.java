@@ -27,36 +27,41 @@ public class GameGUI extends JFrame {
 
         // Create the roll and end turn buttons
         rollButton = new JButton("Roll Dice");
+        rollButton.setFocusable(false);
         rollButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Player currentPlayer = players[currentPlayerIndex];
                 currentPlayer.rollAndMove();
                 updatePlayerPanel(currentPlayer);
+                rollButton.setEnabled(false);
             }
         });
 
         endTurnButton = new JButton("End Turn");
+        endTurnButton.setFocusable(false);
         endTurnButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 endTurn();
+                rollButton.setEnabled(true);
             }
         });
 
         quitButton = new JButton("Quit");
-quitButton.addActionListener(new ActionListener() {
-    @Override
-    public void actionPerformed(ActionEvent e) {
-        Player currentPlayer = players[currentPlayerIndex];
-        // Force elimination by subtracting enough money
-        currentPlayer.updateMoney(-2000);
-        updatePlayerPanel(currentPlayer);
-        JOptionPane.showMessageDialog(GameGUI.this, currentPlayer.getName() + " has quit and is eliminated!");
-        checkWinner(); // Check if only one player remains
-        endTurn();     // Move to the next player's turn
-    }
-});
+        quitButton.setFocusable(false);
+        quitButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Player currentPlayer = players[currentPlayerIndex];
+                // Force elimination by subtracting enough money
+                currentPlayer.updateMoney(-2000);
+                updatePlayerPanel(currentPlayer);
+                JOptionPane.showMessageDialog(GameGUI.this, currentPlayer.getName() + " has quit and is eliminated!");
+                checkWinner(); // Check if only one player remains
+                endTurn();     // Move to the next player's turn
+            }
+        });
 
 
         // Create a panel to display all players' profiles
@@ -114,6 +119,12 @@ quitButton.addActionListener(new ActionListener() {
 
                 moneyLabel.setText("Money: $" + player.getMoney());
                 positionLabel.setText("Position: " + player.getPosition());
+
+                if (player.isEliminated()) {
+                    playerPanel.setBackground(Color.RED);  // Change background to red
+                } else {
+                    playerPanel.setBackground(null);  // Reset to default background color
+                }
                 break;
             }
         }
