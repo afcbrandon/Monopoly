@@ -72,7 +72,7 @@ public class GameGUI extends JFrame {
             JPanel playerPanel = createPlayerProfilePanel(player);
             playersPanel.add(playerPanel);
             playerPanel.setBorder(BorderFactory.createLineBorder(Color.BLACK));
-            setSize(300, 300);
+            setSize(300, 400);
             setLocationRelativeTo(null);
         }
 
