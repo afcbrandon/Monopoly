@@ -43,6 +43,9 @@ public class Player {
 
     public void move(int spaces) {
         position = (position + spaces) % 40; // Monopoly board has 40 spaces
+        if (position == 0) {    // 40 % 40 = 0, but 40th space is valid
+            position = 40;
+        }
     }
 
     public void updateMoney(int amount) {
