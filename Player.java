@@ -6,6 +6,7 @@ public class Player {
     private int money;
     private int position;
     private boolean isEliminated;
+    private char playerToken;
 
     public Player(String name) {
         this.name = name;
@@ -28,6 +29,16 @@ public class Player {
     
     public boolean isEliminated() {
         return isEliminated;
+    }
+
+    // ***BRANDON*** Function that sets the player token
+    public void setToken(Character token) {
+        this.playerToken = token;
+    }
+
+    // ***BRANDON*** Function the returns the player token
+    public Character getToken() {
+        return this.playerToken;
     }
 
     public void move(int spaces) {

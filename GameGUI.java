@@ -2,22 +2,23 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import java.util.Random;
 
 public class GameGUI extends JFrame {
-    private Player[] players;
+    private ArrayList<Player> players = new ArrayList<>();
     private JPanel playersPanel;
     private JButton rollButton;
     private JButton endTurnButton;
     private JButton quitButton;//just for testing player elimination
     private int currentPlayerIndex;
 
-    public GameGUI(Player[] players) {
+    public GameGUI(ArrayList<Player> players) {
         this.players = players;
 
         // Randomly select the first player
         Random rand = new Random();
-        this.currentPlayerIndex = rand.nextInt(players.length);  // Randomly select a starting player
+        this.currentPlayerIndex = rand.nextInt(players.size());  // Randomly select a starting player
 
         // Set up the frame
         setTitle("Monopoly Game");
@@ -31,7 +32,7 @@ public class GameGUI extends JFrame {
         rollButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Player currentPlayer = players[currentPlayerIndex];
+                Player currentPlayer = players.get(currentPlayerIndex);
                 currentPlayer.rollAndMove();
                 updatePlayerPanel(currentPlayer);
                 rollButton.setEnabled(false);
@@ -53,7 +54,7 @@ public class GameGUI extends JFrame {
         quitButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Player currentPlayer = players[currentPlayerIndex];
+                Player currentPlayer = players.get(currentPlayerIndex);
                 // Force elimination by subtracting enough money
                 currentPlayer.updateMoney(-2000);
                 updatePlayerPanel(currentPlayer);
@@ -66,7 +67,7 @@ public class GameGUI extends JFrame {
 
         // Create a panel to display all players' profiles
         playersPanel = new JPanel();
-        playersPanel.setLayout(new GridLayout(players.length, 1));
+        playersPanel.setLayout(new GridLayout(players.size(), 1));
 
         for (Player player : players) {
             JPanel playerPanel = createPlayerProfilePanel(player);
@@ -91,15 +92,18 @@ public class GameGUI extends JFrame {
     }
 
     // creates the profile panel for each player
+    // *** Brandon *** Updated the playerPanel rows to 4 and added Token label
     private JPanel createPlayerProfilePanel(Player player) {
         JPanel playerPanel = new JPanel();
-        playerPanel.setLayout(new GridLayout(3, 1));
+        playerPanel.setLayout(new GridLayout(4, 1)); 
 
         JLabel nameLabel = new JLabel("Name: " + player.getName());
+        JLabel tokenLabel = new JLabel("Token: " + player.getToken());
         JLabel moneyLabel = new JLabel("Money: $" + player.getMoney());
         JLabel positionLabel = new JLabel("Position: " + player.getPosition());
 
         playerPanel.add(nameLabel);
+        playerPanel.add(tokenLabel);
         playerPanel.add(moneyLabel);
         playerPanel.add(positionLabel);
 
@@ -114,8 +118,8 @@ public class GameGUI extends JFrame {
         for (Component comp : components) {
             JPanel playerPanel = (JPanel) comp;
             if (playerPanel.getName().equals(player.getName())) {
-                JLabel moneyLabel = (JLabel) playerPanel.getComponent(1);
-                JLabel positionLabel = (JLabel) playerPanel.getComponent(2);
+                JLabel moneyLabel = (JLabel) playerPanel.getComponent(2);
+                JLabel positionLabel = (JLabel) playerPanel.getComponent(3);
 
                 moneyLabel.setText("Money: $" + player.getMoney());
                 positionLabel.setText("Position: " + player.getPosition());
@@ -152,12 +156,12 @@ public class GameGUI extends JFrame {
     private void endTurn() {
         do {
         // Move to the next player
-        currentPlayerIndex = (currentPlayerIndex + 1) % players.length;
-    } while (players[currentPlayerIndex].isEliminated());
+        currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
+    } while (players.get(currentPlayerIndex).isEliminated());
     checkWinner(); // Check if only one player remains
 
         // Update the GUI to reflect the current player's turn
-        Player currentPlayer = players[currentPlayerIndex];
+        Player currentPlayer = players.get(currentPlayerIndex);
         JOptionPane.showMessageDialog(this, "It's now " + currentPlayer.getName() + "'s turn!");
     }
 

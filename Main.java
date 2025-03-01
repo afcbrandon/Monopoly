@@ -1,4 +1,3 @@
-import javax.swing.*;
 
 public class Main {
   public static void main(String[] args) {
@@ -7,10 +6,10 @@ public class Main {
   }
 
   private void go() {
-    GameBoard gameBoard = new GameBoard();
-    gameBoard.Board();
-    // Get number of players through input dialog
-    int numberOfPlayers = 0;
+    UserInterface ui = new UserInterface();
+    ui.start();
+
+    /*
 
     while (numberOfPlayers < 2 || numberOfPlayers > 8) {
       String input = JOptionPane.showInputDialog("Enter number of players (2-8):");
@@ -29,6 +28,9 @@ public class Main {
     for (int i = 0; i < numberOfPlayers; i++) {
       players[i] = new Player("Player " + (i + 1));
     }
+      
     new GameGUI(players);
+
+    */
   }
 }
