@@ -75,6 +75,7 @@ public class Player {
     }
 
     //created checkPassedGo function
+
     private void checkPassedGo(int previousPosition) {
         // Check if player passed Go or landed on GO and awards 200 bucks
         if (this.position < previousPosition) {
@@ -85,5 +86,4 @@ public class Player {
             JOptionPane.showMessageDialog(null, this.name + " landed on Go and earned $200!");
         }
     }
-
 }
