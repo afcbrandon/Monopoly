@@ -26,7 +26,7 @@ public class Player {
     public int getPosition() {
         return this.position;
     }
-    
+
     public boolean isEliminated() {
         return isEliminated;
     }
@@ -67,9 +67,22 @@ public class Player {
         int diceTwo = rand.nextInt(6) + 1;
         int result = diceOne + diceTwo;
         JOptionPane.showMessageDialog(null, this.name + " rolled a "  + diceOne + " and a " + diceTwo + " summing up for a total of " + result,"Dice Roll", JOptionPane.INFORMATION_MESSAGE);
-
+        int previousPosition = this.position;
         this.move(result);
 
+        checkPassedGo(previousPosition); // added this into the roll and move
 
+    }
+
+    //created checkPassedGo function
+    private void checkPassedGo(int previousPosition) {
+        // Check if player passed Go or landed on GO and awards 200 bucks
+        if (this.position < previousPosition) {
+            this.updateMoney(200);
+            JOptionPane.showMessageDialog(null, this.name + " passed Go and earned $200!");
+        }else if (this.position == 1) {
+            this.updateMoney(200);
+            JOptionPane.showMessageDialog(null, this.name + " landed on Go and earned $200!");
+        }
     }
 }
