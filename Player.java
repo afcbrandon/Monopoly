@@ -85,4 +85,5 @@ public class Player {
             JOptionPane.showMessageDialog(null, this.name + " landed on Go and earned $200!");
         }
     }
+
 }
