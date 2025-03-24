@@ -8,7 +8,7 @@ public class PlayerToken {
 
     private ArrayList<Character> tokenList = new ArrayList<>();
 
-    // EMPTY CONSTRUCTOR
+    // CONSTRUCTOR
     public PlayerToken() {
 
         this.tokenList.add('!');
