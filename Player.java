@@ -10,13 +10,16 @@ public class Player {
     private boolean isJailed;
     private int jailCounter;
 
-    public Player(String name) {
+    private GameBoardSpaces gameBoardSpaces;
+
+    public Player(String name, GameBoardSpaces gameBoardSpaces) {
         this.name = name;
         this.money = 1500;
         this.position = 1; // Starting at position 1 (Go space)
         this.isEliminated = false;
         this.isJailed = false;
         this.jailCounter = 0;
+        this.gameBoardSpaces = gameBoardSpaces;
     }
 
     public String getName() {
@@ -50,6 +53,7 @@ public class Player {
         if (position == 0) {    // 40 % 40 = 0, but 40th space is valid
             position = 40;
         }
+
     }
 
     public void updateMoney(int amount) {
@@ -139,6 +143,11 @@ public class Player {
                 " summing up for a total of " + result, "Dice Roll", JOptionPane.INFORMATION_MESSAGE);
             int previousPosition = this.position;
             this.moveSpaces(result);
+
+            // **ALEX**This will check if a player landed on a property and pay rent if needed(hopefully have not tested it yet)
+            if(gameBoardSpaces.isProperty(this.position)) {
+                gameBoardSpaces.payRent(this, this.position); //pay rent to the property owner
+            }
 
             if (diceOne == diceTwo) {
                 rolledDoubles = true;
