@@ -33,9 +33,9 @@ public class GameGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Player currentPlayer = players.get(currentPlayerIndex);
-                currentPlayer.rollAndMove();
+                currentPlayer.playerTurn();
                 updatePlayerPanel(currentPlayer);
-                rollButton.setEnabled(false);
+                rollButton.setEnabled(false); // TODO: Update this setting, so that player has option to re-roll if they roll doubles
             }
         });
 
