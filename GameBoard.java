@@ -8,7 +8,7 @@ public class GameBoard {
             /* 
                 Inner for loop that determines if a board space is printed, or an empty space.
                 If the loop is on the first (1) or last (11) row, then all spaces are printed to the console.
-                If the loop is not on the first or last row, then 3 empty spaces are printed instead.
+                If the loop is not on the first or last row, then 4 empty spaces are printed instead for proper format.
             */
             for (int col = 0; col < 11; col++) {
                 int floorSpaceNum = spaceIdentifier(row, col);
