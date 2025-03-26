@@ -14,7 +14,7 @@ public class Player {
 
     private GameBoardSpaces gBoardSpaces;
 
-    public Player(String name) {
+    public Player(String name, GameBoardSpaces gBoardSpaces) {
         this.name = name;
         this.money = 1500;
         this.position = 1; // Starting at position 1 (Go space)
