@@ -12,23 +12,24 @@ public class Player {
     private boolean diceDouble;
     private int diceDoubleCounter;
 
-    private GameBoardSpaces gameBoardSpaces;
+    private GameBoardSpaces gBoardSpaces;
 
-    public Player(String name, GameBoardSpaces gameBoardSpaces) {
+    public Player(String name) {
         this.name = name;
         this.money = 1500;
         this.position = 1; // Starting at position 1 (Go space)
         this.isEliminated = false;
         this.isJailed = false;
         this.jailCounter = 0;
-        this.gameBoardSpaces = gameBoardSpaces;
+        this.gBoardSpaces = new GameBoardSpaces();
         this.diceDouble = false;
         this.diceDoubleCounter = 0;
     }
 
-    /*
-        GETTERS
-     */
+    /*  ###############
+        ### Getters ###
+        ###############  */
+
     // Function that returns the player's name
     public String getName() {
         return this.name;
@@ -54,9 +55,9 @@ public class Player {
         return this.diceDouble;
     }
 
-    /*
-        Setters
-     */
+    /*  ###############
+        ### Setters ###
+        ###############  */
     public void setMoney(int money) {
         this.money = money;
     }
@@ -80,6 +81,10 @@ public class Player {
             this.isEliminated = true; // Mark player as eliminated
         }
     }
+
+    /*  #############################
+        ### Functions for Player ###
+        ############################  */
     
     /* Function that is called at the start of a player's turn */
     public void playerTurn() {
@@ -96,6 +101,9 @@ public class Player {
             playerRoll();
         }
 
+        // TODO: Add function that determines what player does dependent on the space they land on
+        //boardSpace();
+
     }
 
     //created checkPassedGo function
@@ -109,6 +117,10 @@ public class Player {
             JOptionPane.showMessageDialog(null, this.name + " landed on Go and earned $200!");
         }
     }
+
+    /*  ############################################
+        ### Functions that handle player in jail ###
+        ############################################  */
 
     // ability for the player to get out of jail
     private void getOutOfJail() {
@@ -155,6 +167,10 @@ public class Player {
         // **** CODE **** //
     }
   
+    /*  ##########################
+        ### Functions for Dice ###
+        ##########################  */
+
     /* Function that rolls a six-sided-die and returns its value */
     private int diceRoll() {
         return new Random().nextInt(6) + 1;
@@ -174,9 +190,10 @@ public class Player {
         checkPassedGo(previousPosition);
 
         // **ALEX**This will check if a player landed on a property and pay rent if needed(hopefully have not tested it yet)
+        /*
         if(gameBoardSpaces.isProperty(this.position)) {
             gameBoardSpaces.payRent(this, this.position); //pay rent to the property owner
-        }
+        } */
 
         if (diceOne == diceTwo) {
             this.diceDouble = true;
