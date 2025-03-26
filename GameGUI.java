@@ -59,7 +59,7 @@ public class GameGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 Player currentPlayer = players.get(currentPlayerIndex);
                 // Force elimination by subtracting enough money
-                currentPlayer.setMoney(0);
+                currentPlayer.setElimination();
                 updatePlayerPanel(currentPlayer);
                 JOptionPane.showMessageDialog(GameGUI.this, currentPlayer.getName() + " has quit and is eliminated!");
                 checkWinner(); // Check if only one player remains
@@ -127,7 +127,7 @@ public class GameGUI extends JFrame {
                 moneyLabel.setText("Money: $" + player.getMoney());
                 positionLabel.setText("Position: " + player.getPosition());
 
-                if (player.isEliminated()) {
+                if (player.getIsEliminated()) {
                     playerPanel.setBackground(Color.RED);  // Change background to red
                 } else {
                     playerPanel.setBackground(null);  // Reset to default background color
@@ -142,7 +142,7 @@ public class GameGUI extends JFrame {
         Player winner = null;
     
         for (Player player : players) {
-            if (!player.isEliminated()) {
+            if (!player.getIsEliminated()) {
                 activePlayers++;
                 winner = player;
             }
@@ -160,7 +160,7 @@ public class GameGUI extends JFrame {
         do {
         // Move to the next player
         currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
-    } while (players.get(currentPlayerIndex).isEliminated());
+    } while (players.get(currentPlayerIndex).getIsEliminated());
     checkWinner(); // Check if only one player remains
 
         // Update the GUI to reflect the current player's turn

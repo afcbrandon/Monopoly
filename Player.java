@@ -58,11 +58,18 @@ public class Player {
     /*  ###############
         ### Setters ###
         ###############  */
+
+    ///  Function that automatically eliminates player, if they player should quit
+    public void setElimination() {
+        this.money = 0;
+        this.isEliminated = true;
+    }
+    /// Function that sets the player's money
     public void setMoney(int money) {
         this.money = money;
     }
 
-    public boolean isEliminated() {
+    public boolean getIsEliminated() {
         return isEliminated;
     }
 
