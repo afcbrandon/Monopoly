@@ -11,6 +11,11 @@ public class Property {
         this.rent = rent;
         this.owner = null; // every property starts with no owner
     }
+
+    /*  ###############
+        ### Getters ###
+        ###############  */
+    
     public String getName() {
         return name;
     }
@@ -20,24 +25,67 @@ public class Property {
     public Player getOwner() {
         return owner;
     }
+
+    /*  ###############
+        ### Setters ###
+        ###############  */
+
+    /// Function that sets the owner
     public void setOwner(Player owner) {
         this.owner = owner;
     }
 
-    /* Function that returns the price of the property, dependent on the space */
+    /*  ##########################
+        ### Property Functions ###
+        ########################## */
+
+    // Function that returns the name of the property, dependent on the space
+    public String propertyName(int boardSpace) {
+        
+        String pName;
+
+        switch (boardSpace) {
+            case 2: pName = "Mediterranean Avenue"; break;
+            case 4: pName = "Baltic Avenue"; break;
+            case 7: pName = "Oriental Avenue"; break;
+            case 9: pName = "Vermont Avenue"; break;
+            case 10: pName = "Connecticut Avenue"; break;
+            case 12: pName = "St. Charles Place"; break;
+            case 14: pName = "States Avenue"; break;
+            case 15: pName = "Virginia Avenue"; break;
+            case 17: pName = "St. James Place"; break;
+            case 19: pName = "Tennesse Avenue"; break;
+            case 20: pName = "New York Avenue"; break;
+            case 22: pName = "Kentucky Avenue"; break;
+            case 24: pName = "Indiana Avenue"; break;
+            case 25: pName = "Illinois Avenue"; break;
+            case 27: pName = "Atlantic Avenue"; break;
+            case 28: pName = "Ventnor Avenue"; break;
+            case 30: pName = "Marvin Gardens"; break;
+            case 32: pName = "Pacific Avenue"; break;
+            case 33: pName = "North Carolina Avenue"; break;
+            case 35: pName = "Pennsylvania Avenue"; break;
+            case 38: pName = "Park Place"; break;
+            default: pName = "Boardwalk";
+        }
+
+        return pName;
+    }
+
+    /// Function that returns the price of the property, dependent on the space
     public int propertyPrice (int boardSpace) {
         int price;
 
         switch (boardSpace) {
-            case 1:     //  Purple Spaces: Mediterranean Avenue, Baltic Avenue
-            case 3: 
+            case 2:     //  Purple Spaces: Mediterranean Avenue, Baltic Avenue
+            case 4: 
                 price = 60; 
                 break;
-            case 6:     //  Light Blue Spaces: Oriental Avenue, Vermont Avenue, Connecticut Avenue
-            case 7:
-            case 8:
+            case 7:     //  Light Blue Spaces: Oriental Avenue, Vermont Avenue, Connecticut Avenue
+            case 9:
+            case 10:
                 price = 100;
-                if (boardSpace == 8) {
+                if (boardSpace == 10) {
                     price += 20;
                 }
                 break;
