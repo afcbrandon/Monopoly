@@ -1,3 +1,5 @@
+/*  Temporarily commenting out this class and returning to it later
+
 public class Property {
     private String name;
     private int price;
@@ -41,3 +43,6 @@ public class Property {
         this.owner = owner;
     }
 }
+
+
+ */
