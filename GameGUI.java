@@ -59,7 +59,7 @@ public class GameGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 Player currentPlayer = players.get(currentPlayerIndex);
                 // Force elimination by subtracting enough money
-                currentPlayer.setMoney(0);;
+                currentPlayer.setMoney(0);
                 updatePlayerPanel(currentPlayer);
                 JOptionPane.showMessageDialog(GameGUI.this, currentPlayer.getName() + " has quit and is eliminated!");
                 checkWinner(); // Check if only one player remains
