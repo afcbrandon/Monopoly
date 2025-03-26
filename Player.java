@@ -208,6 +208,7 @@ public class Player {
             JOptionPane.showMessageDialog(null, 
                 this.name + " has rolled doubles 3 times in a row! GO TO JAIL!");
             this.isJailed = true;
+            this.diceDouble = false;
             this.position = 10;
         }
     }

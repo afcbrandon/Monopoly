@@ -36,7 +36,7 @@ public class GameGUI extends JFrame {
                 do {
                     currentPlayer.playerTurn();
                     updatePlayerPanel(currentPlayer);
-                } while(currentPlayer.getDiceDouble()); // Player can continue rolling if they roll 2 of the same number
+                } while(currentPlayer.getDiceDouble()); // Player can continue rolling if they roll double
 
                 rollButton.setEnabled(false);
             }
