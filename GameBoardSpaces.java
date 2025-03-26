@@ -33,6 +33,29 @@ public class GameBoardSpaces {
             }
         }
     }
+
+    public void purchaseProperty(Player currentPlayer, int spaceNumber) {
+        if (isProperty(spaceNumber)) {
+            Property property = getProperty(spaceNumber);
+            if (property.getOwner() != null){
+                int price = property.getPrice();
+                int choice = JOptionPane.showConfirmDialog(null, currentPlayer.getName() + ", do you want to purchase " + property.getName() + " for $ " + price + "?",
+                        "Purchase Property", JOptionPane.YES_NO_OPTION); // this is how we will save the choice they take
+                //Here
+                if (choice == JOptionPane.YES_OPTION) {
+                    boolean success = property.buyProperty(currentPlayer);
+                    // will check if they can or cant buy the property and yeah
+                    if (success) {
+                        JOptionPane.showMessageDialog(null,currentPlayer.getName() + " successfully purchased "  + property.getName() + "!");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this property!");
+                    }
+                }
+            }else{
+                JOptionPane.showMessageDialog(null,"This property is owned by " + property.getOwner().getName() + "!");
+            }
+        }
+    }
     // We will use this in the future to be able to buy property
     public void setOwner(int spaceNumber, Player owner) {
         if (isProperty(spaceNumber)) {

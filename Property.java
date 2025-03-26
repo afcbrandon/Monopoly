@@ -25,6 +25,9 @@ public class Property {
     public Player getOwner() {
         return owner;
     }
+    public int getPrice() {
+        return price;
+    }
 
     /*  ###############
         ### Setters ###
@@ -40,6 +43,20 @@ public class Property {
         ########################## */
 
     // Function that returns the name of the property, dependent on the space
+    public boolean buyProperty(Player player) {
+        if (owner != null) {
+            //This property already has owner
+            return false;
+        }
+        if (player.getMoney() >= price) {
+            //The player has enough money to buy the property
+            player.setMoney(player.getMoney() - price); // deducts the money
+            this.owner = player;// sets the player as the owner
+            return true;
+        }
+        return false;// They cant buy property bc they dont have enough money
+    }
+
     public String propertyName(int boardSpace) {
         
         String pName;
