@@ -33,8 +33,11 @@ public class GameGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Player currentPlayer = players.get(currentPlayerIndex);
-                currentPlayer.playerTurn();
-                updatePlayerPanel(currentPlayer);
+                do {
+                    currentPlayer.playerTurn();
+                    updatePlayerPanel(currentPlayer);
+                } while(currentPlayer.getDiceDouble()); // Player can continue rolling if they roll 2 of the same number
+
                 rollButton.setEnabled(false); // TODO: Update this setting, so that player has option to re-roll if they roll doubles
             }
         });
