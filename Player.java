@@ -114,9 +114,6 @@ public class Player {
             playerRoll();
             handleLandingOnSpace(); // This function will check and handle property purchases
         }
-
-        // TODO: Add function that determines what player does dependent on the space they land on
-        //boardSpace();
     }
 
     public void handleLandingOnSpace() {
