@@ -68,6 +68,7 @@ public class Property {
             case 9: pName = "Vermont Avenue"; break;
             case 10: pName = "Connecticut Avenue"; break;
             case 12: pName = "St. Charles Place"; break;
+            case 13: pName = "Electric Company"; break;
             case 14: pName = "States Avenue"; break;
             case 15: pName = "Virginia Avenue"; break;
             case 17: pName = "St. James Place"; break;
@@ -78,6 +79,7 @@ public class Property {
             case 25: pName = "Illinois Avenue"; break;
             case 27: pName = "Atlantic Avenue"; break;
             case 28: pName = "Ventnor Avenue"; break;
+            case 29: pName = "Water Works"; break;
             case 30: pName = "Marvin Gardens"; break;
             case 32: pName = "Pacific Avenue"; break;
             case 33: pName = "North Carolina Avenue"; break;
@@ -146,6 +148,10 @@ public class Property {
                     price += 20;
                 }
                 break;
+                case 13:  // Electric Company
+                case 29:  // Water Works
+            price = 150;
+            break;
             default:    // Dark Blue Spaces: Park Place, Boardwalk
                 price = 350;
                 if (boardSpace == 40) {

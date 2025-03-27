@@ -9,6 +9,9 @@ public class GameBoardSpaces {
         properties = new HashMap<>();
 
         properties.put(3, new Property("Mediterranean Avenue", 60, 4));
+        properties.put(13, new Property("Electric Company", 150, 0));
+        properties.put(29, new Property("Water Works", 150, 0));
+
 
     }
 

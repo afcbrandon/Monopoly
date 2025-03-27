@@ -12,9 +12,11 @@ public class GameGUI extends JFrame {
     private JButton endTurnButton;
     private JButton quitButton;//just for testing player elimination
     private int currentPlayerIndex;
-
+    private GameBoardSpaces boardSpaces;
+  
     public GameGUI(ArrayList<Player> players) {
         this.players = players;
+        this.boardSpaces = new GameBoardSpaces();
 
         // Randomly select the first player
         Random rand = new Random();
@@ -33,11 +35,31 @@ public class GameGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Player currentPlayer = players.get(currentPlayerIndex);
-                do {
-                    currentPlayer.playerTurn();
-                    updatePlayerPanel(currentPlayer);
-                } while(currentPlayer.getDiceDouble()); // Player can continue rolling if they roll double
+        
+                int die1 = new Random().nextInt(6) + 1;
+                int die2 = new Random().nextInt(6) + 1;
+                int diceRoll = die1 + die2;
+        
+                JOptionPane.showMessageDialog(null, currentPlayer.getName() + " rolled a " + die1 + " and " + die2 + " = " + diceRoll);
+        
+                int previousPosition = currentPlayer.getPosition();
+                currentPlayer.moveSpaces(diceRoll);
+        
+                if (currentPlayer.getPosition() < previousPosition) {
+                    currentPlayer.updateMoney(200);
+                    JOptionPane.showMessageDialog(null, currentPlayer.getName() + " passed GO and earned $200!");
+                }
+        
+                
+                boardSpaces.payRent(currentPlayer, currentPlayer.getPosition(), diceRoll);
+                if (boardSpaces.isProperty(currentPlayer.getPosition())) {
+                    boardSpaces.purchaseProperty(currentPlayer, currentPlayer.getPosition());
+                }
+                
 
+        
+                updatePlayerPanel(currentPlayer);
+        
                 rollButton.setEnabled(false);
             }
         });

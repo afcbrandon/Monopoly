@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.util.Random;
+import java.util.ArrayList;
 
 public class Player {
     private final String name;
@@ -11,6 +12,7 @@ public class Player {
     private int jailCounter;
     private boolean diceDouble;
     private int diceDoubleCounter;
+    private ArrayList<Property> ownedProperties = new ArrayList<>();
 
     private GameBoardSpaces gBoardSpaces;
 
@@ -88,6 +90,10 @@ public class Player {
             this.isEliminated = true; // Mark player as eliminated
         }
     }
+    public void addProperty(Property p) {
+        ownedProperties.add(p);
+    }
+    
 
     /*  #############################
         ### Functions for Player ###
@@ -219,4 +225,15 @@ public class Player {
             this.position = 10;
         }
     }
+    public int countUtilities() {
+        int count = 0;
+        for (Property p : ownedProperties) {
+            String name = p.getName();
+            if (name.equals("Electric Company") || name.equals("Water Works")) {
+                count++;
+            }
+        }
+        return count;
+    }
+    
 }
