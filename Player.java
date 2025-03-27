@@ -23,7 +23,7 @@ public class Player {
         this.isEliminated = false;
         this.isJailed = false;
         this.jailCounter = 0;
-        this.gBoardSpaces = new GameBoardSpaces();
+        this.gBoardSpaces = gBoardSpaces; 
         this.diceDouble = false;
         this.diceDoubleCounter = 0;
     }
