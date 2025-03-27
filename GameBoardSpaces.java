@@ -3,11 +3,15 @@ import java.util.HashMap;
 
 // class that will contain all the properties and non-properties
 public class GameBoardSpaces {
-    private HashMap<Integer, Property> properties;
+    private HashMap<Integer, Property> properties; // we will use the HashMap for fast lookup
 
     public GameBoardSpaces() {
         properties = new HashMap<>();
+        initializeProperties();
+    }
 
+    public void initializeProperties() {
+        //This will add properties to HashMap with position Key
         properties.put(3, new Property("Mediterranean Avenue", 60, 4));
         properties.put(13, new Property("Electric Company", 150, 0));
         properties.put(29, new Property("Water Works", 150, 0));
@@ -16,6 +20,10 @@ public class GameBoardSpaces {
         properties.put(26, new Property("B. & O. Railroad", 200, 25));
         properties.put(36, new Property("Short Line", 200, 25));
 
+    }
+
+    public Property getPropertyBySpace(int position) {
+        return properties.get(position);
     }
 
     /// Function that checks the type of the board space
@@ -91,31 +99,35 @@ public class GameBoardSpaces {
             }
         }
     }
-    
 
     public void purchaseProperty(Player currentPlayer, int spaceNumber) {
         if (isProperty(spaceNumber)) {
             Property property = getProperty(spaceNumber);
-            if (property.getOwner() != null){
-                int price = property.getPrice();
-                int choice = JOptionPane.showConfirmDialog(null, currentPlayer.getName() + ", do you want to purchase " + property.getName() + " for $ " + price + "?",
-                        "Purchase Property", JOptionPane.YES_NO_OPTION); // this is how we will save the choice they take
-           //Here
-           if (choice == JOptionPane.YES_OPTION) {
-            boolean success = property.buyProperty(currentPlayer);
-            if (success) {
-                
-                currentPlayer.addProperty(property);
-                JOptionPane.showMessageDialog(null,currentPlayer.getName() + " successfully purchased "  + property.getName() + "!");
-            } else {
-                JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this property!");
+
+            // Check if the property is already owned
+            if (property.getOwner() != null) {
+                JOptionPane.showMessageDialog(null, "This property is owned by " + property.getOwner().getName() + "!");
+                return; // Exit the function early since the property is taken
+            }
+
+            // Proceed with the purchase since the property is not owned
+            int price = property.getPrice();
+            int choice = JOptionPane.showConfirmDialog(null, currentPlayer.getName() + ", do you want to purchase " + property.getName() + " for $" + price + "?",
+                    "Purchase Property", JOptionPane.YES_NO_OPTION);
+
+            if (choice == JOptionPane.YES_OPTION) {
+                boolean success = property.buyProperty(currentPlayer);
+                if (success) {
+                    currentPlayer.addProperty(property);
+                    property.setOwner(currentPlayer); // Set the owner after purchase!
+                    JOptionPane.showMessageDialog(null, currentPlayer.getName() + " successfully purchased " + property.getName() + "!");
+                } else {
+                    JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this property!");
+                }
             }
         }
-    }else{
-        JOptionPane.showMessageDialog(null,"This property is owned by " + property.getOwner().getName() + "!");
     }
-}
-}
+
     // We will use this in the future to be able to buy property
     public void setOwner(int spaceNumber, Player owner) {
         if (isProperty(spaceNumber)) {

@@ -112,11 +112,36 @@ public class Player {
             getOutOfJail();
         } else {
             playerRoll();
+            handleLandingOnSpace(); // This function will check and handle property purchases
         }
 
         // TODO: Add function that determines what player does dependent on the space they land on
         //boardSpace();
+    }
 
+    public void handleLandingOnSpace() {
+        Property property = gBoardSpaces.getPropertyBySpace(this.position);
+
+        if (property != null && property.getOwner() == null) {
+            int option = JOptionPane.showConfirmDialog(null,
+                    this.name + ", do you want to purchase " + property.getName() + " for $" + property.getPrice() + "?",
+                    "Buy Property " + property.getName(), JOptionPane.YES_NO_OPTION);
+
+            if (option == JOptionPane.YES_OPTION) {
+                if (this.money >= property.getPrice()) {
+                    this.updateMoney(-property.getPrice());
+                    property.setOwner(this);
+                    this.ownedProperties.add(property);
+                    JOptionPane.showMessageDialog(null, this.name + " bought " + property.getName() + "!");
+                }else {
+                    JOptionPane.showMessageDialog(null, "You don't have enough money to buy " + property.getName() + "!");
+                }
+            }
+
+        }else if (property != null){
+            JOptionPane.showMessageDialog(null, "This property is already owned by " + property.getOwner().getName() + ".");
+
+        }
     }
 
     //created checkPassedGo function
