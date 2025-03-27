@@ -1,12 +1,22 @@
 public class Property {
     private String name;
+    private String streetColor;
     private int price;
     private int rent;
     private Player owner;
-    private GameBoard gBoard;
 
+    // Constructor used by spaces with no street color "Railroads" and utilities
     public Property(String name, int price, int rent) {
         this.name = name;
+        this.price = price;
+        this.rent = rent;
+        this.streetColor = null;    // Properties do not have a street
+    }
+
+    // Constructor used by spaces with properties and streets
+    public Property(String name, String streetColor, int price, int rent) {
+        this.name = name;
+        this.streetColor = streetColor;
         this.price = price;
         this.rent = rent;
         this.owner = null; // every property starts with no owner
@@ -58,38 +68,4 @@ public class Property {
         return false;// They cant buy property bc they dont have enough money
     }
 
-    public String propertyName(int boardSpace) {
-        
-        String pName;
-
-        switch (boardSpace) {
-            case 2: pName = "Mediterranean Avenue"; break;
-            case 4: pName = "Baltic Avenue"; break;
-            case 7: pName = "Oriental Avenue"; break;
-            case 9: pName = "Vermont Avenue"; break;
-            case 10: pName = "Connecticut Avenue"; break;
-            case 12: pName = "St. Charles Place"; break;
-            case 13: pName = "Electric Company"; break;
-            case 14: pName = "States Avenue"; break;
-            case 15: pName = "Virginia Avenue"; break;
-            case 17: pName = "St. James Place"; break;
-            case 19: pName = "Tennesse Avenue"; break;
-            case 20: pName = "New York Avenue"; break;
-            case 22: pName = "Kentucky Avenue"; break;
-            case 24: pName = "Indiana Avenue"; break;
-            case 25: pName = "Illinois Avenue"; break;
-            case 27: pName = "Atlantic Avenue"; break;
-            case 28: pName = "Ventnor Avenue"; break;
-            case 29: pName = "Water Works"; break;
-            case 30: pName = "Marvin Gardens"; break;
-            case 32: pName = "Pacific Avenue"; break;
-            case 33: pName = "North Carolina Avenue"; break;
-            case 35: pName = "Pennsylvania Avenue"; break;
-            case 38: pName = "Park Place"; break;
-            default: pName = "Boardwalk";
-        }
-
-        return pName;
-    }
-    
 }

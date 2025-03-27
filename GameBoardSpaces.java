@@ -11,11 +11,71 @@ public class GameBoardSpaces {
     public GameBoardSpaces(ArrayList<Player> players) {
         this.allPlayers = players != null ? players : new ArrayList<>();
         properties = new HashMap<>();
-        initializeProperties();
+        initializeBoardSpaces();
     }
 
-    public void initializeProperties() {
+    /// Function that sets the properties of all the spaces on the board
+    public void initializeBoardSpaces() {
         //This will add properties to HashMap with position Key
+
+        // Go Space
+
+        // Jail Spaces
+
+        // Chance Spaces
+
+        // Chest Spaces
+
+        // Tax Spaces
+
+
+        /*  ##################
+            ### Properties ###
+            ##################  */
+
+        //  Railroads
+        properties.put(6, new Property("Reading Railroad", 200, 0));
+        properties.put(16, new Property("Pennsylvania Railroad", 200, 0));
+        properties.put(26, new Property("B & O Railroad", 200, 0));
+        properties.put(36, new Property("Short Line", 200, 0));
+        
+        //  Utilities
+        properties.put(13, new Property("Electric Company", 150, 0));
+        properties.put(29, new Property("Water Works", 150, 0));
+
+        // Purple Street
+        properties.put(2, new Property("Mediterranean Avenue", "Purple", 60, 2));
+        properties.put(4, new Property("Baltic Avenue", "Purple", 60, 4));
+        // Light Blue Street
+        properties.put(7, new Property("Oriental Avenue", "Light Blue", 100, 6));
+        properties.put(9, new Property("Vermont Avenue", "Light Blue", 100, 6));
+        properties.put(10, new Property("Connecticut Avenue", "Light Blue", 120, 8));
+        // Pink Street
+        properties.put(12, new Property("St. Charles Place", "Pink", 140, 10));
+        properties.put(14, new Property("States Avenue", "Pink", 140, 10));
+        properties.put(15, new Property("Virginia Avenue", "Pink", 160, 12));
+        // Orange Street
+        properties.put(17, new Property("St. James Place", "Orange", 180, 14));
+        properties.put(19, new Property("Tennessee Avenue", "Orange", 180, 14));
+        properties.put(20, new Property("New York Avenue", "Orange", 200, 16));
+        // Red Street
+        properties.put(22, new Property("Kentucky Avenue", "Red", 220, 18));
+        properties.put(24, new Property("Indiana Avenue", "Red", 220, 18));
+        properties.put(25, new Property("Illinois Avenue", "Red", 240, 20));
+        // Yellow Street
+        properties.put(27, new Property("Atlantic Avenue", "Yellow", 260, 22));
+        properties.put(28, new Property("Ventnor Avenue", "Yellow", 260, 22));
+        properties.put(30, new Property("Marvin Gardens", "Yellow", 280, 24));
+        // Green Street
+        properties.put(32, new Property("Pacific Avenue", "Green", 300, 26));
+        properties.put(33, new Property("North Carolina Avenue", "Green", 300, 26));
+        properties.put(35, new Property("Pennsylvania Avenue", "Green", 300, 28));
+        // Dark Blue Street
+        properties.put(38, new Property("Park Place", "Dark Blue", 350, 35));
+        properties.put(40, new Property("Boardwalk", "Dark Blue", 400, 50));
+
+        /* 
+
         properties.put(3, new Property("Mediterranean Avenue", 60, 4));
         properties.put(13, new Property("Electric Company", 150, 0));
         properties.put(29, new Property("Water Works", 150, 0));
@@ -23,6 +83,8 @@ public class GameBoardSpaces {
         properties.put(16, new Property("Pennsylvania Railroad", 200, 25));
         properties.put(26, new Property("B. & O. Railroad", 200, 25));
         properties.put(36, new Property("Short Line", 200, 25));
+
+        */
 
     }
 
@@ -33,32 +95,6 @@ public class GameBoardSpaces {
     /// Function that checks the type of the board space
     public void spaceType(int spaceNum) {
 
-        switch (spaceNum) {
-            case 1:     // Go Space
-                break;
-            case 3:     // Chest Spaces
-            case 18:
-            case 34:
-                // TODO: Calls a function that draws a chest card
-                break;
-            case 5:     // Tax Spaces
-            case 39:
-                // TODO: Calls a function that prompts player to pay a tax
-                break;
-            case 8:     // Chance Spaces
-            case 23:
-            case 37:
-                // TODO: Calls a function that draws a chance card
-                break;
-            case 11:
-            case 31:
-                break;
-            case 21:    // Free Parking Space
-                // TODO: NOTHING! FREE SPACE! Maybe tell user they are on a free parking space
-                break;
-            default:    // Property Spaces
-                // TODO: Calls a function that handles property options (Buying, Selling, Mortgaging, etc.)
-        }
     }
 
     // This will get the property at a specified space
