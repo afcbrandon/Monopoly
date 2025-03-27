@@ -235,5 +235,17 @@ public class Player {
         }
         return count;
     }
+    public int countRailroads() {
+        int count = 0;
+        for (Property p : ownedProperties) {
+            String name = p.getName();
+            if (name.equals("Reading Railroad") || name.equals("Pennsylvania Railroad") ||
+                name.equals("B. & O. Railroad") || name.equals("Short Line")) {
+                count++;
+            }
+        }
+        return count;
+    }
+    
     
 }

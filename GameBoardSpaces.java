@@ -11,6 +11,11 @@ public class GameBoardSpaces {
         properties.put(3, new Property("Mediterranean Avenue", 60, 4));
         properties.put(13, new Property("Electric Company", 150, 0));
         properties.put(29, new Property("Water Works", 150, 0));
+        properties.put(6, new Property("Reading Railroad", 200, 25));
+        properties.put(16, new Property("Pennsylvania Railroad", 200, 25));
+        properties.put(26, new Property("B. & O. Railroad", 200, 25));
+        properties.put(36, new Property("Short Line", 200, 25));
+
 
 
     }
@@ -35,6 +40,16 @@ public class GameBoardSpaces {
                 if (property.getName().equals("Electric Company") || property.getName().equals("Water Works")) {
                     int utilitiesOwned = property.getOwner().countUtilities();
                     rentAmount = (utilitiesOwned == 1) ? 4 * diceRoll : 10 * diceRoll;
+                }
+                // Check for railroads
+                else if (property.getName().contains("Railroad")) {
+                    int railroadsOwned = property.getOwner().countRailroads();
+                    switch (railroadsOwned) {
+                        case 2: rentAmount = 50; break;
+                        case 3: rentAmount = 100; break;
+                        case 4: rentAmount = 200; break;
+                        default: rentAmount = 25; break;
+                    }
                 }
     
                 currentPlayer.updateMoney(-rentAmount);
