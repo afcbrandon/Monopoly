@@ -148,7 +148,7 @@ public class GameBoardSpaces {
                 if (bidInput != null && !bidInput.isEmpty()) {
                     try {
                         int bid = Integer.parseInt(bidInput);
-                        //see if its the highest bid and if they actually have that money
+                        //see if it is the highest bid and if they actually have that money
                         if (bid > highestBid && bid <= player.getMoney()) {
                             highestBid = bid;
                             highestBidder = player;
