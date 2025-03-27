@@ -104,7 +104,7 @@ public class Property {
             case 9:
             case 10:
                 price = 100;
-                if (boardSpace == 10) {
+                if (boardSpace == 10) {     // Connecticut Avenue is $20 more expensive
                     price += 20;
                 }
                 break;
@@ -112,7 +112,7 @@ public class Property {
             case 14: 
             case 15:
                 price = 140;
-                if (boardSpace == 15) {
+                if (boardSpace == 15) {     // Virginia Avenue is $20 more expensive
                     price += 20;
                 }
                 break;
@@ -120,7 +120,7 @@ public class Property {
             case 19:
             case 20:
                 price = 180;
-                if (boardSpace == 20) {
+                if (boardSpace == 20) {     // New York Avenue is $20 more expensive
                     price += 20;
                 }
                 break;
@@ -128,7 +128,7 @@ public class Property {
             case 24:
             case 25:
                 price = 220;
-                if (boardSpace == 25) {
+                if (boardSpace == 25) {     // Illinois Avenue is $20 more expensive
                     price += 20;
                 }
                 break;
@@ -136,7 +136,7 @@ public class Property {
             case 28:
             case 30:
                 price = 260;
-                if (boardSpace == 30) {
+                if (boardSpace == 30) {     // Marvin Gardens is $20 more expensive
                     price += 20;
                 }
                 break;
@@ -148,13 +148,13 @@ public class Property {
                     price += 20;
                 }
                 break;
-                case 13:  // Electric Company
-                case 29:  // Water Works
-            price = 150;
-            break;
+            case 13:  // Electric Company
+            case 29:  // Water Works
+                price = 150;
+                break;
             default:    // Dark Blue Spaces: Park Place, Boardwalk
                 price = 350;
-                if (boardSpace == 40) {
+                if (boardSpace == 40) {     // Boardwalk Empire is $50 more expensive
                     price += 50;
                 }
         }
