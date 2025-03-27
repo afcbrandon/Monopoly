@@ -72,19 +72,6 @@ public class GameBoardSpaces {
         // Dark Blue Street
         properties.put(38, new Property("Park Place", "Dark Blue", 350, 35));
         properties.put(40, new Property("Boardwalk", "Dark Blue", 400, 50));
-
-        /* 
-
-        properties.put(3, new Property("Mediterranean Avenue", 60, 4));
-        properties.put(13, new Property("Electric Company", 150, 0));
-        properties.put(29, new Property("Water Works", 150, 0));
-        properties.put(6, new Property("Reading Railroad", 200, 25));
-        properties.put(16, new Property("Pennsylvania Railroad", 200, 25));
-        properties.put(26, new Property("B. & O. Railroad", 200, 25));
-        properties.put(36, new Property("Short Line", 200, 25));
-
-        */
-
     }
 
     public Property getPropertyBySpace(int position) {

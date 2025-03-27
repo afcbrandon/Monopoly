@@ -224,12 +224,6 @@ public class Player {
 
         checkPassedGo(previousPosition);
 
-        // **ALEX**This will check if a player landed on a property and pay rent if needed(hopefully have not tested it yet)
-        /*
-        if(gameBoardSpaces.isProperty(this.position)) {
-            gameBoardSpaces.payRent(this, this.position); //pay rent to the property owner
-        } */
-
         if (diceOne == diceTwo) {
             this.diceDouble = true;
             this.diceDoubleCounter += 1;
@@ -247,6 +241,7 @@ public class Player {
             this.position = 10;
         }
     }
+
     public int countUtilities() {
         int count = 0;
         for (Property p : ownedProperties) {
