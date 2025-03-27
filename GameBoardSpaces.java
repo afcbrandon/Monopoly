@@ -16,8 +16,37 @@ public class GameBoardSpaces {
         properties.put(26, new Property("B. & O. Railroad", 200, 25));
         properties.put(36, new Property("Short Line", 200, 25));
 
+    }
 
+    /// Function that checks the type of the board space
+    public void spaceType(int spaceNum) {
 
+        switch (spaceNum) {
+            case 1:     // Go Space
+                break;
+            case 3:     // Chest Spaces
+            case 18:
+            case 34:
+                // TODO: Calls a function that draws a chest card
+                break;
+            case 5:     // Tax Spaces
+            case 39:
+                // TODO: Calls a function that prompts player to pay a tax
+                break;
+            case 8:     // Chance Spaces
+            case 23:
+            case 37:
+                // TODO: Calls a function that draws a chance card
+                break;
+            case 11:
+            case 31:
+                break;
+            case 21:    // Free Parking Space
+                // TODO: NOTHING! FREE SPACE! Maybe tell user they are on a free parking space
+                break;
+            default:    // Property Spaces
+                // TODO: Calls a function that handles property options (Buying, Selling, Mortgaging, etc.)
+        }
     }
 
     // This will get the property at a specified space

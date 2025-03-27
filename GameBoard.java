@@ -2,6 +2,7 @@
     Function that prints the spaces of the GameBoard to the Console
  */
 public class GameBoard {
+    
     public void Board() {
         // For-loop that prints the 40 spaces of the Monopoly Board
         for (int row = 0; row < 11; row++) {
