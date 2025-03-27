@@ -28,7 +28,6 @@ public class GameBoardSpaces {
 
         // Tax Spaces
 
-
         /*  ##################
             ### Properties ###
             ##################  */

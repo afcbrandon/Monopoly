@@ -1,6 +1,6 @@
 public class Property {
     private String name;
-    private String streetColor;
+    private String street;
     private int price;
     private int rent;
     private Player owner;
@@ -10,13 +10,13 @@ public class Property {
         this.name = name;
         this.price = price;
         this.rent = rent;
-        this.streetColor = null;    // Properties do not have a street
+        this.street = null;    // Properties do not have a street
     }
 
     // Constructor used by spaces with properties and streets
     public Property(String name, String streetColor, int price, int rent) {
         this.name = name;
-        this.streetColor = streetColor;
+        this.street = streetColor;
         this.price = price;
         this.rent = rent;
         this.owner = null; // every property starts with no owner
