@@ -68,7 +68,7 @@ public class GameBoardSpaces {
         // Green Street
         properties.put(32, new Property("Pacific Avenue", "Green", 300, 26));
         properties.put(33, new Property("North Carolina Avenue", "Green", 300, 26));
-        properties.put(35, new Property("Pennsylvania Avenue", "Green", 300, 28));
+        properties.put(35, new Property("Pennsylvania Avenue", "Green", 320, 28));
         // Dark Blue Street
         properties.put(38, new Property("Park Place", "Dark Blue", 350, 35));
         properties.put(40, new Property("Boardwalk", "Dark Blue", 400, 50));
