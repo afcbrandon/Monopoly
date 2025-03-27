@@ -55,9 +55,10 @@ public class UserInterface {
     
     ArrayList<Player> playerList = new ArrayList<>();
     PlayerToken tokenList = new PlayerToken();
+    GameBoardSpaces gameBoardSpaces = new GameBoardSpaces(playerList);
 
     for (int i = 0; i < numOfPlayers; i++) {
-      playerList.add(new Player( "Player " + (i + 1), new GameBoardSpaces()));  // Adds a new player to playerlist
+      playerList.add(new Player( "Player " + (i + 1), gameBoardSpaces));  // Adds a new player to playerlist
 
       if (i == 7) { // Max number of players(8), then the last player will get the last token
         Character lastToken = tokenList.getLastToken();

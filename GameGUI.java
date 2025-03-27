@@ -16,7 +16,7 @@ public class GameGUI extends JFrame {
   
     public GameGUI(ArrayList<Player> players) {
         this.players = players;
-        this.boardSpaces = new GameBoardSpaces();
+        this.boardSpaces = new GameBoardSpaces(players);
 
         // Randomly select the first player
         Random rand = new Random();

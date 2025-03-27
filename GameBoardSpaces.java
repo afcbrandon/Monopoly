@@ -1,11 +1,15 @@
 import javax.swing.*;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 // class that will contain all the properties and non-properties
 public class GameBoardSpaces {
+
+    private ArrayList<Player> allPlayers;
     private HashMap<Integer, Property> properties; // we will use the HashMap for fast lookup
 
-    public GameBoardSpaces() {
+    public GameBoardSpaces(ArrayList<Player> players) {
+        this.allPlayers = players != null ? players : new ArrayList<>();
         properties = new HashMap<>();
         initializeProperties();
     }
@@ -124,10 +128,48 @@ public class GameBoardSpaces {
                 } else {
                     JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this property!");
                 }
+            }else{
+                startAuction(property,allPlayers); // If the player decides to not buy a property then the auction will start
             }
         }
     }
+    public void startAuction(Property property, ArrayList<Player> allPlayers) {
+        //shows message about the auction starting
+        JOptionPane.showMessageDialog(null, "Auction for " + property.getName() + " has started!");
 
+        Player highestBidder = null;
+        int highestBid = 0;
+
+        for (Player player : allPlayers) {
+            if (player != property.getOwner()) {
+                //here we get the input on how much they are bidding or if they even are bidding
+                String bidInput = JOptionPane.showInputDialog(player.getName() + ", enter your bid for the property " + property.getName() + " (or 0 to pass): ");
+                //checks that it actually has something
+                if (bidInput != null && !bidInput.isEmpty()) {
+                    try {
+                        int bid = Integer.parseInt(bidInput);
+                        //see if its the highest bid and if they actually have that money
+                        if (bid > highestBid && bid <= player.getMoney()) {
+                            highestBid = bid;
+                            highestBidder = player;
+                        }
+                    } catch (NumberFormatException e) {
+                        //catches error
+                        JOptionPane.showMessageDialog(null, "Invalid bid. Please enter a valid number.");
+                    }
+                }
+            }
+        }
+
+        if (highestBidder != null) {
+            highestBidder.updateMoney(-highestBid); //subtracks the amount of money they bid
+            highestBidder.addProperty(property);
+            property.setOwner(highestBidder);//sets as owner
+            JOptionPane.showMessageDialog(null, highestBidder.getName() + " won the auction for $" + highestBid + "!");
+        } else {
+            JOptionPane.showMessageDialog(null, "No one bid on the property. It remains unowned.");
+        }
+    }
     // We will use this in the future to be able to buy property
     public void setOwner(int spaceNumber, Player owner) {
         if (isProperty(spaceNumber)) {
