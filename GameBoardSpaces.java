@@ -119,6 +119,7 @@ public class GameBoardSpaces {
     public void payRent(Player currentPlayer, int spaceNumber, int diceRoll) {
         if (isProperty(spaceNumber)) {
             Property property = getProperty(spaceNumber);
+            Player owner = currentPlayer;
             if (property.getOwner() != null && property.getOwner() != currentPlayer) {
                 int rentAmount = property.getRent();
     
@@ -136,6 +137,9 @@ public class GameBoardSpaces {
                         case 4: rentAmount = 200; break;
                         default: rentAmount = 25; break;
                     }
+                }
+                else if (owner.ownsFullSet(property.getStreetColor())) {
+                    rentAmount *= 2;  // Double the rent if the full set is owned
                 }
     
                 currentPlayer.updateMoney(-rentAmount);

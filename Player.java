@@ -159,6 +159,32 @@ public class Player {
 
     }
 
+    // will get how may color properties there are in total
+    public int getTotalPropertiesInSet(String color){
+        switch (color) {
+            case "Brown": return 2;
+            case "Blue": return 2;
+            case "Pink":
+            case "Orange":
+            case "Red":
+            case "Yellow":
+            case "Green": return 3;
+            case "Dark Blue": return 2;
+            default: return 0; // No color set
+        }
+    }
+
+    public boolean ownsFullSet(String color) {
+        int count = 0;
+        int totalNeeded = getTotalPropertiesInSet(color);//again this gets total count
+
+        for (Property property : ownedProperties) {
+            if (property.getStreetColor() != null && property.getStreetColor().equals(color)) {
+                count++;
+            }
+        }
+        return count == totalNeeded;
+    }
     //created checkPassedGo function
     private void checkPassedGo(int previousPosition) {
         // Check if player passed Go or landed on GO and awards 200 bucks

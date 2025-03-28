@@ -38,6 +38,9 @@ public class Property {
     public int getPrice() {
         return price;
     }
+    public String getStreetColor() {
+        return street;
+    }
 
 
     /*  ###############
