@@ -23,39 +23,6 @@ public class GameBoard extends JPanel {
         super.paintComponent(g);
         g.drawImage(image, 0, 0, this.getWidth(), this.getHeight(), this);
     }
-    
-    public void Board() {
-        // For-loop that prints the 40 spaces of the Monopoly Board
-        for (int row = 0; row < 11; row++) {
-            /* 
-                Inner for loop that determines if a board space is printed, or an empty space.
-                If the loop is on the first (1) or last (11) row, then all spaces are printed to the console.
-                If the loop is not on the first or last row, then 4 empty spaces are printed instead for proper format.
-            */
-            for (int col = 0; col < 11; col++) {
-                int floorSpaceNum = spaceIdentifier(row, col);
-                if (row == 0) {
-                    System.out.print("[" + floorSpaceNum +"]");
-                }
-                else if (row == 10) {
-                    String floorSpaceString = "";  // will be used to add zero in front of single digit numbers
-                    floorSpaceString += floorSpaceNum;
-                    if (floorSpaceNum < 10) {
-                        floorSpaceString = "0" + floorSpaceNum;
-                    }
-                    System.out.print("[" + floorSpaceString +"]");
-                }
-                else {
-                    if (col == 0 || col == 10) {
-                        System.out.print("[" + floorSpaceNum +"]");
-                    } else {
-                        System.out.print("    ");
-                    }
-                }
-            }
-            System.out.println();   // Prints the next row on a new line
-        }
-    }
 
     // Function that returns the floor space number of a board space
     private int spaceIdentifier(int row, int col) {
