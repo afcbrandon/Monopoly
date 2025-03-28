@@ -10,6 +10,7 @@ public class Player {
     private char playerToken;
     private boolean isJailed;
     private int jailCounter;
+    private int globalDiceRoll;
     private boolean diceDouble;
     private int diceDoubleCounter;
     private ArrayList<Property> ownedProperties = new ArrayList<>();
@@ -26,6 +27,7 @@ public class Player {
         this.gbSpace = gBoardSpaces; 
         this.diceDouble = false;
         this.diceDoubleCounter = 0;
+        this.globalDiceRoll = 0;
     }
 
     /*  ###############
@@ -71,6 +73,14 @@ public class Player {
         this.money = money;
     }
 
+    /// Function that update's the player's available money 
+    public void updateMoney(int amount) {
+        this.money += amount;
+        if (this.money < 1) {
+            this.isEliminated = true; // Mark player as eliminated
+        }
+    }
+
     public boolean getIsEliminated() {
         return isEliminated;
     }
@@ -83,13 +93,6 @@ public class Player {
         }
     }
 
-    /* Function that update's the player's available money */
-    public void updateMoney(int amount) {
-        this.money += amount;
-        if (this.money < 1) {
-            this.isEliminated = true; // Mark player as eliminated
-        }
-    }
     public void addProperty(Property p) {
         ownedProperties.add(p);
     }
@@ -135,10 +138,24 @@ public class Player {
 
         }
         else if (fieldType.equals("Tax")) {     //  Tax Space
+            
+            if (this.position == 5) {         //  Income Tax
+                String[] options = { "Pay $200", "Pay 10% of income" };
+                var selection = JOptionPane.showOptionDialog(null, "How would " + this.name + 
+                    " like to pay the     income tax?", "Income Tax", 0, 1,
+                     null, options, options[0]);
 
+                gbSpace.payIncomeTax(this, selection);
+            }
+            else {      //  Luxury Tax
+                gbSpace.payLuxuryTax(this);
+            }
         }
         else {              //  Property Space
 
+            gbSpace.purchaseProperty(this, currentSpace, this.globalDiceRoll);
+
+            /*
             Property property = gbSpace.getPropertyBySpace(this.position);
 
             if (property != null && property.getOwner() == null) {
@@ -162,8 +179,10 @@ public class Player {
                 JOptionPane.showMessageDialog(null, "This property is already owned by " 
                     + property.getOwner().getName() + ".");
             }
+                    */
 
         }
+
     }
 
     //created checkPassedGo function
@@ -242,6 +261,7 @@ public class Player {
         int diceOne = diceRoll();
         int diceTwo = diceRoll();
         int rollResult = diceOne + diceTwo;
+        this.globalDiceRoll = rollResult;
 
         JOptionPane.showMessageDialog(null, this.name + " rolled a "  + diceOne + " and a " + diceTwo + 
                 " summing up for a total of " + rollResult, "Dice Roll", JOptionPane.INFORMATION_MESSAGE);
@@ -282,7 +302,7 @@ public class Player {
         for (Property p : ownedProperties) {
             String name = p.getName();
             if (name.equals("Reading Railroad") || name.equals("Pennsylvania Railroad") ||
-                name.equals("B. & O. Railroad") || name.equals("Short Line")) {
+                name.equals("B & O Railroad") || name.equals("Short Line")) {
                 count++;
             }
         }

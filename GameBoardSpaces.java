@@ -149,13 +149,13 @@ public class GameBoardSpaces {
         }
     }
 
-    public void purchaseProperty(Player currentPlayer, int spaceNumber) {
+    public void purchaseProperty(Player currentPlayer, int spaceNumber, int diceRoll) {
         if (isProperty(spaceNumber)) {
             Property property = getProperty(spaceNumber);
 
             // Check if the property is already owned
             if (property.getOwner() != null) {
-                JOptionPane.showMessageDialog(null, "This property is owned by " + property.getOwner().getName() + "!");
+                payRent(currentPlayer, spaceNumber, diceRoll);
                 return; // Exit the function early since the property is taken
             }
 
@@ -220,5 +220,27 @@ public class GameBoardSpaces {
         if (isProperty(spaceNumber)) {
             getProperty(spaceNumber).setOwner(owner);
         }
+    }
+
+    /*
+        Tax Functions
+     */
+    public void payIncomeTax(Player player, int selection) {
+        
+        if (selection == 0) {       //  Pay $200 Income Tax
+            JOptionPane.showMessageDialog(null, player.getName() + " paid a $200 income tax.");
+            player.updateMoney(-200);
+        }
+        else {          //  Pay 10% of current income (money)
+            int percentageOfIncome = (int)(Math.ceil(player.getMoney() * 0.10));
+            JOptionPane.showMessageDialog(null, player.getName() + "paid a $" + 
+                percentageOfIncome + " income tax.");
+            player.updateMoney(-percentageOfIncome);
+        }
+
+    }
+
+    public void payLuxuryTax(Player player) {
+       player.updateMoney(-100);
     }
 }
