@@ -78,8 +78,31 @@ public class GameBoardSpaces {
         return properties.get(position);
     }
 
-    /// Function that checks the type of the board space
-    public void spaceType(int spaceNum) {
+    /// Function that checks, and returns, the type of the board space as a String
+    public String spaceType(int spaceNum) {
+
+        switch (spaceNum) {
+            case 1:     //  Go Space
+                return "Go";
+            case 3:     //  Chest Space
+            case 18:
+            case 34:
+                return "Chest";
+            case 5:     //  Tax Space
+            case 39:
+                return "Tax";
+            case 8:     //  Chance Space
+            case 23:
+            case 37:
+                return "Chance";
+            case 11:    //  Jail Space
+            case 31:
+                return "Jail";
+            case 21:    //  Free Parking Space
+                return "Parking";   
+            default:    // Property Space
+                return "Property";
+        }
 
     }
 

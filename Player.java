@@ -14,7 +14,7 @@ public class Player {
     private int diceDoubleCounter;
     private ArrayList<Property> ownedProperties = new ArrayList<>();
 
-    private GameBoardSpaces gBoardSpaces;
+    private GameBoardSpaces gbSpace;
 
     public Player(String name, GameBoardSpaces gBoardSpaces) {
         this.name = name;
@@ -23,7 +23,7 @@ public class Player {
         this.isEliminated = false;
         this.isJailed = false;
         this.jailCounter = 0;
-        this.gBoardSpaces = gBoardSpaces; 
+        this.gbSpace = gBoardSpaces; 
         this.diceDouble = false;
         this.diceDoubleCounter = 0;
     }
@@ -112,31 +112,56 @@ public class Player {
             getOutOfJail();
         } else {
             playerRoll();
-            handleLandingOnSpace(); // This function will check and handle property purchases
+            handleLandingOnSpace(this.position); // This function will check and handle property purchases
         }
     }
 
-    public void handleLandingOnSpace() {
-        Property property = gBoardSpaces.getPropertyBySpace(this.position);
+    // Function that handles action, dependent on the player's current space.
+    public void handleLandingOnSpace(int currentSpace) {
+        
+        //  Board checks to see what type of space the player is currently on
+        String fieldType = gbSpace.spaceType(currentSpace);
 
-        if (property != null && property.getOwner() == null) {
-            int option = JOptionPane.showConfirmDialog(null,
-                    this.name + ", do you want to purchase " + property.getName() + " for $" + property.getPrice() + "?",
-                    "Buy Property " + property.getName(), JOptionPane.YES_NO_OPTION);
+        if (fieldType.equals("Go") || fieldType.equals("Parking")) {        //  Space is either Go or Free Parking      
 
-            if (option == JOptionPane.YES_OPTION) {
-                if (this.money >= property.getPrice()) {
-                    this.updateMoney(-property.getPrice());
-                    property.setOwner(this);
-                    this.ownedProperties.add(property);
-                    JOptionPane.showMessageDialog(null, this.name + " bought " + property.getName() + "!");
-                }else {
-                    JOptionPane.showMessageDialog(null, "You don't have enough money to buy " + property.getName() + "!");
+        }
+        else if (fieldType.equals("Jail")) {        //  Space is a Jail Space
+
+        }
+        else if (fieldType.equals("Chance")) {      //  Chance Card Space
+
+        }
+        else if (fieldType.equals("Chest")) {       //  Chest Card Space
+
+        }
+        else if (fieldType.equals("Tax")) {     //  Tax Space
+
+        }
+        else {              //  Property Space
+
+            Property property = gbSpace.getPropertyBySpace(this.position);
+
+            if (property != null && property.getOwner() == null) {
+                int option = JOptionPane.showConfirmDialog(null,
+                        this.name + ", do you want to purchase " + property.getName() + " for $" + property.getPrice() + "?",
+                        "Buy Property " + property.getName(), JOptionPane.YES_NO_OPTION);
+
+                if (option == JOptionPane.YES_OPTION) {
+                    if (this.money >= property.getPrice()) {
+                        this.updateMoney(-property.getPrice());
+                        property.setOwner(this);
+                        this.ownedProperties.add(property);
+                        JOptionPane.showMessageDialog(null, this.name + " bought " + property.getName() + "!");
+                    }else {
+                        JOptionPane.showMessageDialog(null, "You don't have enough money to buy " + property.getName() + "!");
+                    }
                 }
-            }
 
-        }else if (property != null){
-            JOptionPane.showMessageDialog(null, "This property is already owned by " + property.getOwner().getName() + ".");
+            } 
+            else if (property != null) {
+                JOptionPane.showMessageDialog(null, "This property is already owned by " 
+                    + property.getOwner().getName() + ".");
+            }
 
         }
     }
@@ -263,6 +288,5 @@ public class Player {
         }
         return count;
     }
-    
     
 }
