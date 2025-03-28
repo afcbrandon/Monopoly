@@ -32,7 +32,6 @@ public class UserInterface {
 
     });
 
-    monopolyBoard.Board();
     new GameGUI(pList);
   }
 
