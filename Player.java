@@ -11,8 +11,8 @@ public class Player {
     private boolean isJailed;
     private int jailCounter;
     private int globalDiceRoll;
-    private boolean diceDouble;
-    private int diceDoubleCounter;
+    private boolean rolledDouble;
+    private int rolledDoubleCounter;
     private ArrayList<Property> ownedProperties = new ArrayList<>();
 
     private GameBoardSpaces gbSpace;
@@ -25,8 +25,8 @@ public class Player {
         this.isJailed = false;
         this.jailCounter = 0;
         this.gbSpace = gBoardSpaces; 
-        this.diceDouble = false;
-        this.diceDoubleCounter = 0;
+        this.rolledDouble = false;
+        this.rolledDoubleCounter = 0;
         this.globalDiceRoll = 0;
     }
 
@@ -54,9 +54,9 @@ public class Player {
     public Character getToken() {
         return this.playerToken;
     }
-    // Function that returns the boolean value of diceDouble
-    public boolean getDiceDouble() {
-        return this.diceDouble;
+    // Function that returns the boolean value of rolledDouble, which is used to determine if player can roll again
+    public boolean getRolledDouble() {
+        return this.rolledDouble;
     }
 
     /*  ###############
@@ -244,19 +244,19 @@ public class Player {
         checkPassedGo(previousPosition);
 
         if (diceOne == diceTwo) {
-            this.diceDouble = true;
-            this.diceDoubleCounter += 1;
+            this.rolledDouble = true;
+            this.rolledDoubleCounter += 1;
         }
         else {
-            this.diceDoubleCounter = 0;
-            this.diceDouble = false;
+            this.rolledDoubleCounter = 0;
+            this.rolledDouble = false;
         }
 
-        if (this.diceDoubleCounter == 3) {
+        if (this.rolledDoubleCounter == 3) {
             JOptionPane.showMessageDialog(null, 
                 this.name + " has rolled doubles 3 times in a row! GO TO JAIL!");
             this.isJailed = true;
-            this.diceDouble = false;
+            this.rolledDouble = false;
             this.position = 10;
         }
     }

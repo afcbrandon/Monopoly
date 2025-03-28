@@ -36,9 +36,10 @@ public class GameGUI extends JFrame {
             public void actionPerformed(ActionEvent e) {
                 Player currentPlayer = players.get(currentPlayerIndex);
 
-                currentPlayer.playerTurn();
-        
-                updatePlayerPanel(currentPlayer);
+                do {
+                    currentPlayer.playerTurn();
+                    updatePlayerPanel(currentPlayer);
+                } while(currentPlayer.getRolledDouble());
         
                 rollButton.setEnabled(false);
             }
