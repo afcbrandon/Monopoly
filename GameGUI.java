@@ -35,19 +35,8 @@ public class GameGUI extends JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 Player currentPlayer = players.get(currentPlayerIndex);
-        
-                /*
-                boardSpaces.payRent(currentPlayer, currentPlayer.getPosition(), diceRoll);
-                if (boardSpaces.isProperty(currentPlayer.getPosition())) {
-                    boardSpaces.purchaseProperty(currentPlayer, currentPlayer.getPosition());
-                }
-
-                */
-
 
                 currentPlayer.playerTurn();
-                
-
         
                 updatePlayerPanel(currentPlayer);
         

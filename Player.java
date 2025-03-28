@@ -142,7 +142,7 @@ public class Player {
             if (this.position == 5) {         //  Income Tax
                 String[] options = { "Pay $200", "Pay 10% of income" };
                 var selection = JOptionPane.showOptionDialog(null, "How would " + this.name + 
-                    " like to pay the     income tax?", "Income Tax", 0, 1,
+                    " like to pay the income tax?", "Income Tax", 0, 1,
                      null, options, options[0]);
 
                 gbSpace.payIncomeTax(this, selection);
@@ -154,32 +154,6 @@ public class Player {
         else {              //  Property Space
 
             gbSpace.purchaseProperty(this, currentSpace, this.globalDiceRoll);
-
-            /*
-            Property property = gbSpace.getPropertyBySpace(this.position);
-
-            if (property != null && property.getOwner() == null) {
-                int option = JOptionPane.showConfirmDialog(null,
-                        this.name + ", do you want to purchase " + property.getName() + " for $" + property.getPrice() + "?",
-                        "Buy Property " + property.getName(), JOptionPane.YES_NO_OPTION);
-
-                if (option == JOptionPane.YES_OPTION) {
-                    if (this.money >= property.getPrice()) {
-                        this.updateMoney(-property.getPrice());
-                        property.setOwner(this);
-                        this.ownedProperties.add(property);
-                        JOptionPane.showMessageDialog(null, this.name + " bought " + property.getName() + "!");
-                    }else {
-                        JOptionPane.showMessageDialog(null, "You don't have enough money to buy " + property.getName() + "!");
-                    }
-                }
-
-            } 
-            else if (property != null) {
-                JOptionPane.showMessageDialog(null, "This property is already owned by " 
-                    + property.getOwner().getName() + ".");
-            }
-                    */
 
         }
 

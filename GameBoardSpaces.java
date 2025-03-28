@@ -149,6 +149,7 @@ public class GameBoardSpaces {
         }
     }
 
+    /// Function that allows player to purchase property when they land on a property space, or pay rent if someone else already owns the property
     public void purchaseProperty(Player currentPlayer, int spaceNumber, int diceRoll) {
         if (isProperty(spaceNumber)) {
             Property property = getProperty(spaceNumber);
