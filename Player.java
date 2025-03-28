@@ -104,12 +104,7 @@ public class Player {
     
     /* Function that is called at the start of a player's turn */
     public void playerTurn() {
-        // TODO: Check to see if this section of code is even necessary
-        if (isEliminated) {
-            JOptionPane.showMessageDialog(null, this.name + " is eliminated and cannot roll.");
-            return;
-        }
-
+      
         // Player has option to leave jail, if jailed
         if (this.isJailed) {
             getOutOfJail();
