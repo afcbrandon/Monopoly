@@ -1,27 +1,38 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javax.swing.JFrame;
+import javax.swing.SwingUtilities;
+
 /*
   Class that handles all UserInterface prompts within the console
  */
 public class UserInterface {
   private Scanner uiScanner = new Scanner(System.in);
 
-  // EMPTY CONSTRUCTOR 
-  public void UserInterface() {
-    
-  }
-
   /*  Function that begins the game process
       The function first calls the getPlayers function 
         that prompts the user for the number of players (between 2-8 players).
   */
   public void start() {
-    GameBoard gBoard = new GameBoard();
+
     int numOfPlayers = getNumberOfPlayers();
     ArrayList<Player> pList = createPlayers(numOfPlayers);
 
-    gBoard.Board();
+    GameBoard monopolyBoard = new GameBoard("Monopoly Board Numbered.jpg");
+    SwingUtilities.invokeLater(() -> {
+
+      JFrame frame = new JFrame("Monopoly");
+      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+    
+      frame.setContentPane(monopolyBoard);
+
+      frame.setSize(800, 800);
+      frame.setVisible(true);
+
+    });
+
+    monopolyBoard.Board();
     new GameGUI(pList);
   }
 
