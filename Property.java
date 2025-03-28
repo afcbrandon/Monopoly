@@ -20,13 +20,13 @@ public class Property {
     }
 
     // Constructor used by spaces with properties and streets
-    public Property(String name, String streetColor, int price, int rent, int numHouses, int numHotels, int costHouses, int costHotels, int mortgageValue ) {
+    public Property(String name, String streetColor, int price, int rent, int costHouses, int costHotels, int mortgageValue ) {
         this.name = name;
         this.street = streetColor;
         this.price = price;
         this.rent = rent;
-        this.numHouses = numHouses;
-        this.numHotels = numHotels;
+        this.numHouses = 0;
+        this.numHotels = 0;
         this.costHouses = costHouses;
         this.costHotels = costHotels;
         this.mortgageValue = mortgageValue;
