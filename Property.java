@@ -3,7 +3,13 @@ public class Property {
     private String street;
     private int price;
     private int rent;
+    private int numHouses;
+    private int numHotels;
+    private int costHouses;
+    private int costHotels;
+    private int mortgageValue;
     private Player owner;
+
 
     // Constructor used by spaces with no street color "Railroads" and utilities
     public Property(String name, int price, int rent) {
@@ -14,11 +20,16 @@ public class Property {
     }
 
     // Constructor used by spaces with properties and streets
-    public Property(String name, String streetColor, int price, int rent) {
+    public Property(String name, String streetColor, int price, int rent, int numHouses, int numHotels, int costHouses, int costHotels, int mortgageValue ) {
         this.name = name;
         this.street = streetColor;
         this.price = price;
         this.rent = rent;
+        this.numHouses = numHouses;
+        this.numHotels = numHotels;
+        this.costHouses = costHouses;
+        this.costHotels = costHotels;
+        this.mortgageValue = mortgageValue;
         this.owner = null; // every property starts with no owner
     }
 
@@ -70,5 +81,7 @@ public class Property {
         }
         return false;// They cant buy property bc they dont have enough money
     }
+
+    
 
 }
