@@ -124,6 +124,13 @@ public class Player {
 
         }
         else if (fieldType.equals("Jail")) {        //  Space is a Jail Space
+            if (currentSpace == 31) {   // Go to Jail
+                JOptionPane.showMessageDialog(null, "Go to Jail!");
+                this.isJailed = true;
+                this.position = 11;
+            }
+
+            // If player landed on space 11, then they are most likely just visiting.
 
         }
         else if (fieldType.equals("Chance")) {      //  Chance Card Space
@@ -199,46 +206,52 @@ public class Player {
     // ability for the player to get out of jail
     private void getOutOfJail() {
         // TODO: Implement a JOptionPane that asks the user if they would like to roll double, pay a fine, or use a card
-        // **** CODE **** //
-
-        String userOption = ""; // *** Dummy Code to remove errors ***
+        String options[] = {"Roll Dice", "Pay $50", "Get Out Of Jail Free"};
+        var userOption = JOptionPane.showOptionDialog(null, "", "Jail", 0, 1, null, options, options[0]);
 
         // Player selects option to roll doubles
-        if (userOption.equals("A")) {
+        if (userOption == 0) {
             int diceOne = diceRoll();
             int diceTwo = diceRoll();
             int result = diceOne + diceTwo;
 
             /* If the player successfully rolls double, then the player leaves jail, and the jail counter resets. */
             if (diceOne == diceTwo) {
+                JOptionPane.showMessageDialog(null, 
+                    this.name + " rolled a " + diceOne + " and " + diceTwo + "!. Move " + result + " spaces.");
                 this.isJailed = false;
                 moveSpaces(result);
                 this.jailCounter = 0;
             }
             else {  /* If the player fails to roll doubles, then the jailCounter increments by 1. */
+                JOptionPane.showMessageDialog(null, this.name + " failed to roll doubles. Stay in Jail for 1 more turn.");
                 this.jailCounter += 1;
             }
 
             if (jailCounter == 3) { // Player has failed to roll a double after 3 turns. They must pay $50 and move the amount of spaces they rolled
-                updateMoney(-50);
                 
-                if (this.money <= 0) { // Player has gone bankrupt and they are eliminated
+                if ((this.money - 50) <= 0) { // Player has gone bankrupt and they are eliminated
+                    JOptionPane.showMessageDialog(null, this.name + " has paid the $50 fine and has gone bankrupt. They are eliminated.");
                     this.isEliminated = true;
                 } else {    // Player leaves jail and moves the amount they previously rolled
+                    JOptionPane.showMessageDialog(null, 
+                        this.name + " failed to roll doubles for 3 turns in a row. Pay $50 and move " + result + " spaces.");
+                    updateMoney(-50);
                     this.isJailed = false;
                     this.jailCounter = 0;
                     moveSpaces(result);
                 }
             }
         }
-
         // Player chooses to pay $50 fine
-        if (userOption.equals("B")) {
+        else if (userOption == 1) {
+            JOptionPane.showMessageDialog(null, this.name + " paid $50 to escape jail.");
             updateMoney(-50);
         }
-
         // TODO: Implement a 'Get Out of Jail card'
-        // **** CODE **** //
+        else {
+            // *** CODE ***
+        }
     }
   
     /*  ##########################
