@@ -68,7 +68,15 @@ public class UserInterface {
     GameBoardSpaces gameBoardSpaces = new GameBoardSpaces(playerList);
 
     for (int i = 0; i < numOfPlayers; i++) {
-      playerList.add(new Player( "Player " + (i + 1), gameBoardSpaces));  //  Adds a new player to playerlist
+      System.out.print("Enter name for Player " + (i + 1) + ": ");
+      String playerName = uiScanner.nextLine().trim();
+
+      while(playerName.isEmpty()) {
+        System.out.print("ERROR! Please enter a valid name for Player " + (i + 1) + ": ");
+        playerName = uiScanner.nextLine().trim();
+      }
+      Player player = new Player(playerName, gameBoardSpaces);
+      playerList.add(player);
 
       if (i == 7) { // Max number of players(8), then the last player will get the last token
         Character lastToken = tokenList.getLastToken();
@@ -87,6 +95,7 @@ public class UserInterface {
   public void chooseToken(PlayerToken tokenList, ArrayList<Player> pList, Player player) {
 
     boolean tokenChosen = false;
+    char userChar = ' ';
 
     // Prints the avaiable tokens
     System.out.println("Available Tokens: ");
@@ -97,16 +106,15 @@ public class UserInterface {
     /*
         Prompts user to select the token, and loops until valid input
      */
-    char userChar;
     System.out.print("Select the token for " + player.getName() + ": ");
     do {
 
-      userChar = uiScanner.next().charAt(0);
+      String input = uiScanner.nextLine().trim();
 
-      for (Character token : tokenList.getTokenList()) {
-        if (userChar == token) {
+      if (input.length() == 1) {  // Ensure only one character is entered
+        userChar = input.charAt(0);
+        if (tokenList.getTokenList().contains(userChar)) {
           tokenChosen = true;
-          break;
         }
       }
 
