@@ -52,6 +52,12 @@ public class Property {
     public String getStreetColor() {
         return street;
     }
+    public int getNumHouses() {
+        return this.numHouses;
+    }
+    public int getNumHotels() {
+        return this.numHotels;
+    }
 
 
     /*  ###############

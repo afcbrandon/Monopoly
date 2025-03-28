@@ -162,16 +162,17 @@ public class GameBoardSpaces {
             if (property.getOwner() != null) {
 
                 //  If-Else statement. If someone else owns the property then pay them, otherwise player has the option to build houses.
+                // TODO: Eventually this function will check if player has houses and then ask to build hotels
 
                 if(property.getOwner().getName().equals(currentPlayer.getName())) {     // Current Player owns the property
-
-                    JOptionPane.showMessageDialog(null, "You own this property. Would you like to build a house?");
-
+                    buildHouse(currentPlayer, spaceNumber);
                 }
                 else {
                     payRent(currentPlayer, spaceNumber, diceRoll);
-                    return; // Exit the function early since the property is taken
                 }
+
+                return; // Exit the function early since the property is taken
+
             }
 
             // Proceed with the purchase since the property is not owned
@@ -185,14 +186,30 @@ public class GameBoardSpaces {
                     currentPlayer.addProperty(property);
                     property.setOwner(currentPlayer); // Set the owner after purchase!
                     JOptionPane.showMessageDialog(null, currentPlayer.getName() + " successfully purchased " + property.getName() + "!");
-                } else {
+                } 
+                else {
                     JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this property!");
                 }
-            }else{
+            }
+            else {
                 startAuction(property,allPlayers); // If the player decides to not buy a property then the auction will start
             }
         }
     }
+
+    public void buildHouse(Player player, int spaceNumber) {
+        //
+        String[] options = { "Yes", "No" };
+        var selection = JOptionPane.showOptionDialog(null, "", "Income Tax", 0, 1,
+                     null, options, options[0]);
+        if (selection == 0) {   //  Yes
+            // TODO: Add Code Here
+        }
+        else {  //  No
+            JOptionPane.showMessageDialog(null, player.getName() + " chose not to build a house.");
+        }
+    }
+
     public void startAuction(Property property, ArrayList<Player> allPlayers) {
         //shows message about the auction starting
         JOptionPane.showMessageDialog(null, "Auction for " + property.getName() + " has started!");
