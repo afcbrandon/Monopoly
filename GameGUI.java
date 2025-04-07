@@ -106,7 +106,15 @@ public class GameGUI extends JFrame {
         JLabel nameLabel = new JLabel("Name: " + player.getName());
         JLabel tokenLabel = new JLabel("Token: " + player.getToken());
         JLabel moneyLabel = new JLabel("Money: $" + player.getMoney());
-        JLabel positionLabel = new JLabel("Position: " + player.getPosition());
+        String spaceDescription;
+        int pos = player.getPosition();
+
+        if (boardSpaces.isProperty(pos)) {
+            spaceDescription = boardSpaces.getProperty(pos).getName();
+        } else {
+            spaceDescription = boardSpaces.spaceType(pos);  // e.g. "Chance", "Tax", etc.
+        }
+        JLabel positionLabel = new JLabel("Position: " + pos + " - " + spaceDescription);
 
         playerPanel.add(nameLabel);
         playerPanel.add(tokenLabel);
@@ -128,7 +136,14 @@ public class GameGUI extends JFrame {
                 JLabel positionLabel = (JLabel) playerPanel.getComponent(3);
 
                 moneyLabel.setText("Money: $" + player.getMoney());
-                positionLabel.setText("Position: " + player.getPosition());
+                int pos = player.getPosition();
+                String spaceDescription;
+                if (boardSpaces.isProperty(pos)) {
+                    spaceDescription = boardSpaces.getProperty(pos).getName();
+                } else {
+                    spaceDescription = boardSpaces.spaceType(pos);
+                }
+                positionLabel.setText("Position: " + pos + " - " + spaceDescription);
 
                 if (player.getIsEliminated()) {
                     playerPanel.setBackground(Color.RED);  // Change background to red
