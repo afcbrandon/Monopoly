@@ -257,22 +257,22 @@ public class GameBoardSpaces {
     /*
         Tax Functions
      */
-    public void payIncomeTax(Player player, int selection) {
+    public int payIncomeTax(Player player, int selection) {
         
         if (selection == 0) {       //  Pay $200 Income Tax
             JOptionPane.showMessageDialog(null, player.getName() + " paid a $200 income tax.");
-            player.updateMoney(-200);
+            return -200;       // Return negative 200, since the player will pay 200 dollars in tax
         }
         else {          //  Pay 10% of current income (money)
             int percentageOfIncome = (int)(Math.ceil(player.getMoney() * 0.10));
             JOptionPane.showMessageDialog(null, player.getName() + "paid a $" + 
                 percentageOfIncome + " income tax.");
-            player.updateMoney(-percentageOfIncome);
+            
+            return -percentageOfIncome;     //  Return the negative of percentageOfIncome because it will be subtracted from the player's money
         }
-
     }
 
-    public void payLuxuryTax(Player player) {
-       player.updateMoney(-100);
+    public int payLuxuryTax(Player player) {
+       return -100;
     }
 }

@@ -87,8 +87,8 @@ public class Player {
 
     /* Function that moves the player's token along the board */
     public void moveSpaces(int rolledAmount) {
-        position = (position + rolledAmount) % 40; // Monopoly board has 40 spaces
-        if (position == 0) {    // 40 % 40 = 0, but 40th space is valid
+        this.position = (position + rolledAmount) % 40; // Monopoly board has 40 spaces
+        if (this.position == 0) {    // 40 % 40 = 0, but 40th space is valid
             this.position = 40;
         }
     }
@@ -147,10 +147,10 @@ public class Player {
                     " like to pay the income tax?", "Income Tax", 0, 1,
                      null, options, options[0]);
 
-                gbSpace.payIncomeTax(this, selection);
+                updateMoney(gbSpace.payIncomeTax(this, selection));
             }
             else {      //  Luxury Tax
-                gbSpace.payLuxuryTax(this);
+                updateMoney(gbSpace.payLuxuryTax(this));
             }
         }
         else {              //  Property Space
@@ -247,6 +247,8 @@ public class Player {
         else if (userOption == 1) {
             JOptionPane.showMessageDialog(null, this.name + " paid $50 to escape jail.");
             updateMoney(-50);
+            this.isJailed = false;
+            playerRoll();
         }
         // TODO: Implement a 'Get Out of Jail card'
         else {
@@ -290,8 +292,8 @@ public class Player {
             JOptionPane.showMessageDialog(null, 
                 this.name + " has rolled doubles 3 times in a row! GO TO JAIL!");
             this.isJailed = true;
-            this.rolledDouble = false;
-            this.position = 10;
+            this.rolledDouble = false;      // Reset the double counter for next time
+            this.position = 11;     // Jail Position
         }
     }
 
