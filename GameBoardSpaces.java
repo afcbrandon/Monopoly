@@ -1,17 +1,23 @@
 import javax.swing.*;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 // class that will contain all the properties and non-properties
 public class GameBoardSpaces {
 
     private ArrayList<Player> allPlayers;
     private HashMap<Integer, Property> properties; // we will use the HashMap for fast lookup
+    private List<ChanceCard> chanceDeck = new ArrayList<>();
 
     public GameBoardSpaces(ArrayList<Player> players) {
         this.allPlayers = players != null ? players : new ArrayList<>();
         properties = new HashMap<>();
         initializeBoardSpaces();
+    }
+    public ArrayList<Player> getPlayers() {
+        return allPlayers;
     }
 
     /// Function that sets the properties of all the spaces on the board
@@ -109,6 +115,58 @@ public class GameBoardSpaces {
     // This will get the property at a specified space
     public Property getProperty(int spaceNumber) {
         return properties.get(spaceNumber);
+    }
+    public int getNearestRailroad(int position) {
+        int[] railroads = {5, 15, 25, 35};
+        for (int railroad : railroads) {
+            if (railroad > position) return railroad;
+        }
+        return 0;
+    }
+
+    public int getNearestUtility(int position) {
+        int[] utilities = {13, 29};
+        for (int utility : utilities) {
+            if (utility > position) {
+                return utility;
+            }
+        }
+        return utilities[0]; // Wrap around
+    }
+    public Property getPropertyAt(int position) {
+        return properties.containsKey(position) ? properties.get(position) : null;
+    }
+    public void initializeChanceDeck() {
+        chanceDeck = new ArrayList<>();
+
+        chanceDeck.add(new ChanceCard("Advance to Boardwalk"));
+        chanceDeck.add(new ChanceCard("Advance to Go (Collect $200)"));
+        chanceDeck.add(new ChanceCard("Advance to Illinois Avenue. If you pass Go, collect $200"));
+        chanceDeck.add(new ChanceCard("Advance to St. Charles Place. If you pass Go, collect $200"));
+        chanceDeck.add(new ChanceCard("Advance to the nearest Railroad. If unowned, you may buy it from the Bank. If owned, pay twice the rental"));
+        chanceDeck.add(new ChanceCard("Advance to the nearest Utility. If unowned, you may buy it from the Bank. If owned, throw dice and pay owner 10 times the amount thrown"));
+        chanceDeck.add(new ChanceCard("Bank pays you dividend of $50"));
+        chanceDeck.add(new ChanceCard("Get Out of Jail Free"));
+        chanceDeck.add(new ChanceCard("Go Back 3 Spaces"));
+        chanceDeck.add(new ChanceCard("Go to Jail. Go directly to Jail, do not pass Go, do not collect $200"));
+        chanceDeck.add(new ChanceCard("Make general repairs on all your property. For each house pay $25. For each hotel pay $100"));
+        chanceDeck.add(new ChanceCard("Speeding fine $15"));
+        chanceDeck.add(new ChanceCard("Take a trip to Reading Railroad. If you pass Go, collect $200"));
+        chanceDeck.add(new ChanceCard("You have been elected Chairman of the Board. Pay each player $50"));
+        chanceDeck.add(new ChanceCard("Your building loan matures. Collect $150"));
+
+        Collections.shuffle(chanceDeck);  // Shuffle the deck so it’s random each game
+    }
+    public ChanceCard drawChanceCard(Player player) {
+        if (chanceDeck.isEmpty()) {
+            initializeChanceDeck(); // Reshuffle or refill deck
+        }
+
+        ChanceCard card = chanceDeck.removeFirst();
+        JOptionPane.showMessageDialog(null, "Chance Card: " + card.getDescription());
+        card.applyEffect(player, this);
+
+        return card;
     }
 
     // Will check if space is a property

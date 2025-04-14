@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
 
@@ -13,7 +14,10 @@ public class Player {
     private int globalDiceRoll;
     private boolean rolledDouble;
     private int rolledDoubleCounter;
+    private boolean hasOutOfJailCard = false;
     private ArrayList<Property> ownedProperties = new ArrayList<>();
+
+
 
     private GameBoardSpaces gbSpace;
 
@@ -80,6 +84,9 @@ public class Player {
             this.isEliminated = true; // Mark player as eliminated
         }
     }
+    public void setPosition(int position) {
+        this.position = position;
+    }
 
     public boolean getIsEliminated() {
         return isEliminated;
@@ -95,6 +102,15 @@ public class Player {
 
     public void addProperty(Property p) {
         ownedProperties.add(p);
+    }
+    public ArrayList<Property> getOwnedProperties() {
+        return ownedProperties;
+    }
+    public void setJailed(boolean jailed) {
+        this.isJailed = jailed;
+    }
+    public void setOutOfJailCard(boolean hasCard){
+        this.hasOutOfJailCard = hasCard;
     }
     
 
@@ -134,7 +150,9 @@ public class Player {
 
         }
         else if (fieldType.equals("Chance")) {      //  Chance Card Space
-
+            ChanceCard drawnCard = gbSpace.drawChanceCard(this); // Get a random Chance card
+            JOptionPane.showMessageDialog(null, this.name + " drew a Chance card: " + drawnCard.getDescription());
+            drawnCard.applyEffect(this, gbSpace); // Apply the effect
         }
         else if (fieldType.equals("Chest")) {       //  Chest Card Space
 
