@@ -199,10 +199,44 @@ public class GameBoardSpaces {
                 else if (owner.ownsFullSet(property.getStreetColor())) {
                     rentAmount *= 2;  // Double the rent if the full set is owned
                 }
-    
-                currentPlayer.updateMoney(-rentAmount);
-                property.getOwner().updateMoney(rentAmount);
-    
+
+                if (currentPlayer.getMoney() >= rentAmount) {
+                    currentPlayer.updateMoney(-rentAmount);
+                    property.getOwner().updateMoney(rentAmount);
+                    JOptionPane.showMessageDialog(null,
+                            currentPlayer.getName() + " paid $" + rentAmount +
+                                    " rent to " + property.getOwner().getName() +
+                                    " for landing on " + property.getName() + "!");
+                } else {
+                    int option = JOptionPane.showConfirmDialog(null,
+                            currentPlayer.getName() + " does not have enough money to pay $" + rentAmount + ".\n" +
+                                    "Do you want to sell your assets to the bank to try and stay in the game?",
+                            "Insufficient Funds", JOptionPane.YES_NO_OPTION);
+
+                    if (option == JOptionPane.YES_OPTION) {
+                        currentPlayer.sellAssetsToBankInteractive();
+                        ;
+
+                        if (currentPlayer.getMoney() >= rentAmount) {
+                            currentPlayer.updateMoney(-rentAmount);
+                            property.getOwner().updateMoney(rentAmount);
+                            JOptionPane.showMessageDialog(null,
+                                    currentPlayer.getName() + " paid $" + rentAmount + " rent to " +
+                                            property.getOwner().getName() + " after selling assets!");
+                        } else {
+                            JOptionPane.showMessageDialog(null,
+                                    currentPlayer.getName() + " still cannot afford the rent and is BANKRUPT!");
+                            currentPlayer.transferAssetsTo(property.getOwner());
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(null,
+                                currentPlayer.getName() + " refused to sell assets and is BANKRUPT!");
+                        currentPlayer.transferAssetsTo(property.getOwner());
+                    }
+                }
+
+
+
                 JOptionPane.showMessageDialog(null,
                     currentPlayer.getName() + " paid $" + rentAmount +
                     " rent to " + property.getOwner().getName() +

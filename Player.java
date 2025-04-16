@@ -112,7 +112,67 @@ public class Player {
     public void setOutOfJailCard(boolean hasCard){
         this.hasOutOfJailCard = hasCard;
     }
-    
+
+    public void transferAssetsTo(Player receiver) {
+        // Transfer remaining money
+        receiver.updateMoney(this.money);
+        this.money = 0;
+
+        // Transfer all owned properties
+        for (Property p : new ArrayList<>(ownedProperties)) {
+            receiver.addProperty(p);
+            p.setOwner(receiver);
+        }
+        ownedProperties.clear();
+
+        // Mark this player as eliminated
+        this.setElimination();
+
+        JOptionPane.showMessageDialog(null,
+                this.name + " has gone bankrupt and transferred all assets to " + receiver.getName());
+    }
+
+    public void sellAssetsToBankInteractive() {
+        while (!ownedProperties.isEmpty()) {
+            String[] options = new String[ownedProperties.size()];
+            for (int i = 0; i < ownedProperties.size(); i++) {
+                Property p = ownedProperties.get(i);
+                options[i] = p.getName() + " ($" + (p.getPrice() / 2) + ")";
+            }
+
+            int choice = JOptionPane.showOptionDialog(
+                    null,
+                    "Select a property to sell (for half value):",
+                    "Sell Property",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
+
+            if (choice >= 0) {
+                Property selected = ownedProperties.remove(choice);
+                updateMoney(selected.getPrice() / 2);
+                selected.setOwner(null);
+                JOptionPane.showMessageDialog(null, selected.getName() + " sold for $" + (selected.getPrice() / 2));
+            } else {
+                break; // Cancel or close
+            }
+
+            int continueSelling = JOptionPane.showConfirmDialog(null, "Sell another property?", "Continue?", JOptionPane.YES_NO_OPTION);
+            if (continueSelling != JOptionPane.YES_OPTION) {
+                break;
+            }
+        }
+
+        if (ownedProperties.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "You have no more properties to sell.");
+        }
+    }
+
+
+
 
     /*  #############################
         ### Functions for Player ###
