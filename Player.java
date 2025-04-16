@@ -62,6 +62,12 @@ public class Player {
     public boolean getRolledDouble() {
         return this.rolledDouble;
     }
+    public boolean getIsJailed() {
+        return this.isJailed;
+    }
+    public boolean hasOutOfJailCard() {
+        return this.hasOutOfJailCard;
+    }
 
     /*  ###############
         ### Setters ###

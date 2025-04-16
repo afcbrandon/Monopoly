@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.awt.*;
 import java.util.Random;
 
 public class ChanceCard {
@@ -121,3 +120,4 @@ public class ChanceCard {
         }
     }
 }
+

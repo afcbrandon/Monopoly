@@ -121,7 +121,7 @@ public class GameBoardSpaces {
         for (int railroad : railroads) {
             if (railroad > position) return railroad;
         }
-        return 0;
+        return railroads[0];
     }
 
     public int getNearestUtility(int position) {
@@ -154,6 +154,8 @@ public class GameBoardSpaces {
         chanceDeck.add(new ChanceCard("Take a trip to Reading Railroad. If you pass Go, collect $200"));
         chanceDeck.add(new ChanceCard("You have been elected Chairman of the Board. Pay each player $50"));
         chanceDeck.add(new ChanceCard("Your building loan matures. Collect $150"));
+
+
 
         Collections.shuffle(chanceDeck);  // Shuffle the deck so it’s random each game
     }
