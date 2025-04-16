@@ -124,6 +124,7 @@ public class GameBoardSpaces {
         return railroads[0];
     }
 
+
     public int getNearestUtility(int position) {
         int[] utilities = {13, 29};
         for (int utility : utilities) {
