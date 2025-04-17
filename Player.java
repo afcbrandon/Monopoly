@@ -334,12 +334,20 @@ public class Player {
             this.isJailed = false;
             playerRoll();
         }
-        // TODO: Implement a 'Get Out of Jail card'
-        else {
-            // *** CODE ***
+        else if (userOption == 2) {
+            if (this.hasOutOfJailCard()) { // Check if the player has the "Get Out of Jail Free" card
+                JOptionPane.showMessageDialog(null, this.name + " used their 'Get Out of Jail Free' card!");
+                this.isJailed = false;  // The player is no longer in jail
+                this.removeOutOfJailCard();  // Remove the card from the player's inventory
+                playerRoll(); // Roll the dice to continue the game
+            } else {
+                JOptionPane.showMessageDialog(null, "You don't have a 'Get Out of Jail Free' card.");
+            }
         }
     }
-  
+  private void removeOutOfJailCard() {
+        this.hasOutOfJailCard = false;
+  }
     /*  ##########################
         ### Functions for Dice ###
         ##########################  */
