@@ -1,5 +1,4 @@
 import javax.swing.*;
-import java.util.List;
 import java.util.Random;
 import java.util.ArrayList;
 
@@ -28,7 +27,7 @@ public class Player {
         this.isEliminated = false;
         this.isJailed = false;
         this.jailCounter = 0;
-        this.gbSpace = gBoardSpaces; 
+        this.gbSpace = gBoardSpaces;
         this.rolledDouble = false;
         this.rolledDoubleCounter = 0;
         this.globalDiceRoll = 0;
@@ -83,7 +82,7 @@ public class Player {
         this.money = money;
     }
 
-    /// Function that update's the player's available money 
+    /// Function that update's the player's available money
     public void updateMoney(int amount) {
         this.money += amount;
         if (this.money < 1) {
@@ -118,6 +117,7 @@ public class Player {
     public void setOutOfJailCard(boolean hasCard){
         this.hasOutOfJailCard = hasCard;
     }
+
 
     public void transferAssetsTo(Player receiver) {
         // Transfer remaining money
@@ -155,6 +155,34 @@ public class Player {
                 this.name + " has gone bankrupt and surrendered all assets to the bank.");
     }
 
+    // Will: leaving commented out. supposed to allow the player to decide which property to mortgage but got stuck trying to update
+    // mortgaged from false to true
+   /* public void mortgageProperties() {
+        while(!ownedProperties.isEmpty() && getMoney() < 1){
+            String[] options = new String[ownedProperties.size()];
+            for (int i = 0; i < ownedProperties.size(); i++){
+                Property p = ownedProperties.get(i);
+                options[i] = p.getName() + " ($" + (p.getMortgageValue() + ")");
+            }
+
+            int choice = JOptionPane.showOptionDialog(
+                    null,
+                    "Select which property you would like to mortgage",
+                    "Mortgage Property",
+                    JOptionPane.DEFAULT_OPTION,
+                    JOptionPane.PLAIN_MESSAGE,
+                    null,
+                    options,
+                    options[0]
+            );
+
+            if (choice >= 0){
+                Property selected = ownedProperties.add(choice);
+
+                updateMoney(selected.getMortgageValue());
+            }
+        }
+    } */
 
     public void sellAssetsToBankInteractive() {
         while (!ownedProperties.isEmpty()) {
@@ -216,11 +244,11 @@ public class Player {
 
     // Function that handles action, dependent on the player's current space.
     public void handleLandingOnSpace(int currentSpace) {
-        
+
         //  Board checks to see what type of space the player is currently on
         String fieldType = gbSpace.spaceType(currentSpace);
 
-        if (fieldType.equals("Go") || fieldType.equals("Parking")) {        //  Space is either Go or Free Parking      
+        if (fieldType.equals("Go") || fieldType.equals("Parking")) {        //  Space is either Go or Free Parking
 
         }
         else if (fieldType.equals("Jail")) {        //  Space is a Jail Space
@@ -242,10 +270,10 @@ public class Player {
 
         }
         else if (fieldType.equals("Tax")) {     //  Tax Space
-            
+
             if (this.position == 5) {         //  Income Tax
                 String[] options = { "Pay $200", "Pay 10% of income" };
-                var selection = JOptionPane.showOptionDialog(null, "How would " + this.name + 
+                var selection = JOptionPane.showOptionDialog(null, "How would " + this.name +
                     " like to pay the income tax?", "Income Tax", 0, 1,
                      null, options, options[0]);
 
@@ -399,7 +427,7 @@ public class Player {
         }
 
         if (this.rolledDoubleCounter == 3) {
-            JOptionPane.showMessageDialog(null, 
+            JOptionPane.showMessageDialog(null,
                 this.name + " has rolled doubles 3 times in a row! GO TO JAIL!");
             this.isJailed = true;
             this.rolledDouble = false;      // Reset the double counter for next time
@@ -428,5 +456,4 @@ public class Player {
         }
         return count;
     }
-    
 }
