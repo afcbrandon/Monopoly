@@ -28,15 +28,14 @@ public class GameGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
-        // Variable that has the current player selected
-        Player currentPlayer = players.get(currentPlayerIndex);
-
         // Create the roll and end turn buttons
         rollButton = new JButton("Roll Dice");
         rollButton.setFocusable(false);
         rollButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Variable that has the current player selected
+                Player currentPlayer = players.get(currentPlayerIndex);
                 do {
                     currentPlayer.playerTurn();
                     updatePlayerPanel(currentPlayer);
@@ -62,6 +61,8 @@ public class GameGUI extends JFrame {
         buildButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
+                // Variable that has the current player selected
+                Player currentPlayer = players.get(currentPlayerIndex);
                 if (currentPlayer.ownsFullSet(null)) {  // TODO: added null code so that button does not throw errors
                     buildButton.setEnabled(true);
                 }
