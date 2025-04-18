@@ -72,6 +72,7 @@ public class GameGUI extends JFrame {
         });
 
 
+
         // Create a panel to display all players' profiles
         playersPanel = new JPanel();
         playersPanel.setLayout(new GridLayout(players.size(), 1));
@@ -86,10 +87,20 @@ public class GameGUI extends JFrame {
 
         // Add the players panel and buttons to the frame
         JPanel controlPanel = new JPanel();
-        controlPanel.setLayout(new FlowLayout());
+        controlPanel.setLayout(new GridLayout(0, 1));
         controlPanel.add(rollButton);
         controlPanel.add(endTurnButton);
         controlPanel.add(buildButton); // quit button
+        JButton debugButton = new JButton("Debug");
+        debugButton.setFocusable(false);
+        debugButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                Player currentPlayer = players.get(currentPlayerIndex);
+                showDebugPanel(currentPlayer);
+            }
+        });
+        controlPanel.add(debugButton);
 
 
         add(playersPanel, BorderLayout.CENTER);
@@ -186,5 +197,33 @@ public class GameGUI extends JFrame {
         Player currentPlayer = players.get(currentPlayerIndex);
         JOptionPane.showMessageDialog(this, "It's now " + currentPlayer.getPlayerName() + "'s turn!");
     }
+    private void showDebugPanel(Player player) {
+        JPanel panel = new JPanel(new GridLayout(4, 2));
+
+        JTextField moneyField = new JTextField();
+        JTextField positionField = new JTextField();
+
+        panel.add(new JLabel("Add/Subtract Money:"));
+        panel.add(moneyField);
+        panel.add(new JLabel("Move to Position (1-40):"));
+        panel.add(positionField);
+
+        int result = JOptionPane.showConfirmDialog(this, panel, "Debug Tool", JOptionPane.OK_CANCEL_OPTION);
+        if (result == JOptionPane.OK_OPTION) {
+            try {
+                int moneyChange = Integer.parseInt(moneyField.getText());
+                int newPosition = Integer.parseInt(positionField.getText());
+
+                player.updateMoney(moneyChange);
+                player.setPosition(newPosition);
+                updatePlayerPanel(player);
+                boardSpaces.purchaseProperty(player, player.getPosition(), 1);
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(this, "Invalid input. Please enter valid numbers.");
+            }
+        }
+    }
+
+
 
 }
