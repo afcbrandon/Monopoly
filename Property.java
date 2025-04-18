@@ -87,10 +87,10 @@ public class Property {
     }
 
     /// Setters that update that total houses build in the set
-    public void setHouses(String streetName, int numHouses) {
-        this.totalHouses.put(streetColor, numHouses);
+    public void setBuildHouse(String propertyName, int numHouses) {
+        totalHotels.put(propertyName, totalHotels.getOrDefault(propertyName, 0) + 1);
     }
-    public void setHotels(String propertyName) {
+    public void setBuildHotel(String propertyName) {
         this.totalHotels.put(propertyName, 1);
     }
 
@@ -116,14 +116,19 @@ public class Property {
     // Functions that return the total properties a player owns
 
     //  Function that allows player to upgrade houses to hotels
-    public void upgradeToHotel() {
+    public void upgradeToHotel(String propertyName) {
         owner.updateMoney(-costHotels);
+        setBuildHotel(propertyName);
         numHotels++;
-        setHotels(streetColor);
+    }
+
+    public void sellHouse(Player player) {
+        player.updateMoney( costHouses / 2 );   // player gets back half the value of a house
     }
 
     // Function that allows player to sell hotel
     public void sellHotel(Player player) {
-        
+        player.updateMoney( this.costHotels / 2 ); // player gets back half the value of the hotel
+        numHotels--;
     }
 }
