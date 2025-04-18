@@ -300,10 +300,10 @@ public class GameBoardSpaces {
     public void buildHouse(Player player, int spaceNumber) {
         //
         String[] options = { "Yes", "No" };
-        var selection = JOptionPane.showOptionDialog(null, "", "Income Tax", 0, 1,
+        var selection = JOptionPane.showOptionDialog(null, "", "Build a House", 0, 1,
                      null, options, options[0]);
         if (selection == 0) {   //  Yes
-            // TODO: Add Code Here
+            // TODO: Add Code Here to build a house
         }
         else {  //  No
             JOptionPane.showMessageDialog(null, player.getName() + " chose not to build a house.");

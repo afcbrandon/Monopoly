@@ -1,6 +1,8 @@
+import java.util.HashMap;
+
 public class Property {
     private String name;
-    private String street;
+    private String streetColor;
     private int price;
     private int rent;
     private int numHouses;
@@ -9,20 +11,21 @@ public class Property {
     private int costHotels;
     private int mortgageValue;
     private Player owner;
-
+    private HashMap<String, Integer> totalHouses = new HashMap<>();
+    private HashMap<String, Integer> totalHotels = new HashMap<>();
 
     // Constructor used by spaces with no street color "Railroads" and utilities
     public Property(String name, int price, int rent) {
         this.name = name;
         this.price = price;
         this.rent = rent;
-        this.street = null;    // Properties do not have a street
+        this.streetColor = null;    // Properties do not have a street
     }
 
     // Constructor used by spaces with properties and streets
     public Property(String name, String streetColor, int price, int rent, int costHouses, int costHotels, int mortgageValue ) {
         this.name = name;
-        this.street = streetColor;
+        this.streetColor = streetColor;
         this.price = price;
         this.rent = rent;
         this.numHouses = 0;
@@ -50,13 +53,19 @@ public class Property {
         return price;
     }
     public String getStreetColor() {
-        return street;
+        return streetColor;
     }
     public int getNumHouses() {
         return this.numHouses;
     }
     public int getNumHotels() {
         return this.numHotels;
+    }
+    public int getTotalHouses(String streetColor) {
+        return totalHouses.get(streetColor);
+    }
+    public int getTotalHotels(String streetColor) {
+        return totalHotels.get(streetColor);
     }
 
 
@@ -67,6 +76,14 @@ public class Property {
     /// Function that sets the owner
     public void setOwner(Player owner) {
         this.owner = owner;
+    }
+
+    /// Setters that update that total houses build in the set
+    public void setHouses(String streetColor) {
+        this.totalHouses.put(streetColor, 1);
+    }
+    public void setHotels(String streetColor) {
+        this.totalHotels.put(streetColor, 1);
     }
 
     /*  ##########################
@@ -88,6 +105,12 @@ public class Property {
         return false;// They cant buy property bc they dont have enough money
     }
 
+    // Functions that return the total properties a player owns
+
+    //  Function that allows player to upgrade houses to hotels
+    public void upgradeToHotel() {
+        
+    }
     
 
 }
