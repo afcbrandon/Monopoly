@@ -49,35 +49,35 @@ public class GameBoardSpaces {
         properties.put(29, new Property("Water Works", 150, 0));
 
         // Purple Street
-        properties.put(2, new Property("Mediterranean Avenue", "Purple", 60, 2, 50, 250, 30, false));
-        properties.put(4, new Property("Baltic Avenue", "Purple", 60, 4, 50, 250, 30, false));
+        properties.put(2, new Property("Mediterranean Avenue", "Purple", 60, 2, 50, 50, 30, false));
+        properties.put(4, new Property("Baltic Avenue", "Purple", 60, 4, 50, 50, 30, false));
         // Light Blue Street
-        properties.put(7, new Property("Oriental Avenue", "Light Blue", 100, 6, 50, 250, 50, false));
-        properties.put(9, new Property("Vermont Avenue", "Light Blue", 100, 6, 50, 250, 50, false));
-        properties.put(10, new Property("Connecticut Avenue", "Light Blue", 120, 8, 250, 50, 60, false));
+        properties.put(7, new Property("Oriental Avenue", "Light Blue", 100, 6, 50, 50, 50, false));
+        properties.put(9, new Property("Vermont Avenue", "Light Blue", 100, 6, 50, 50, 50, false));
+        properties.put(10, new Property("Connecticut Avenue", "Light Blue", 120, 8, 50, 50, 60, false));
         // Pink Street
-        properties.put(12, new Property("St. Charles Place", "Pink", 140, 10, 100, 500, 70, false));
-        properties.put(14, new Property("States Avenue", "Pink", 140, 10,  100, 500,70, false));
-        properties.put(15, new Property("Virginia Avenue", "Pink", 160, 12, 100, 500,80, false));
+        properties.put(12, new Property("St. Charles Place", "Pink", 140, 10, 100, 100, 70, false));
+        properties.put(14, new Property("States Avenue", "Pink", 140, 10,  100, 100,70, false));
+        properties.put(15, new Property("Virginia Avenue", "Pink", 160, 12, 100, 100,80, false));
         // Orange Street
-        properties.put(17, new Property("St. James Place", "Orange", 180, 14, 100, 500,90, false));
-        properties.put(19, new Property("Tennessee Avenue", "Orange", 180, 14, 100, 500,90, false));
-        properties.put(20, new Property("New York Avenue", "Orange", 200, 16, 100, 500, 90, false));
+        properties.put(17, new Property("St. James Place", "Orange", 180, 14, 100, 100,90, false));
+        properties.put(19, new Property("Tennessee Avenue", "Orange", 180, 14, 100, 100,90, false));
+        properties.put(20, new Property("New York Avenue", "Orange", 200, 16, 100, 100, 90, false));
         // Red Street
-        properties.put(22, new Property("Kentucky Avenue", "Red", 220, 18, 150, 750, 110, false));
-        properties.put(24, new Property("Indiana Avenue", "Red", 220, 18, 150, 750, 110, false));
-        properties.put(25, new Property("Illinois Avenue", "Red", 240, 20, 150, 750, 120, false));
+        properties.put(22, new Property("Kentucky Avenue", "Red", 220, 18, 150, 150, 110, false));
+        properties.put(24, new Property("Indiana Avenue", "Red", 220, 18, 150, 150, 110, false));
+        properties.put(25, new Property("Illinois Avenue", "Red", 240, 20, 150, 150, 120, false));
         // Yellow Street
-        properties.put(27, new Property("Atlantic Avenue", "Yellow", 260, 22, 150, 750, 130, false));
-        properties.put(28, new Property("Ventnor Avenue", "Yellow", 260, 22, 150, 750, 130, false));
-        properties.put(30, new Property("Marvin Gardens", "Yellow", 280, 24, 150, 750,140, false));
+        properties.put(27, new Property("Atlantic Avenue", "Yellow", 260, 22, 150, 150, 130, false));
+        properties.put(28, new Property("Ventnor Avenue", "Yellow", 260, 22, 150, 150, 130, false));
+        properties.put(30, new Property("Marvin Gardens", "Yellow", 280, 24, 150, 150,140, false));
         // Green Street
-        properties.put(32, new Property("Pacific Avenue", "Green", 300, 26, 200, 1000, 150, false));
-        properties.put(33, new Property("North Carolina Avenue", "Green", 300, 26, 1000, 200,150, false));
-        properties.put(35, new Property("Pennsylvania Avenue", "Green", 320, 28, 1000, 200,150, false));
+        properties.put(32, new Property("Pacific Avenue", "Green", 300, 26, 200, 200, 150, false));
+        properties.put(33, new Property("North Carolina Avenue", "Green", 300, 26, 200, 200,150, false));
+        properties.put(35, new Property("Pennsylvania Avenue", "Green", 320, 28, 200, 200,150, false));
         // Dark Blue Street
-        properties.put(38, new Property("Park Place", "Dark Blue", 350, 35, 200, 1000,175, false));
-        properties.put(40, new Property("Boardwalk", "Dark Blue", 400, 50, 200, 1000,200, false));
+        properties.put(38, new Property("Park Place", "Dark Blue", 350, 35, 200, 200,175, false));
+        properties.put(40, new Property("Boardwalk", "Dark Blue", 400, 50, 200, 200,200, false));
     }
 
     public Property getPropertyBySpace(int position) {
