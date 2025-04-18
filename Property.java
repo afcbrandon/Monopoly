@@ -13,6 +13,8 @@ public class Property {
     private Player owner;
     private HashMap<String, Integer> totalHouses = new HashMap<>();
     private HashMap<String, Integer> totalHotels = new HashMap<>();
+    private boolean mortgaged;
+
 
     // Constructor used by spaces with no street color "Railroads" and utilities
     public Property(String name, int price, int rent) {
@@ -23,7 +25,7 @@ public class Property {
     }
 
     // Constructor used by spaces with properties and streets
-    public Property(String name, String streetColor, int price, int rent, int costHouses, int costHotels, int mortgageValue ) {
+    public Property(String name, String streetColor, int price, int rent, int costHouses, int costHotels, int mortgageValue, boolean mortgaged) {
         this.name = name;
         this.streetColor = streetColor;
         this.price = price;
@@ -33,6 +35,7 @@ public class Property {
         this.costHouses = costHouses;
         this.costHotels = costHotels;
         this.mortgageValue = mortgageValue;
+        this.mortgaged = false;
         this.owner = null; // every property starts with no owner
     }
 
@@ -66,6 +69,9 @@ public class Property {
     }
     public int getTotalHotels(String streetColor) {
         return totalHotels.get(streetColor);
+    }
+    public int getMortgageValue(){
+        return this.mortgageValue;
     }
 
 
@@ -109,8 +115,6 @@ public class Property {
 
     //  Function that allows player to upgrade houses to hotels
     public void upgradeToHotel() {
-        
-    }
-    
 
+    }
 }
