@@ -80,7 +80,7 @@ public class UserInterface {
 
       if (i == 7) { // Max number of players(8), then the last player will get the last token
         Character lastToken = tokenList.getLastToken();
-        System.out.println("The token for " + playerList.get(i).getName() + " is " + lastToken);
+        System.out.println("The token for " + playerList.get(i).getPlayerName() + " is " + lastToken);
         playerList.get(i).setToken(lastToken);
       }
       else {
@@ -106,7 +106,7 @@ public class UserInterface {
     /*
         Prompts user to select the token, and loops until valid input
      */
-    System.out.print("Select the token for " + player.getName() + ": ");
+    System.out.print("Select the token for " + player.getPlayerName() + ": ");
     do {
 
       String input = uiScanner.nextLine().trim();
