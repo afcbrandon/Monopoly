@@ -10,7 +10,7 @@ public class GameGUI extends JFrame {
     private JPanel playersPanel;
     private JButton rollButton;
     private JButton endTurnButton;
-    private JButton quitButton;//just for testing player elimination
+    private JButton buildButton;
     private int currentPlayerIndex;
     private GameBoardSpaces boardSpaces;
   
@@ -28,14 +28,15 @@ public class GameGUI extends JFrame {
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
+        // Variable that has the current player selected
+        Player currentPlayer = players.get(currentPlayerIndex);
+
         // Create the roll and end turn buttons
         rollButton = new JButton("Roll Dice");
         rollButton.setFocusable(false);
         rollButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Player currentPlayer = players.get(currentPlayerIndex);
-
                 do {
                     currentPlayer.playerTurn();
                     updatePlayerPanel(currentPlayer);
@@ -55,18 +56,18 @@ public class GameGUI extends JFrame {
             }
         });
 
-        quitButton = new JButton("Quit");
-        quitButton.setFocusable(false);
-        quitButton.addActionListener(new ActionListener() {
+        // buildButton button that gives player the option to buildButton houses on their properties
+        buildButton = new JButton("buildButton");
+        buildButton.setFocusable(false);
+        buildButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                Player currentPlayer = players.get(currentPlayerIndex);
-                // Force elimination by subtracting enough money
-                currentPlayer.setElimination();
-                updatePlayerPanel(currentPlayer);
-                JOptionPane.showMessageDialog(GameGUI.this, currentPlayer.getName() + " has quit and is eliminated!");
-                checkWinner(); // Check if only one player remains
-                endTurn();     // Move to the next player's turn
+                if (currentPlayer.ownsFullSet(null)) {  // TODO: added null code so that button does not throw errors
+                    buildButton.setEnabled(true);
+                }
+                else {
+                    buildButton.setEnabled(false);
+                }
             }
         });
 
@@ -88,7 +89,7 @@ public class GameGUI extends JFrame {
         controlPanel.setLayout(new FlowLayout());
         controlPanel.add(rollButton);
         controlPanel.add(endTurnButton);
-        controlPanel.add(quitButton);// quit button
+        controlPanel.add(buildButton); // quit button
 
 
         add(playersPanel, BorderLayout.CENTER);
@@ -103,7 +104,7 @@ public class GameGUI extends JFrame {
         JPanel playerPanel = new JPanel();
         playerPanel.setLayout(new GridLayout(4, 1)); 
 
-        JLabel nameLabel = new JLabel("Name: " + player.getName());
+        JLabel nameLabel = new JLabel("Name: " + player.getPlayerName());
         JLabel tokenLabel = new JLabel("Token: " + player.getToken());
         JLabel moneyLabel = new JLabel("Money: $" + player.getMoney());
         String spaceDescription;
@@ -121,7 +122,7 @@ public class GameGUI extends JFrame {
         playerPanel.add(moneyLabel);
         playerPanel.add(positionLabel);
 
-        playerPanel.setName(player.getName());
+        playerPanel.setName(player.getPlayerName());
 
         return playerPanel;
     }
@@ -131,7 +132,7 @@ public class GameGUI extends JFrame {
         Component[] components = playersPanel.getComponents();
         for (Component comp : components) {
             JPanel playerPanel = (JPanel) comp;
-            if (playerPanel.getName().equals(player.getName())) {
+            if (playerPanel.getName().equals(player.getPlayerName())) {
                 JLabel moneyLabel = (JLabel) playerPanel.getComponent(2);
                 JLabel positionLabel = (JLabel) playerPanel.getComponent(3);
 
@@ -167,7 +168,7 @@ public class GameGUI extends JFrame {
         }
     
         if (activePlayers == 1) {
-            JOptionPane.showMessageDialog(this, winner.getName() + " is the winner!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
+            JOptionPane.showMessageDialog(this, winner.getPlayerName() + " is the winner!", "Game Over", JOptionPane.INFORMATION_MESSAGE);
             System.exit(0); // End the game
         }
     }
@@ -183,7 +184,7 @@ public class GameGUI extends JFrame {
 
         // Update the GUI to reflect the current player's turn
         Player currentPlayer = players.get(currentPlayerIndex);
-        JOptionPane.showMessageDialog(this, "It's now " + currentPlayer.getName() + "'s turn!");
+        JOptionPane.showMessageDialog(this, "It's now " + currentPlayer.getPlayerName() + "'s turn!");
     }
 
 }
