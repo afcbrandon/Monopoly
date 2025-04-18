@@ -137,6 +137,24 @@ public class Player {
         JOptionPane.showMessageDialog(null,
                 this.name + " has gone bankrupt and transferred all assets to " + receiver.getName());
     }
+    public void surrenderAssetsToBank() {
+
+        this.money = 0;
+
+
+        for (Property p : new ArrayList<>(ownedProperties)) {
+            p.setOwner(null);
+        }
+
+        ownedProperties.clear(); // Clear list
+
+        
+        this.setElimination();
+
+        JOptionPane.showMessageDialog(null,
+                this.name + " has gone bankrupt and surrendered all assets to the bank.");
+    }
+
 
     public void sellAssetsToBankInteractive() {
         while (!ownedProperties.isEmpty()) {

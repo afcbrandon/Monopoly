@@ -181,9 +181,14 @@ public class GameBoardSpaces {
         if (isProperty(spaceNumber)) {
             Property property = getProperty(spaceNumber);
             Player owner = currentPlayer;
+            if (property.getOwner() == null) {
+                currentPlayer.surrenderAssetsToBank();
+                return;
+            }
+
             if (property.getOwner() != null && property.getOwner() != currentPlayer) {
                 int rentAmount = property.getRent();
-    
+
                 // Check for utilities
                 if (property.getName().equals("Electric Company") || property.getName().equals("Water Works")) {
                     int utilitiesOwned = property.getOwner().countUtilities();
