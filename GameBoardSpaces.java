@@ -212,12 +212,12 @@ public class GameBoardSpaces {
                     currentPlayer.updateMoney(-rentAmount);
                     property.getOwner().updateMoney(rentAmount);
                     JOptionPane.showMessageDialog(null,
-                            currentPlayer.getName() + " paid $" + rentAmount +
-                                    " rent to " + property.getOwner().getName() +
+                            currentPlayer.getPlayerName() + " paid $" + rentAmount +
+                                    " rent to " + property.getOwner().getPlayerName() +
                                     " for landing on " + property.getName() + "!");
                 } else {
                     int option = JOptionPane.showConfirmDialog(null,
-                            currentPlayer.getName() + " does not have enough money to pay $" + rentAmount + ".\n" +
+                            currentPlayer.getPlayerName() + " does not have enough money to pay $" + rentAmount + ".\n" +
                                     "Do you want to sell your assets to the bank to try and stay in the game?",
                             "Insufficient Funds", JOptionPane.YES_NO_OPTION);
 
@@ -229,16 +229,16 @@ public class GameBoardSpaces {
                             currentPlayer.updateMoney(-rentAmount);
                             property.getOwner().updateMoney(rentAmount);
                             JOptionPane.showMessageDialog(null,
-                                    currentPlayer.getName() + " paid $" + rentAmount + " rent to " +
-                                            property.getOwner().getName() + " after selling assets!");
+                                    currentPlayer.getPlayerName() + " paid $" + rentAmount + " rent to " +
+                                            property.getOwner().getPlayerName() + " after selling assets!");
                         } else {
                             JOptionPane.showMessageDialog(null,
-                                    currentPlayer.getName() + " still cannot afford the rent and is BANKRUPT!");
+                                    currentPlayer.getPlayerName() + " still cannot afford the rent and is BANKRUPT!");
                             currentPlayer.transferAssetsTo(property.getOwner());
                         }
                     } else {
                         JOptionPane.showMessageDialog(null,
-                                currentPlayer.getName() + " refused to sell assets and is BANKRUPT!");
+                                currentPlayer.getPlayerName() + " refused to sell assets and is BANKRUPT!");
                         currentPlayer.transferAssetsTo(property.getOwner());
                     }
                 }
@@ -246,8 +246,8 @@ public class GameBoardSpaces {
 
 
                 JOptionPane.showMessageDialog(null,
-                    currentPlayer.getName() + " paid $" + rentAmount +
-                    " rent to " + property.getOwner().getName() +
+                    currentPlayer.getPlayerName() + " paid $" + rentAmount +
+                    " rent to " + property.getOwner().getPlayerName() +
                     " for landing on " + property.getName() + "!");
             }
         }
@@ -264,7 +264,7 @@ public class GameBoardSpaces {
                 //  If-Else statement. If someone else owns the property then pay them, otherwise player has the option to build houses.
                 // TODO: Eventually this function will check if player has houses and then ask to build hotels
 
-                if(property.getOwner().getName().equals(currentPlayer.getName())) {     // Current Player owns the property
+                if(property.getOwner().getPlayerName().equals(currentPlayer.getPlayerName())) {     // Current Player owns the property
                     buildHouse(currentPlayer, spaceNumber);
                 }
                 else {
@@ -277,7 +277,7 @@ public class GameBoardSpaces {
 
             // Proceed with the purchase since the property is not owned
             int price = property.getPrice();
-            int choice = JOptionPane.showConfirmDialog(null, currentPlayer.getName() + ", do you want to purchase " + property.getName() + " for $" + price + "?",
+            int choice = JOptionPane.showConfirmDialog(null, currentPlayer.getPlayerName() + ", do you want to purchase " + property.getName() + " for $" + price + "?",
                     "Purchase Property", JOptionPane.YES_NO_OPTION);
 
             if (choice == JOptionPane.YES_OPTION) {
@@ -285,7 +285,7 @@ public class GameBoardSpaces {
                 if (success) {
                     currentPlayer.addProperty(property);
                     property.setOwner(currentPlayer); // Set the owner after purchase!
-                    JOptionPane.showMessageDialog(null, currentPlayer.getName() + " successfully purchased " + property.getName() + "!");
+                    JOptionPane.showMessageDialog(null, currentPlayer.getPlayerName() + " successfully purchased " + property.getName() + "!");
                 } 
                 else {
                     JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this property!");
@@ -306,7 +306,7 @@ public class GameBoardSpaces {
             // TODO: Add Code Here to build a house
         }
         else {  //  No
-            JOptionPane.showMessageDialog(null, player.getName() + " chose not to build a house.");
+            JOptionPane.showMessageDialog(null, player.getPlayerName() + " chose not to build a house.");
         }
     }
 
@@ -320,7 +320,7 @@ public class GameBoardSpaces {
         for (Player player : allPlayers) {
             if (player != property.getOwner()) {
                 //here we get the input on how much they are bidding or if they even are bidding
-                String bidInput = JOptionPane.showInputDialog(player.getName() + ", enter your bid for the property " + property.getName() + " (or 0 to pass): ");
+                String bidInput = JOptionPane.showInputDialog(player.getPlayerName() + ", enter your bid for the property " + property.getName() + " (or 0 to pass): ");
                 //checks that it actually has something
                 if (bidInput != null && !bidInput.isEmpty()) {
                     try {
@@ -342,7 +342,7 @@ public class GameBoardSpaces {
             highestBidder.updateMoney(-highestBid); //subtracks the amount of money they bid
             highestBidder.addProperty(property);
             property.setOwner(highestBidder);//sets as owner
-            JOptionPane.showMessageDialog(null, highestBidder.getName() + " won the auction for $" + highestBid + "!");
+            JOptionPane.showMessageDialog(null, highestBidder.getPlayerName() + " won the auction for $" + highestBid + "!");
         } else {
             JOptionPane.showMessageDialog(null, "No one bid on the property. It remains unowned.");
         }
@@ -360,12 +360,12 @@ public class GameBoardSpaces {
     public int payIncomeTax(Player player, int selection) {
         
         if (selection == 0) {       //  Pay $200 Income Tax
-            JOptionPane.showMessageDialog(null, player.getName() + " paid a $200 income tax.");
+            JOptionPane.showMessageDialog(null, player.getPlayerName() + " paid a $200 income tax.");
             return -200;       // Return negative 200, since the player will pay 200 dollars in tax
         }
         else {          //  Pay 10% of current income (money)
             int percentageOfIncome = (int)(Math.ceil(player.getMoney() * 0.10));
-            JOptionPane.showMessageDialog(null, player.getName() + "paid a $" + 
+            JOptionPane.showMessageDialog(null, player.getPlayerName() + "paid a $" + 
                 percentageOfIncome + " income tax.");
             
             return -percentageOfIncome;     //  Return the negative of percentageOfIncome because it will be subtracted from the player's money

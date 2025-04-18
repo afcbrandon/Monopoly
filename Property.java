@@ -37,6 +37,8 @@ public class Property {
         this.mortgageValue = mortgageValue;
         this.mortgaged = false;
         this.owner = null; // every property starts with no owner
+        this.totalHouses.put(name, numHouses);
+        this.totalHotels.put(name, numHotels);
     }
 
     /*  ###############
@@ -64,11 +66,11 @@ public class Property {
     public int getNumHotels() {
         return this.numHotels;
     }
-    public int getTotalHouses(String streetColor) {
-        return totalHouses.get(streetColor);
+    public int getTotalHouses(String propertyName) {
+        return totalHouses.get(propertyName);
     }
-    public int getTotalHotels(String streetColor) {
-        return totalHotels.get(streetColor);
+    public int getTotalHotels(String propertyName) {
+        return totalHotels.get(propertyName);
     }
     public int getMortgageValue(){
         return this.mortgageValue;
@@ -85,11 +87,11 @@ public class Property {
     }
 
     /// Setters that update that total houses build in the set
-    public void setHouses(String streetColor) {
-        this.totalHouses.put(streetColor, 1);
+    public void setHouses(String streetName, int numHouses) {
+        this.totalHouses.put(streetColor, numHouses);
     }
-    public void setHotels(String streetColor) {
-        this.totalHotels.put(streetColor, 1);
+    public void setHotels(String propertyName) {
+        this.totalHotels.put(propertyName, 1);
     }
 
     /*  ##########################
@@ -115,6 +117,13 @@ public class Property {
 
     //  Function that allows player to upgrade houses to hotels
     public void upgradeToHotel() {
+        owner.updateMoney(-costHotels);
+        numHotels++;
+        setHotels(streetColor);
+    }
 
+    // Function that allows player to sell hotel
+    public void sellHotel(Player player) {
+        
     }
 }

@@ -38,7 +38,7 @@ public class Player {
         ###############  */
 
     // Function that returns the player's name
-    public String getName() {
+    public String getPlayerName() {
         return this.name;
     }
     // function that returns the player's current money
@@ -135,7 +135,7 @@ public class Player {
         this.setElimination();
 
         JOptionPane.showMessageDialog(null,
-                this.name + " has gone bankrupt and transferred all assets to " + receiver.getName());
+                this.name + " has gone bankrupt and transferred all assets to " + receiver.getPlayerName());
     }
     public void surrenderAssetsToBank() {
 
