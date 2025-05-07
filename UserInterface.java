@@ -10,86 +10,115 @@ import javax.swing.SwingUtilities;
 public class UserInterface {
   private Scanner uiScanner = new Scanner(System.in);
 
+  private boolean playWithBots;  // This will store whether we're playing with bots or not
+
+  // Constructor to accept the boolean value
+  public UserInterface(boolean playWithBots) {
+    this.playWithBots = playWithBots;
+  }
   /*  Function that begins the game process
-      The function first calls the getPlayers function 
+      The function first calls the getPlayers function
         that prompts the user for the number of players (between 2-8 players).
   */
   public void start() {
+    int totalPlayers = getNumberOfPlayers();
+    int humanPlayers = playWithBots ? getNumberOfHumanPlayers(totalPlayers) : totalPlayers;
 
-    int numOfPlayers = getNumberOfPlayers();
-    ArrayList<Player> pList = createPlayers(numOfPlayers);
+    ArrayList<Player> pList = createPlayers(totalPlayers, humanPlayers);
 
     GameBoard monopolyBoard = new GameBoard("Monopoly Board Numbered.jpg");
     SwingUtilities.invokeLater(() -> {
-
       JFrame frame = new JFrame("Monopoly");
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-    
       frame.setContentPane(monopolyBoard);
-
       frame.setSize(800, 800);
       frame.setVisible(true);
-
     });
 
     new GameGUI(pList);
   }
-
-  /* 
-    This function prompts the user for the number of players in the game, 
+  /*
+    This function prompts the user for the number of players in the game,
     and returns the total number (between 2-8 players)
   */
   private int getNumberOfPlayers() {
+    int totalPlayers = 0;
 
-    int numOfPlayers = 0;
-
-    System.out.print("Enter the number of players (2-8): ");
+    System.out.print("Enter the total number of players (2-8): ");
     do {
-      String totalPlayers = uiScanner.nextLine();
-      numOfPlayers = Integer.valueOf(totalPlayers);
+      String input = uiScanner.nextLine();
+      totalPlayers = Integer.parseInt(input);
 
-      if (numOfPlayers < 2 || numOfPlayers > 8) {
-        System.out.print("ERROR! Please enter a valid amount of players (2-8): ");
+      if (totalPlayers < 2 || totalPlayers > 8) {
+        System.out.print("ERROR! Please enter a valid number (2-8): ");
       }
-    } 
-    while (numOfPlayers < 2 || numOfPlayers > 8);
+    } while (totalPlayers < 2 || totalPlayers > 8);
 
-    return numOfPlayers;
+    return totalPlayers;
   }
 
-  /* 
+  private int getNumberOfHumanPlayers(int totalPlayers) {
+    int humans = 0;
+
+    System.out.print("Enter number of human players (at least 1): ");
+    do {
+      String input = uiScanner.nextLine();
+      humans = Integer.parseInt(input);
+
+      if (humans < 1 || humans > totalPlayers) {
+        System.out.print("ERROR! Must be between 1 and " + totalPlayers + ": ");
+      }
+    } while (humans < 1 || humans > totalPlayers);
+
+    return humans;
+  }
+  /*
     Function that creates an ArrayList of players determined by the number of players
       Also calls chooseToken function to let each player choose their token
   */
-  private ArrayList<Player> createPlayers(int numOfPlayers) {
-    
+  private ArrayList<Player> createPlayers(int totalPlayers, int humanPlayers) {
     ArrayList<Player> playerList = new ArrayList<>();
     PlayerToken tokenList = new PlayerToken();
     GameBoardSpaces gameBoardSpaces = new GameBoardSpaces(playerList);
 
-    for (int i = 0; i < numOfPlayers; i++) {
-      System.out.print("Enter name for Player " + (i + 1) + ": ");
-      String playerName = uiScanner.nextLine().trim();
+    for (int i = 0; i < totalPlayers; i++) {
+      Player player;
+      boolean isBot = playWithBots && i >= humanPlayers;
 
-      while(playerName.isEmpty()) {
-        System.out.print("ERROR! Please enter a valid name for Player " + (i + 1) + ": ");
-        playerName = uiScanner.nextLine().trim();
+      if (isBot) {
+        String botName = "Bot " + (i - humanPlayers + 1);  // Bot 1, 2, ...
+        System.out.println(botName + " has joined the game!");
+        player = new Bot(botName, gameBoardSpaces);
+
+        char botToken = tokenList.getTokenList().get(0);
+        tokenList.chooseToken(botToken);
+        player.setToken(botToken);
+        System.out.println(botName + " chose token: " + botToken);
+      } else {
+        System.out.print("Enter name for Player " + (i + 1) + ": ");
+        String playerName = uiScanner.nextLine().trim();
+        while (playerName.isEmpty()) {
+          System.out.print("ERROR! Please enter a valid name for Player " + (i + 1) + ": ");
+          playerName = uiScanner.nextLine().trim();
+        }
+
+        player = new Player(playerName, gameBoardSpaces, false);
+
+        if (i == 7) {
+          Character lastToken = tokenList.getLastToken();
+          System.out.println("The token for " + player.getPlayerName() + " is " + lastToken);
+          player.setToken(lastToken);
+        } else {
+          chooseToken(tokenList, playerList, player);
+        }
       }
-      Player player = new Player(playerName, gameBoardSpaces);
+
       playerList.add(player);
-
-      if (i == 7) { // Max number of players(8), then the last player will get the last token
-        Character lastToken = tokenList.getLastToken();
-        System.out.println("The token for " + playerList.get(i).getPlayerName() + " is " + lastToken);
-        playerList.get(i).setToken(lastToken);
-      }
-      else {
-        chooseToken(tokenList, playerList, playerList.get(i));
-      }
     }
 
     return playerList;
   }
+
 
   // Function that prompts user to select their token
   public void chooseToken(PlayerToken tokenList, ArrayList<Player> pList, Player player) {

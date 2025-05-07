@@ -7,11 +7,11 @@ public class TestCommunityChestCard {
     public static void main(String[] args) {
         // Create a mock list of players
         ArrayList<Player> players = new ArrayList<>();
-        players.add(new Player("Player 1", null));
-        players.add(new Player("Player 2", null));
-        players.add(new Player("Player 3", null));
-        players.add(new Player("Player 4", null));
-        players.add(new Player("Player 5", null)); // Temporarily null
+        players.add(new Player("Player 1", null, false));
+        players.add(new Player("Player 2",null,false));
+        players.add(new Player("Player 3", null,false));
+        players.add(new Player("Player 4", null,false));
+        players.add(new Player("Player 5", null,false)); // Temporarily null
 
         // Create a mock GameBoardSpaces object and link players
         GameBoardSpaces gbSpace = new GameBoardSpaces(players);
@@ -90,7 +90,7 @@ public class TestCommunityChestCard {
     private static void resetPlayer(Player player) {
         Random rand = new Random();
         int randomPosition = rand.nextInt(40); // Random board position (0-39)
-        int defaultMoney = 10;
+        int defaultMoney = 1500;
 
         player.setPosition(randomPosition);
         player.setJailed(false);

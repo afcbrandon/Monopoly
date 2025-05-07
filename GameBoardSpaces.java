@@ -43,7 +43,7 @@ public class GameBoardSpaces {
         properties.put(16, new Property("Pennsylvania Railroad", 200, 0));
         properties.put(26, new Property("B & O Railroad", 200, 0));
         properties.put(36, new Property("Short Line", 200, 0));
-        
+
         //  Utilities
         properties.put(13, new Property("Electric Company", 150, 0));
         properties.put(29, new Property("Water Works", 150, 0));
@@ -105,7 +105,7 @@ public class GameBoardSpaces {
             case 31:
                 return "Jail";
             case 21:    //  Free Parking Space
-                return "Parking";   
+                return "Parking";
             default:    // Property Space
                 return "Property";
         }
@@ -177,7 +177,7 @@ public class GameBoardSpaces {
         return properties.containsKey(spaceNumber);
     }
 
-    public void payRent(Player currentPlayer, int spaceNumber, int diceRoll) {
+    protected void payRent(Player currentPlayer, int spaceNumber, int diceRoll) {
         if (isProperty(spaceNumber)) {
             Property property = getProperty(spaceNumber);
             Player owner = currentPlayer;
@@ -246,62 +246,75 @@ public class GameBoardSpaces {
 
 
                 JOptionPane.showMessageDialog(null,
-                    currentPlayer.getPlayerName() + " paid $" + rentAmount +
-                    " rent to " + property.getOwner().getPlayerName() +
-                    " for landing on " + property.getName() + "!");
+                        currentPlayer.getPlayerName() + " paid $" + rentAmount +
+                                " rent to " + property.getOwner().getPlayerName() +
+                                " for landing on " + property.getName() + "!");
             }
         }
     }
 
     /// Function that allows player to purchase property when they land on a property space, or pay rent if someone else already owns the property
-    public void purchaseProperty(Player currentPlayer, int spaceNumber, int diceRoll) {
+    protected void purchaseProperty(Player currentPlayer, int spaceNumber, int diceRoll) {
         if (isProperty(spaceNumber)) {
             Property property = getProperty(spaceNumber);
 
             // Check if the property is already owned
             if (property.getOwner() != null) {
-
-                //  If-Else statement. If someone else owns the property then pay them, otherwise player has the option to build houses.
-                // TODO: Eventually this function will check if player has houses and then ask to build hotels
-
-                if(property.getOwner().getPlayerName().equals(currentPlayer.getPlayerName())) {     // Current Player owns the property
+                if (property.getOwner().getPlayerName().equals(currentPlayer.getPlayerName())) {
                     buildHouse(currentPlayer, spaceNumber);
-                }
-                else {
+                } else {
                     payRent(currentPlayer, spaceNumber, diceRoll);
                 }
-
-                return; // Exit the function early since the property is taken
-
+                return; // Exit early if already owned
             }
 
-            // Proceed with the purchase since the property is not owned
             int price = property.getPrice();
-            int choice = JOptionPane.showConfirmDialog(null, currentPlayer.getPlayerName() + ", do you want to purchase " + property.getName() + " for $" + price + "?",
-                    "Purchase Property", JOptionPane.YES_NO_OPTION);
 
-            if (choice == JOptionPane.YES_OPTION) {
-                boolean success = property.buyProperty(currentPlayer);
-                if (success) {
-                    currentPlayer.addProperty(property);
-                    property.setOwner(currentPlayer); // Set the owner after purchase!
-                    JOptionPane.showMessageDialog(null, currentPlayer.getPlayerName() + " successfully purchased " + property.getName() + "!");
-                } 
-                else {
-                    JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this property!");
+            // ✅ Handle bots automatically
+            if (currentPlayer instanceof Bot) {
+                if (currentPlayer.getMoney() >= price) {
+                    boolean success = property.buyProperty(currentPlayer);
+                    if (success) {
+                        currentPlayer.addProperty(property);
+                        property.setOwner(currentPlayer);
+                        String msg = currentPlayer.getPlayerName() + " bought " + property.getName() + " for $" + price;
+                        System.out.println(msg);
+                        JOptionPane.showMessageDialog(null, msg);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, currentPlayer.getPlayerName() + " cannot afford " + property.getName());
                 }
             }
+
+            // ✅ Handle human players with a confirmation dialog
             else {
-                startAuction(property,allPlayers); // If the player decides to not buy a property then the auction will start
+                int choice = JOptionPane.showConfirmDialog(
+                        null,
+                        currentPlayer.getPlayerName() + ", do you want to purchase " + property.getName() + " for $" + price + "?",
+                        "Purchase Property",
+                        JOptionPane.YES_NO_OPTION
+                );
+
+                if (choice == JOptionPane.YES_OPTION) {
+                    boolean success = property.buyProperty(currentPlayer);
+                    if (success) {
+                        currentPlayer.addProperty(property);
+                        property.setOwner(currentPlayer);
+                        JOptionPane.showMessageDialog(null, currentPlayer.getPlayerName() + " successfully purchased " + property.getName() + "!");
+                    } else {
+                        JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this property!");
+                    }
+                } else {
+                    startAuction(property, allPlayers); // Launch auction if declined
+                }
             }
         }
     }
-
     public void buildHouse(Player player, int spaceNumber) {
         //
         String[] options = { "Yes", "No" };
         var selection = JOptionPane.showOptionDialog(null, "", "Build a House", 0, 1,
-                     null, options, options[0]);
+                null, options, options[0]);
         if (selection == 0) {   //  Yes
             // TODO: Add Code Here to build a house
         }
@@ -358,21 +371,21 @@ public class GameBoardSpaces {
         Tax Functions
      */
     public int payIncomeTax(Player player, int selection) {
-        
+
         if (selection == 0) {       //  Pay $200 Income Tax
             JOptionPane.showMessageDialog(null, player.getPlayerName() + " paid a $200 income tax.");
             return -200;       // Return negative 200, since the player will pay 200 dollars in tax
         }
         else {          //  Pay 10% of current income (money)
             int percentageOfIncome = (int)(Math.ceil(player.getMoney() * 0.10));
-            JOptionPane.showMessageDialog(null, player.getPlayerName() + "paid a $" + 
-                percentageOfIncome + " income tax.");
-            
+            JOptionPane.showMessageDialog(null, player.getPlayerName() + "paid a $" +
+                    percentageOfIncome + " income tax.");
+
             return -percentageOfIncome;     //  Return the negative of percentageOfIncome because it will be subtracted from the player's money
         }
     }
 
     public int payLuxuryTax(Player player) {
-       return -100;
+        return -100;
     }
 }

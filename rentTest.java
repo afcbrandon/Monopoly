@@ -2,7 +2,7 @@ import java.util.ArrayList;
 
 public class rentTest {
     public static void main(String[] args) {
-        Player testPlayer = new Player("TestPlayer", new GameBoardSpaces(new ArrayList<>()));
+        Player testPlayer = new Player("TestPlayer", new GameBoardSpaces(new ArrayList<>()),false);
 
         // Create properties for a specific color (e.g., Purple)
         // In your actual game, you would normally get these from your GameBoardSpaces,

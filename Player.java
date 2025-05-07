@@ -3,24 +3,25 @@ import java.util.Random;
 import java.util.ArrayList;
 
 public class Player {
-    private final String name;
-    private int money;
-    private int position;
+    protected final String name;
+    protected int money;
+    protected int position;
     private boolean isEliminated;
     private char playerToken;
-    private boolean isJailed;
+    protected boolean isJailed;
     private int jailCounter;
-    private int globalDiceRoll;
-    private boolean rolledDouble;
-    private int rolledDoubleCounter;
+    protected int globalDiceRoll;
+    protected boolean rolledDouble;
+    protected int rolledDoubleCounter;
     private boolean hasOutOfJailCard = false;
     private ArrayList<Property> ownedProperties = new ArrayList<>();
+    private boolean isBot = false;
 
 
+    protected GameBoardSpaces gbSpace;
 
-    private GameBoardSpaces gbSpace;
-
-    public Player(String name, GameBoardSpaces gBoardSpaces) {
+    //Constructor for both humans and bots
+    public Player(String name, GameBoardSpaces gBoardSpaces, boolean isBot) {
         this.name = name;
         this.money = 1500;
         this.position = 1; // Starting at position 1 (Go space)
@@ -31,6 +32,7 @@ public class Player {
         this.rolledDouble = false;
         this.rolledDoubleCounter = 0;
         this.globalDiceRoll = 0;
+        this.isBot = isBot;
     }
 
     /*  ###############
@@ -243,7 +245,7 @@ public class Player {
     }
 
     // Function that handles action, dependent on the player's current space.
-    public void handleLandingOnSpace(int currentSpace) {
+    protected void handleLandingOnSpace(int currentSpace) {
 
         //  Board checks to see what type of space the player is currently on
         String fieldType = gbSpace.spaceType(currentSpace);
@@ -318,7 +320,7 @@ public class Player {
         return count == totalNeeded;
     }
     //created checkPassedGo function
-    private void checkPassedGo(int previousPosition) {
+    protected void checkPassedGo(int previousPosition) {
         // Check if player passed Go or landed on GO and awards 200 bucks
         if (this.position < previousPosition) {
             this.updateMoney(200);
@@ -334,7 +336,7 @@ public class Player {
         ############################################  */
 
     // ability for the player to get out of jail
-    private void getOutOfJail() {
+    protected void getOutOfJail() {
         // TODO: Implement a JOptionPane that asks the user if they would like to roll double, pay a fine, or use a card
         String options[] = {"Roll Dice", "Pay $50", "Get Out Of Jail Free"};
         var userOption = JOptionPane.showOptionDialog(null, "", "Jail", 0, 1, null, options, options[0]);
@@ -399,12 +401,12 @@ public class Player {
         ##########################  */
 
     /* Function that rolls a six-sided-die and returns its value */
-    private int diceRoll() {
+    protected int diceRoll() {
         return new Random().nextInt(6) + 1;
     }
 
     /* Function where player rolls the two dice */
-    private void playerRoll() {
+    protected void playerRoll() {
         int previousPosition = this.position;
         int diceOne = diceRoll();
         int diceTwo = diceRoll();
