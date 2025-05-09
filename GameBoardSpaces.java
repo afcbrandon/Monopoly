@@ -204,13 +204,11 @@ public class GameBoardSpaces {
                         default: rentAmount = 25; break;
                     }
                 }
-                else if (owner.ownsFullSet(property.getStreetColor())) {
-                    rentAmount *= 2;  // Double the rent if the full set is owned
-                }
 
                 if (currentPlayer.getMoney() >= rentAmount) {
                     currentPlayer.updateMoney(-rentAmount);
-                    property.getOwner().updateMoney(rentAmount);
+                    // property.getOwner().updateMoney(rentAmount);    // TODO: BUG, Property owner money doesn't update when rent is paid to them
+                    property.getOwner().setMoney(property.getOwner().getMoney() + rentAmount);
                     JOptionPane.showMessageDialog(null,
                             currentPlayer.getPlayerName() + " paid $" + rentAmount +
                                     " rent to " + property.getOwner().getPlayerName() +
@@ -260,6 +258,7 @@ public class GameBoardSpaces {
 
             // Check if the property is already owned
             if (property.getOwner() != null) {
+                // TODO: Build House code is not needed here. Player can build houses during any turn, not only when they land on a space they already own
                 if (property.getOwner().getPlayerName().equals(currentPlayer.getPlayerName())) {
                     buildHouse(currentPlayer, spaceNumber);
                 } else {
@@ -310,6 +309,8 @@ public class GameBoardSpaces {
             }
         }
     }
+
+
     public void buildHouse(Player player, int spaceNumber) {
         //
         String[] options = { "Yes", "No" };
