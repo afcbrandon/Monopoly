@@ -50,11 +50,16 @@ public class GameGUI extends JFrame {
             handleBotTurns(); // If it's a bot, take turns automatically
         });
 
-        buildButton = new JButton("Build");
+        buildButton = new JButton("Build Property");
         buildButton.setFocusable(false);
+        
+        // Sets the clickability of build property button, dependent if the player owns any properties 
+        if ( !players.get(currentPlayerIndex).getOwnsColorSet() ) { // Player does not own a full set of properties within a color set
+            buildButton.setEnabled(false);
+        }
+
         buildButton.addActionListener(e -> {
             Player currentPlayer = players.get(currentPlayerIndex);
-            buildButton.setEnabled(currentPlayer.ownsFullSet(null)); // Placeholder logic
         });
 
         // Debug button (unchanged)
