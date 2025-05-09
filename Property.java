@@ -11,8 +11,6 @@ public class Property {
     private int costHotels;
     private int mortgageValue;
     private Player owner;
-    private HashMap<String, Integer> totalHouses = new HashMap<>();
-    private HashMap<String, Integer> totalHotels = new HashMap<>();
     private boolean mortgaged;
 
 
@@ -37,8 +35,6 @@ public class Property {
         this.mortgageValue = mortgageValue;
         this.mortgaged = false;
         this.owner = null; // every property starts with no owner
-        this.totalHouses.put(name, numHouses);
-        this.totalHotels.put(name, numHotels);
     }
 
     /*  ###############
@@ -66,32 +62,27 @@ public class Property {
     public int getNumHotels() {
         return this.numHotels;
     }
-    public int getTotalHouses(String propertyName) {
-        return totalHouses.get(propertyName);
-    }
-    public int getTotalHotels(String propertyName) {
-        return totalHotels.get(propertyName);
-    }
     public int getMortgageValue(){
         return this.mortgageValue;
     }
-
 
     /*  ###############
         ### Setters ###
         ###############  */
 
-    /// Function that sets the owner
+    /* Function that sets the owner */
     public void setOwner(Player owner) {
         this.owner = owner;
     }
 
-    /// Setters that update that total houses build in the set
-    public void setBuildHouse(String propertyName, int numHouses) {
-        totalHotels.put(propertyName, totalHotels.getOrDefault(propertyName, 0) + 1);
+    /*  Function that increments number of houses on the property by 1 */
+    public void setHouses() {
+        this.numHouses++;
     }
-    public void setBuildHotel(String propertyName) {
-        this.totalHotels.put(propertyName, 1);
+
+    /* Function that increments the number of hotels on the property by 1 */
+    public void setHotels() {
+        this.numHouses++;
     }
 
     /*  ##########################
@@ -113,22 +104,322 @@ public class Property {
         return false;// They cant buy property bc they dont have enough money
     }
 
-    // Functions that return the total properties a player owns
+    /*  ###########################################################################################
+        ### Function that updates the rent based on the amount of houses/hotels on the property ###
+        ###########################################################################################  */
+    // Function that updates the rent based on 
+    public void updateRentHouses() {
 
-    //  Function that allows player to upgrade houses to hotels
-    public void upgradeToHotel(String propertyName) {
-        owner.updateMoney(-costHotels);
-        setBuildHotel(propertyName);
-        numHotels++;
+        switch (this.name) {
+            case "Mediterranean Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 10;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 30;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 90;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 160;
+                }
+                break;
+            case "Baltic Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 20;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 60;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 180;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 320;
+                }
+                break;
+            
+            case "Oriental Avenue":
+            case "Vermont Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 30;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 90;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 270;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 400;
+                }
+                break;
+            case "Connecticut Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 40;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 100;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 300;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 450;
+                }
+                break;
+
+            case "St. Charles Place":
+            case "States Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 50;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 150;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 450;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 625;
+                }
+                break;
+            case "Virginia Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 60;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 180;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 500;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 700;   
+                }
+                break;
+
+            case "St. James Place":
+            case "Tennessee Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 70;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 200;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 550;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 750;
+                }
+                break;
+            case "New York Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 80;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 220;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 600;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 800;
+                }
+                break;
+
+            case "Kentucky Avenue":
+            case "Indiana Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 90;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 250;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 700;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 875;
+                }
+                break;
+            case "Illinois Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 100;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 300;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 750;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 925;
+                }
+                break;
+
+            case "Atlantic Avenue":
+            case "Ventnor Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 110;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 330;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 800;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 975;
+                }
+                break;
+            case "Marvin Gardens":
+                if (this.numHouses == 1) {
+                    this.rent = 120;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 360;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 850;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 1025;
+                }
+                break;
+
+            case "Pacific Avenue":
+            case "North Carolina Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 130;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 390;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 900;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 1100;
+                }
+                break;
+            case "Pennsylvania Avenue":
+                if (this.numHouses == 1) {
+                    this.rent = 150;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 450;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 1000;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 1200;
+                }
+                break;
+
+            case "Park Place":
+                if (this.numHouses == 1) {
+                    this.rent = 175;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 500;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 1100;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 1300;
+                }
+                break;
+            case "Boardwalk":
+                if (this.numHouses == 1) {
+                    this.rent = 200;
+                }
+                else if (this.numHouses == 2) {
+                    this.rent = 600;
+                }
+                else if (this.numHouses == 3) {
+                    this.rent = 1400;
+                }
+                else if (this.numHouses == 4) {
+                    this.rent = 1700;
+                }
+                break;
+
+            default:
+        }
     }
 
-    public void sellHouse(Player player) {
-        player.updateMoney( costHouses / 2 );   // player gets back half the value of a house
+    public void updateRentHotels() {
+
+        switch (this.name) {
+            case "Mediterranean Avenue":
+                this.rent = 250;
+                break;
+            case "Baltic Avenue":
+                this.rent = 450;
+                break;
+            
+            case "Oriental Avenue":
+            case "Vermont Avenue":
+                this.rent = 550;
+                break;
+            case "Connecticut Avenue":
+                this.rent = 600;
+                break;
+
+            case "St. Charles Place":
+            case "States Avenue":
+                this.rent = 750;
+                break;
+            case "Virginia Avenue":
+                this.rent = 900;
+                break;
+
+            case "St. James Place":
+            case "Tennessee Avenue":
+                this.rent = 950;
+                break;
+            case "New York Avenue":
+                this.rent = 1000;
+                break;
+
+            case "Kentucky Avenue":
+            case "Indiana Avenue":
+                this.rent = 1050;
+                break;
+            case "Illinois Avenue":
+                this.rent = 1100;
+                break;
+
+            case "Atlantic Avenue":
+            case "Ventnor Avenue":
+                this.rent = 1150;
+                break;
+            case "Marvin Gardens":
+                this.rent = 1200;
+                break;
+
+            case "Pacific Avenue":
+            case "North Carolina Avenue":
+                this.rent = 1275;
+                break;
+            case "Pennsylvania Avenue":
+                this.rent = 1400;
+                break;
+                
+            case "Park Place":
+                this.rent = 1500;
+                break;
+            case "Boardwalk":
+                this.rent = 2000;
+                break;
+                
+            default:
+        }
     }
 
-    // Function that allows player to sell hotel
-    public void sellHotel(Player player) {
-        player.updateMoney( this.costHotels / 2 ); // player gets back half the value of the hotel
-        numHotels--;
-    }
 }
