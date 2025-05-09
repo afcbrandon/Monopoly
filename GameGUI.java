@@ -54,7 +54,7 @@ public class GameGUI extends JFrame {
         buildButton.setFocusable(false);
         
         // Sets the clickability of build property button, dependent if the player owns any properties 
-        if ( !players.get(currentPlayerIndex).getOwnsColorSet() ) { // Player does not own a full set of properties within a color set
+        if ( players.get(currentPlayerIndex).getFullColorsets().isEmpty() ) { // if HashMap is empty, then player does not own a full set of properties within a color set
             buildButton.setEnabled(false);
         }
 
