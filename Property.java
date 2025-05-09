@@ -104,10 +104,19 @@ public class Property {
         return false;// They cant buy property bc they dont have enough money
     }
 
+    public void buildHouses() {
+
+    }
+
+    private void buildHotel() {
+        
+    }
+
     /*  ###########################################################################################
         ### Function that updates the rent based on the amount of houses/hotels on the property ###
         ###########################################################################################  */
-    // Function that updates the rent based on 
+
+    /* Function that updates the rent based on the amount of houses on a property space */
     public void updateRentHouses() {
 
         switch (this.name) {
@@ -353,6 +362,7 @@ public class Property {
         }
     }
 
+    /*  Function that updates the rent if a property has a hotel on its space */
     public void updateRentHotels() {
 
         switch (this.name) {
@@ -417,7 +427,7 @@ public class Property {
             case "Boardwalk":
                 this.rent = 2000;
                 break;
-                
+
             default:
         }
     }

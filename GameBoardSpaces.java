@@ -20,23 +20,12 @@ public class GameBoardSpaces {
         return allPlayers;
     }
 
+    /*  ##################
+        ### Properties ###
+        ##################  */
+        
     /// Function that sets the properties of all the spaces on the board
     public void initializeBoardSpaces() {
-        //This will add properties to HashMap with position Key
-
-        // Go Space
-
-        // Jail Spaces
-
-        // Chance Spaces
-
-        // Chest Spaces
-
-        // Tax Spaces
-
-        /*  ##################
-            ### Properties ###
-            ##################  */
 
         //  Railroads
         properties.put(6, new Property("Reading Railroad", 200, 0));
@@ -307,7 +296,7 @@ public class GameBoardSpaces {
                 }
             }
         }
-        
+
     }
 
     public void startAuction(Property property, ArrayList<Player> allPlayers) {

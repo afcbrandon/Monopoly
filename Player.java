@@ -74,6 +74,16 @@ public class Player {
         return this.hasOutOfJailCard;
     }
 
+    //  Function that allows player to build property as long as they own a property (checks to see if ownedColorSets has any key within)
+    public boolean getOwnsColorSet() {
+        if (this.ownedColorSets.isEmpty()) {
+            return false; 
+        }
+        // TODO: Add code that checks to see if player owns all properties within a color set, returns false if not { Most likely use a for loop that checks to see if any key within hashmap satisfies all properties owned }
+
+        return true;    // Returns true if all 
+    }
+
     /*  ###############
         ### Setters ###
         ###############  */
