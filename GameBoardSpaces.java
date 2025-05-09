@@ -257,14 +257,13 @@ public class GameBoardSpaces {
             Property property = getProperty(spaceNumber);
 
             // Check if the property is already owned
+            if (property.getOwner() == currentPlayer) {
+                return; // exit early if player already owns the property
+            }
+
             if (property.getOwner() != null) {
-                // TODO: Build House code is not needed here. Player can build houses during any turn, not only when they land on a space they already own
-                if (property.getOwner().getPlayerName().equals(currentPlayer.getPlayerName())) {
-                    buildHouse(currentPlayer, spaceNumber);
-                } else {
-                    payRent(currentPlayer, spaceNumber, diceRoll);
-                }
-                return; // Exit early if already owned
+                payRent(currentPlayer, spaceNumber, diceRoll);
+                return; // exit early after rent has been paid to owner of this property
             }
 
             int price = property.getPrice();
@@ -308,20 +307,7 @@ public class GameBoardSpaces {
                 }
             }
         }
-    }
-
-
-    public void buildHouse(Player player, int spaceNumber) {
-        //
-        String[] options = { "Yes", "No" };
-        var selection = JOptionPane.showOptionDialog(null, "", "Build a House", 0, 1,
-                null, options, options[0]);
-        if (selection == 0) {   //  Yes
-            // TODO: Add Code Here to build a house
-        }
-        else {  //  No
-            JOptionPane.showMessageDialog(null, player.getPlayerName() + " chose not to build a house.");
-        }
+        
     }
 
     public void startAuction(Property property, ArrayList<Player> allPlayers) {
