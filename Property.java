@@ -11,19 +11,20 @@ public class Property {
     private int costHotels;
     private int mortgageValue;
     private Player owner;
-    private boolean mortgaged;
+    private boolean isMortgaged;
 
 
     // Constructor used by spaces with no street color "Railroads" and utilities
-    public Property(String name, int price, int rent) {
+    public Property(String name, int price, int rent, int mortgageValue) {
         this.name = name;
         this.price = price;
         this.rent = rent;
-        this.streetColor = null;    // Properties do not have a street
+        this.mortgageValue = mortgageValue;
+        this.isMortgaged = false;
     }
 
     // Constructor used by spaces with properties and streets
-    public Property(String name, String streetColor, int price, int rent, int costHouses, int costHotels, int mortgageValue, boolean mortgaged) {
+    public Property(String name, String streetColor, int price, int rent, int costHouses, int costHotels, int mortgageValue) {
         this.name = name;
         this.streetColor = streetColor;
         this.price = price;
@@ -33,7 +34,7 @@ public class Property {
         this.costHouses = costHouses;
         this.costHotels = costHotels;
         this.mortgageValue = mortgageValue;
-        this.mortgaged = false;
+        this.isMortgaged = false;
         this.owner = null; // every property starts with no owner
     }
 
@@ -42,19 +43,19 @@ public class Property {
         ###############  */
     
     public String getName() {
-        return name;
+        return this.name;
     }
     public int getRent() {
-        return rent;
+        return this.rent;
     }
     public Player getOwner() {
-        return owner;
+        return this.owner;
     }
     public int getPrice() {
-        return price;
+        return this.price;
     }
     public String getStreetColor() {
-        return streetColor;
+        return this.streetColor;
     }
     public int getNumHouses() {
         return this.numHouses;
@@ -73,16 +74,6 @@ public class Property {
     /* Function that sets the owner */
     public void setOwner(Player owner) {
         this.owner = owner;
-    }
-
-    /*  Function that increments number of houses on the property by 1 */
-    public void setHouses() {
-        this.numHouses++;
-    }
-
-    /* Function that increments the number of hotels on the property by 1 */
-    public void setHotels() {
-        this.numHouses++;
     }
 
     /*  ##########################
@@ -109,7 +100,17 @@ public class Property {
     }
 
     private void buildHotel() {
-        
+
+    }
+
+    /*  Function that increments number of houses on the property by 1 */
+    public void addHouses() {
+        this.numHouses++;
+    }
+
+    /* Function that increments the number of hotels on the property by 1 */
+    public void addHotels() {
+        this.numHouses++;
     }
 
     /*  ###########################################################################################
@@ -358,7 +359,7 @@ public class Property {
                 }
                 break;
 
-            default:
+            default:    // Do NOTHING
         }
     }
 
@@ -428,7 +429,7 @@ public class Property {
                 this.rent = 2000;
                 break;
 
-            default:
+            default:    // DO NOTHING
         }
     }
 

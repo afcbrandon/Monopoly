@@ -23,54 +23,79 @@ public class GameBoardSpaces {
     /*  ##################
         ### Properties ###
         ##################  */
-        
+
     /// Function that sets the properties of all the spaces on the board
     public void initializeBoardSpaces() {
 
         //  Railroads
-        properties.put(6, new Property("Reading Railroad", 200, 0));
-        properties.put(16, new Property("Pennsylvania Railroad", 200, 0));
-        properties.put(26, new Property("B & O Railroad", 200, 0));
-        properties.put(36, new Property("Short Line", 200, 0));
+        properties.put(6, new Property("Reading Railroad", 200, 25, 100));
+        properties.put(16, new Property("Pennsylvania Railroad", 200, 25, 100));
+        properties.put(26, new Property("B & O Railroad", 200, 25, 100));
+        properties.put(36, new Property("Short Line", 200, 25, 100));
 
         //  Utilities
-        properties.put(13, new Property("Electric Company", 150, 0));
-        properties.put(29, new Property("Water Works", 150, 0));
+        properties.put(13, new Property("Electric Company", 150, 0, 75));
+        properties.put(29, new Property("Water Works", 150, 0, 75));
 
         // Purple Street
-        properties.put(2, new Property("Mediterranean Avenue", "Purple", 60, 2, 50, 50, 30, false));
-        properties.put(4, new Property("Baltic Avenue", "Purple", 60, 4, 50, 50, 30, false));
-        // Light Blue Street
-        properties.put(7, new Property("Oriental Avenue", "Light Blue", 100, 6, 50, 50, 50, false));
-        properties.put(9, new Property("Vermont Avenue", "Light Blue", 100, 6, 50, 50, 50, false));
-        properties.put(10, new Property("Connecticut Avenue", "Light Blue", 120, 8, 50, 50, 60, false));
-        // Pink Street
-        properties.put(12, new Property("St. Charles Place", "Pink", 140, 10, 100, 100, 70, false));
-        properties.put(14, new Property("States Avenue", "Pink", 140, 10,  100, 100,70, false));
-        properties.put(15, new Property("Virginia Avenue", "Pink", 160, 12, 100, 100,80, false));
-        // Orange Street
-        properties.put(17, new Property("St. James Place", "Orange", 180, 14, 100, 100,90, false));
-        properties.put(19, new Property("Tennessee Avenue", "Orange", 180, 14, 100, 100,90, false));
-        properties.put(20, new Property("New York Avenue", "Orange", 200, 16, 100, 100, 90, false));
-        // Red Street
-        properties.put(22, new Property("Kentucky Avenue", "Red", 220, 18, 150, 150, 110, false));
-        properties.put(24, new Property("Indiana Avenue", "Red", 220, 18, 150, 150, 110, false));
-        properties.put(25, new Property("Illinois Avenue", "Red", 240, 20, 150, 150, 120, false));
-        // Yellow Street
-        properties.put(27, new Property("Atlantic Avenue", "Yellow", 260, 22, 150, 150, 130, false));
-        properties.put(28, new Property("Ventnor Avenue", "Yellow", 260, 22, 150, 150, 130, false));
-        properties.put(30, new Property("Marvin Gardens", "Yellow", 280, 24, 150, 150,140, false));
-        // Green Street
-        properties.put(32, new Property("Pacific Avenue", "Green", 300, 26, 200, 200, 150, false));
-        properties.put(33, new Property("North Carolina Avenue", "Green", 300, 26, 200, 200,150, false));
-        properties.put(35, new Property("Pennsylvania Avenue", "Green", 320, 28, 200, 200,150, false));
-        // Dark Blue Street
-        properties.put(38, new Property("Park Place", "Dark Blue", 350, 35, 200, 200,175, false));
-        properties.put(40, new Property("Boardwalk", "Dark Blue", 400, 50, 200, 200,200, false));
-    }
+        properties.put(2, new Property("Mediterranean Avenue", "Purple", 60,
+                                        2, 50, 50, 30));
+        properties.put(4, new Property("Baltic Avenue", "Purple", 60, 
+                                        4, 50, 50, 30));
 
-    public Property getPropertyBySpace(int position) {
-        return properties.get(position);
+        // Light Blue Street
+        properties.put(7, new Property("Oriental Avenue", "Light Blue", 100, 
+                                        6, 50, 50, 50));
+        properties.put(9, new Property("Vermont Avenue", "Light Blue", 100,
+                                        6, 50, 50, 50));
+        properties.put(10, new Property("Connecticut Avenue", "Light Blue", 120, 
+                                        8, 50, 50, 60));
+
+        // Pink Street
+        properties.put(12, new Property("St. Charles Place", "Pink", 140, 
+                                        10, 100, 100, 70));
+        properties.put(14, new Property("States Avenue", "Pink", 140, 
+                                        10,  100, 100,70));
+        properties.put(15, new Property("Virginia Avenue", "Pink", 160, 
+                                        12, 100, 100,80));
+
+        // Orange Street
+        properties.put(17, new Property("St. James Place", "Orange", 180, 
+                                        14, 100, 100,90));
+        properties.put(19, new Property("Tennessee Avenue", "Orange", 180, 
+                                        14, 100, 100,90));
+        properties.put(20, new Property("New York Avenue", "Orange", 200, 
+                                        16, 100, 100, 90));
+
+        // Red Street
+        properties.put(22, new Property("Kentucky Avenue", "Red", 220, 
+                                        18, 150, 150, 110));
+        properties.put(24, new Property("Indiana Avenue", "Red", 220, 
+                                        18, 150, 150, 110));
+        properties.put(25, new Property("Illinois Avenue", "Red", 240, 
+                                        20, 150, 150, 120));
+
+        // Yellow Street
+        properties.put(27, new Property("Atlantic Avenue", "Yellow", 260, 
+                                        22, 150, 150, 130));
+        properties.put(28, new Property("Ventnor Avenue", "Yellow", 260, 
+                                    22, 150, 150, 130));
+        properties.put(30, new Property("Marvin Gardens", "Yellow", 280, 
+                                    24, 150, 150, 140));
+
+        // Green Street
+        properties.put(32, new Property("Pacific Avenue", "Green", 300, 
+                                    26, 200, 200, 150));
+        properties.put(33, new Property("North Carolina Avenue", "Green", 300, 
+                                    26, 200, 200, 150));
+        properties.put(35, new Property("Pennsylvania Avenue", "Green", 320, 
+                                    28, 200, 200, 150));
+
+        // Dark Blue Street
+        properties.put(38, new Property("Park Place", "Dark Blue", 350, 
+                                    35, 200, 200, 175));
+        properties.put(40, new Property("Boardwalk", "Dark Blue", 400, 
+                                    50, 200, 200, 200));
     }
 
     /// Function that checks, and returns, the type of the board space as a String
@@ -105,6 +130,7 @@ public class GameBoardSpaces {
     public Property getProperty(int spaceNumber) {
         return properties.get(spaceNumber);
     }
+
     public int getNearestRailroad(int position) {
         int[] railroads = {5, 15, 25, 35};
         for (int railroad : railroads) {
@@ -123,9 +149,11 @@ public class GameBoardSpaces {
         }
         return utilities[0]; // Wrap around
     }
+
     public Property getPropertyAt(int position) {
         return properties.containsKey(position) ? properties.get(position) : null;
     }
+
     public void initializeChanceDeck() {
         chanceDeck = new ArrayList<>();
 
@@ -144,8 +172,6 @@ public class GameBoardSpaces {
         chanceDeck.add(new ChanceCard("Take a trip to Reading Railroad. If you pass Go, collect $200"));
         chanceDeck.add(new ChanceCard("You have been elected Chairman of the Board. Pay each player $50"));
         chanceDeck.add(new ChanceCard("Your building loan matures. Collect $150"));
-
-
 
         Collections.shuffle(chanceDeck);  // Shuffle the deck so it’s random each game
     }
@@ -196,13 +222,13 @@ public class GameBoardSpaces {
 
                 if (currentPlayer.getMoney() >= rentAmount) {
                     currentPlayer.updateMoney(-rentAmount);
-                    // property.getOwner().updateMoney(rentAmount);    // TODO: BUG, Property owner money doesn't update when rent is paid to them
-                    property.getOwner().setMoney(property.getOwner().getMoney() + rentAmount);
+                    property.getOwner().updateMoney(rentAmount);    // TODO: BUG, Property owner money doesn't update on the GUI after this code runs
                     JOptionPane.showMessageDialog(null,
                             currentPlayer.getPlayerName() + " paid $" + rentAmount +
                                     " rent to " + property.getOwner().getPlayerName() +
                                     " for landing on " + property.getName() + "!");
                 } else {
+                    // TODO: PLAYER MUST SELL ASSETS TO BANK TO PAY OFF DEBT TO PROPERTY OWNER
                     int option = JOptionPane.showConfirmDialog(null,
                             currentPlayer.getPlayerName() + " does not have enough money to pay $" + rentAmount + ".\n" +
                                     "Do you want to sell your assets to the bank to try and stay in the game?",
@@ -268,7 +294,8 @@ public class GameBoardSpaces {
                         System.out.println(msg);
                         JOptionPane.showMessageDialog(null, msg);
                     }
-                } else {
+                } 
+                else {
                     JOptionPane.showMessageDialog(null, currentPlayer.getPlayerName() + " cannot afford " + property.getName());
                 }
             }
@@ -288,10 +315,12 @@ public class GameBoardSpaces {
                         currentPlayer.addProperty(property);
                         property.setOwner(currentPlayer);
                         JOptionPane.showMessageDialog(null, currentPlayer.getPlayerName() + " successfully purchased " + property.getName() + "!");
-                    } else {
+                    } 
+                    else {
                         JOptionPane.showMessageDialog(null, "You don't have enough money to purchase this property!");
                     }
-                } else {
+                } 
+                else {
                     startAuction(property, allPlayers); // Launch auction if declined
                 }
             }
@@ -328,24 +357,19 @@ public class GameBoardSpaces {
         }
 
         if (highestBidder != null) {
-            highestBidder.updateMoney(-highestBid); //subtracks the amount of money they bid
+            highestBidder.updateMoney(-highestBid);                         //subtracks the amount of money they bid
             highestBidder.addProperty(property);
-            property.setOwner(highestBidder);//sets as owner
+            property.setOwner(highestBidder);                               //sets as owner
             JOptionPane.showMessageDialog(null, highestBidder.getPlayerName() + " won the auction for $" + highestBid + "!");
         } else {
             JOptionPane.showMessageDialog(null, "No one bid on the property. It remains unowned.");
         }
     }
-    // We will use this in the future to be able to buy property
-    public void setOwner(int spaceNumber, Player owner) {
-        if (isProperty(spaceNumber)) {
-            getProperty(spaceNumber).setOwner(owner);
-        }
-    }
 
-    /*
-        Tax Functions
-     */
+    /*  #####################
+        ### Tax Functions ###
+        #####################  */
+
     public int payIncomeTax(Player player, int selection) {
 
         if (selection == 0) {       //  Pay $200 Income Tax

@@ -1,13 +1,12 @@
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.ArrayList;
 import java.util.Random;
 
 public class GameGUI extends JFrame {
     private ArrayList<Player> players;
     private JPanel playersPanel;
+    private JPanel controlPanel;
     private JButton rollButton;
     private JButton endTurnButton;
     private JButton buildButton;
@@ -24,19 +23,28 @@ public class GameGUI extends JFrame {
 
         // Set up the frame
         setTitle("Monopoly Game");
-        setSize(300, 400);
+        if ( players.size() >= 6 ) {
+            setSize(300, 800);
+        }
+        else if (players.size() >= 4 ) {
+            setSize(300, 600);
+        }
+        else {
+            setSize(300, 400);
+        }
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
 
         // Initialize buttons
         rollButton = new JButton("Roll Dice");
         rollButton.setFocusable(false);
-        rollButton.addActionListener(e -> {
+        rollButton.addActionListener( _ -> {
             Player currentPlayer = players.get(currentPlayerIndex);
 
             do {
                 currentPlayer.playerTurn();
                 updatePlayerPanel(currentPlayer);
+                updateControlPanel(this.controlPanel);
             } while (currentPlayer.getRolledDouble());
 
             rollButton.setEnabled(false); // Human's turn ends here
@@ -44,28 +52,27 @@ public class GameGUI extends JFrame {
 
         endTurnButton = new JButton("End Turn");
         endTurnButton.setFocusable(false);
-        endTurnButton.addActionListener(e -> {
+        endTurnButton.addActionListener( _ -> {
             endTurn();
             rollButton.setEnabled(!(players.get(currentPlayerIndex) instanceof Bot)); // Only enable for humans
             handleBotTurns(); // If it's a bot, take turns automatically
         });
 
         buildButton = new JButton("Build Property");
-        buildButton.setFocusable(false);
+        buildButton.setFocusable(false);    //  disabled keyboard focus
         
         // Sets the clickability of build property button, dependent if the player owns any properties 
         if ( players.get(currentPlayerIndex).getFullColorsets().isEmpty() ) { // if HashMap is empty, then player does not own a full set of properties within a color set
             buildButton.setEnabled(false);
+        } 
+        else {
+            buildButton.setEnabled(true);
         }
-
-        buildButton.addActionListener(e -> {
-            Player currentPlayer = players.get(currentPlayerIndex);
-        });
 
         // Debug button (unchanged)
         JButton debugButton = new JButton("Debug");
         debugButton.setFocusable(false);
-        debugButton.addActionListener(e -> {
+        debugButton.addActionListener( _ -> {
             Player currentPlayer = players.get(currentPlayerIndex);
             showDebugPanel(currentPlayer);
         });
@@ -79,7 +86,7 @@ public class GameGUI extends JFrame {
         }
 
         // Control panel
-        JPanel controlPanel = new JPanel(new GridLayout(0, 1));
+        this.controlPanel = new JPanel(new GridLayout(0, 1));
         controlPanel.add(rollButton);
         controlPanel.add(endTurnButton);
         controlPanel.add(buildButton);
@@ -131,6 +138,10 @@ public class GameGUI extends JFrame {
         }
     }
 
+    private void updateControlPanel(JPanel controlPanel) {
+        controlPanel.revalidate();
+    }
+
     private void endTurn() {
         do {
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
@@ -148,6 +159,7 @@ public class GameGUI extends JFrame {
             do {
                 bot.playerTurn();
                 updatePlayerPanel(bot);
+                // TODO: Add code for bot to update control panel {might be needed for bought to build houses}
             } while (bot.getRolledDouble());
 
             endTurn();
@@ -174,6 +186,7 @@ public class GameGUI extends JFrame {
                 player.updateMoney(moneyChange);
                 player.setPosition(newPos);
                 updatePlayerPanel(player);
+                updateControlPanel(this.controlPanel);
                 boardSpaces.purchaseProperty(player, player.getPosition(), 1);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Invalid input.");

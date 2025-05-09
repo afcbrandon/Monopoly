@@ -116,15 +116,14 @@ public class Player {
         }
     }
 
-    public void addProperty(Property p) {
-        ownedProperties.add(p);
-    }
     public ArrayList<Property> getOwnedProperties() {
         return ownedProperties;
     }
+
     public void setJailed(boolean jailed) {
         this.isJailed = jailed;
     }
+
     public void setOutOfJailCard(boolean hasCard){
         this.hasOutOfJailCard = hasCard;
     }
@@ -310,6 +309,35 @@ public class Player {
 
     // **************************************** COLORSET FUNCTIONS
 
+    /*  Function that adds properties to ownedProperties and totalColorSetProperties */
+    public void addProperty(Property boughtProperty) {
+        ownedProperties.add(boughtProperty);
+
+        if ( boughtProperty.getStreetColor() == null || boughtProperty.getStreetColor().isEmpty() ) {
+            System.out.println("Property has no street color. Not added to a colorset");
+            return;
+        }
+
+        for (Property p : ownedProperties) {
+            if ( p.getName().equals(boughtProperty.getName()) ) {
+                updateColorsetBuy( p.getStreetColor() );
+
+                System.out.println(this.name + " added " + p.getName() + " to their colorset");
+                System.out.println( "Total colorset properties for " + this.name );
+                System.out.println(totalColorSetProperties);
+            }
+        }
+
+    }
+
+    /*  Function that handles selling property to another player */
+    public void sellProperty(Property soldProperty, Player newOwner) {
+        
+        updateColorsetSell( soldProperty.getStreetColor() ); // property is removed from current player's HashMap totalColorSetProperties
+        ownedProperties.remove(soldProperty);   // Remove property from ArrayList ownedProperties
+        newOwner.addProperty(soldProperty); // property is added to newOwner
+    }
+
     /*  Function that increments the amount of properties in a colorset when player buys a property */
     private void updateColorsetBuy(String streetColor) {
 
@@ -340,7 +368,7 @@ public class Player {
 
         for ( String streetColor : totalColorSetProperties.keySet() ) {
             int propertiesOwned = totalColorSetProperties.get(streetColor);
-            if ( checkFullColorSet(streetColor, propertiesOwned) ) {
+            if ( checkFullColorSet(streetColor, propertiesOwned) == true ) {
                 checkedStreets.put(streetColor, propertiesOwned);
             }
         }
@@ -348,6 +376,7 @@ public class Player {
         return checkedStreets;
     }
 
+    /*  Function that checks to see if player owns the full colorset in a Street Color. Returns false if they do not */
     private boolean checkFullColorSet(String streetColor, Integer totalPropertiesOwned) {
 
         switch (streetColor) {
@@ -357,42 +386,19 @@ public class Player {
             case "Red":
             case "Yellow":
             case "Green":
-                if (totalPropertiesOwned == 3) return true;
+                if ( totalColorSetProperties.get(streetColor) == 3 ) return true;
             case "Purple":
             case "Dark Blue":
-                if (totalPropertiesOwned == 2) return true;
+                if ( totalColorSetProperties.get(streetColor) == 2 ) return true;
+            default:    // Do Nothing
         }
 
         return false;
     }
 
-    /* 
-    // will get how may color properties there are in total
-    public int getTotalPropertiesInSet(String color){
-        switch (color) {
-            case "Brown": return 2;
-            case "Blue": return 2;
-            case "Pink":
-            case "Orange":
-            case "Red":
-            case "Yellow":
-            case "Green": return 3;
-            case "Dark Blue": return 2;
-            default: return 0; // No color set
-        }
-    }
-
-    public boolean ownsFullSet(String color) {
-        int count = 0;
-        int totalNeeded = getTotalPropertiesInSet(color);//again this gets total count
-
-        for (Property property : ownedProperties) {
-            if (property.getStreetColor() != null && property.getStreetColor().equals(color)) {
-                count++;
-            }
-        }
-        return count == totalNeeded;
-    }       */
+    /*  #######################################
+        ### Function for checking Passed Go ###
+        #######################################  */
 
     //created checkPassedGo function
     protected void checkPassedGo(int previousPosition) {
@@ -415,6 +421,11 @@ public class Player {
         // TODO: Implement a JOptionPane that asks the user if they would like to roll double, pay a fine, or use a card
         String options[] = {"Roll Dice", "Pay $50", "Get Out Of Jail Free"};
         var userOption = JOptionPane.showOptionDialog(null, "", "Jail", 0, 1, null, options, options[0]);
+
+        // If player does not have a get out Jail Free card, then the button is disabled
+        if ( hasOutOfJailCard() == false ) {
+            // TODO: Code that disables button if player does not have a get out of jail card
+        }
 
         // Player selects option to roll doubles
         if (userOption == 0) {
@@ -457,17 +468,16 @@ public class Player {
             this.isJailed = false;
             playerRoll();
         }
-        else if (userOption == 2) {
-            if (this.hasOutOfJailCard()) { // Check if the player has the "Get Out of Jail Free" card
-                JOptionPane.showMessageDialog(null, this.name + " used their 'Get Out of Jail Free' card!");
-                this.isJailed = false;  // The player is no longer in jail
-                this.removeOutOfJailCard();  // Remove the card from the player's inventory
-                playerRoll(); // Roll the dice to continue the game
-            } else {
-                JOptionPane.showMessageDialog(null, "You don't have a 'Get Out of Jail Free' card.");
-            }
+        // Player has Get Out of Jail Free card
+        else {
+            JOptionPane.showMessageDialog(null, this.name + " used their 'Get Out of Jail Free' card!");
+            this.isJailed = false;  // The player is no longer in jail
+            this.removeOutOfJailCard();  // Remove the card from the player's inventory
+            playerRoll(); // Roll the dice to continue the game
         }
+
     }
+
   private void removeOutOfJailCard() {
         this.hasOutOfJailCard = false;
   }
@@ -522,6 +532,7 @@ public class Player {
         }
         return count;
     }
+
     public int countRailroads() {
         int count = 0;
         for (Property p : ownedProperties) {
