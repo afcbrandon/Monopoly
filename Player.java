@@ -1,6 +1,7 @@
 import javax.swing.*;
 import java.util.Random;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Player {
     protected final String name;
@@ -14,7 +15,8 @@ public class Player {
     protected boolean rolledDouble;
     protected int rolledDoubleCounter;
     private boolean hasOutOfJailCard = false;
-    private ArrayList<Property> ownedProperties = new ArrayList<>();
+    private ArrayList<Property> ownedProperties;
+    private HashMap<String, Integer> ownedColorSets;
     private boolean isBot = false;
 
 
@@ -32,6 +34,8 @@ public class Player {
         this.rolledDouble = false;
         this.rolledDoubleCounter = 0;
         this.globalDiceRoll = 0;
+        this.ownedProperties = new ArrayList<>();
+        this.ownedColorSets = new HashMap<String, Integer>();
         this.isBot = isBot;
     }
 
@@ -121,6 +125,9 @@ public class Player {
     }
 
 
+    /*  #############################################################################################
+        ### Functions for Player  when they have run out of money and must surrender their assets ###
+        #############################################################################################  */
     public void transferAssetsTo(Player receiver) {
         // Transfer remaining money
         receiver.updateMoney(this.money);
@@ -293,6 +300,37 @@ public class Player {
 
     }
 
+    
+    /*  ##############################
+        ### Functions for Colorset ###
+        ##############################  */
+
+    // **************************************** COLORSET FUNCTIONS
+
+    /*  Function that increments the amount of properties in a colorset when player buys a property */
+    private void updateColorsetBuy(String streetColor) {
+
+        // Increment number of properties on a given Color Set
+        if ( ownedColorSets.containsKey(streetColor) ) {
+            ownedColorSets.put( streetColor, ownedColorSets.get(streetColor) + 1 );
+        }
+        else {
+            ownedColorSets.put( streetColor, 1 );
+        }
+        
+    }
+
+    /*  Function that decrements the amount of properties on a colorset when player sells a property */
+    private void updateColorsetSell(String streetColor) {
+
+        ownedColorSets.put(streetColor, ownedColorSets.get(streetColor) - 1);
+
+        if (ownedColorSets.get(streetColor) == 0) {
+            ownedColorSets.remove(streetColor);
+        }
+
+    }
+
     // will get how may color properties there are in total
     public int getTotalPropertiesInSet(String color){
         switch (color) {
@@ -319,6 +357,9 @@ public class Player {
         }
         return count == totalNeeded;
     }
+
+
+
     //created checkPassedGo function
     protected void checkPassedGo(int previousPosition) {
         // Check if player passed Go or landed on GO and awards 200 bucks
@@ -458,4 +499,6 @@ public class Player {
         }
         return count;
     }
+
+
 }
