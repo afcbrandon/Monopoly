@@ -28,6 +28,7 @@ public class PlayerToken {
         for (int i = 0; i < tokenList.size(); i++) {
             if (tokenList.get(i) == userChar) {
                 tokenList.remove(i);
+                return;
             }
         }
     }
