@@ -274,11 +274,7 @@ public class GameBoardSpaces {
                         currentPlayer.transferAssetsTo(property.getOwner());
                     }
                 }
-
-                JOptionPane.showMessageDialog(null,
-                        currentPlayer.getPlayerName() + " paid $" + rentAmount +
-                                " rent to " + property.getOwner().getPlayerName() +
-                                " for landing on " + property.getName() + "!");
+                
             }
         }
     }
