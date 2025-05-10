@@ -14,17 +14,17 @@ public class MainMenu extends JFrame {
         JButton playBotBtn = new JButton("Play with Bot(s)");
         JButton exitBtn = new JButton("Exit");
 
-        playHumanBtn.addActionListener(e -> {
+        playHumanBtn.addActionListener( _ -> {
             dispose();  // Close this window
             new UserInterface(false).start(); // false = human players only
         });
 
-        playBotBtn.addActionListener(e -> {
+        playBotBtn.addActionListener( _ -> {
             dispose();
             new UserInterface(true).start(); // true = play with bots
         });
 
-        exitBtn.addActionListener(e -> System.exit(0));
+        exitBtn.addActionListener( _ -> System.exit(0));
 
         add(playHumanBtn);
         add(playBotBtn);
