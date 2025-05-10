@@ -10,14 +10,29 @@ public class GameBoardSpaces {
     private ArrayList<Player> allPlayers;
     private HashMap<Integer, Property> properties; // we will use the HashMap for fast lookup
     private List<ChanceCard> chanceDeck = new ArrayList<>();
+    private GameGUI gameGUI;
 
     public GameBoardSpaces(ArrayList<Player> players) {
         this.allPlayers = players != null ? players : new ArrayList<>();
         properties = new HashMap<>();
         initializeBoardSpaces();
+        initializeChanceDeck();
     }
+
+    /*  ##################
+        ### Properties ###
+        ##################  */
+
     public ArrayList<Player> getPlayers() {
         return allPlayers;
+    }
+
+    /*  ##################
+        ### Setters ###
+        ##################  */
+
+    public void setGameGUI(GameGUI gGUI) {
+        this.gameGUI = gGUI;
     }
 
     /*  ##################
@@ -195,7 +210,8 @@ public class GameBoardSpaces {
     protected void payRent(Player currentPlayer, int spaceNumber, int diceRoll) {
         if (isProperty(spaceNumber)) {
             Property property = getProperty(spaceNumber);
-            Player owner = currentPlayer;
+            Player owner = property.getOwner();
+
             if (property.getOwner() == null) {
                 currentPlayer.surrenderAssetsToBank();
                 return;
@@ -222,7 +238,10 @@ public class GameBoardSpaces {
 
                 if (currentPlayer.getMoney() >= rentAmount) {
                     currentPlayer.updateMoney(-rentAmount);
-                    property.getOwner().updateMoney(rentAmount);    // TODO: BUG, Property owner money doesn't update on the GUI after this code runs
+                    owner.updateMoney(rentAmount);
+                    // Update both player and owner panel after rent is paid
+                    gameGUI.updatePlayerPanel(currentPlayer);
+                    gameGUI.updatePlayerPanel(owner);
                     JOptionPane.showMessageDialog(null,
                             currentPlayer.getPlayerName() + " paid $" + rentAmount +
                                     " rent to " + property.getOwner().getPlayerName() +
@@ -256,8 +275,6 @@ public class GameBoardSpaces {
                     }
                 }
 
-
-
                 JOptionPane.showMessageDialog(null,
                         currentPlayer.getPlayerName() + " paid $" + rentAmount +
                                 " rent to " + property.getOwner().getPlayerName() +
@@ -266,8 +283,9 @@ public class GameBoardSpaces {
         }
     }
 
-    /// Function that allows player to purchase property when they land on a property space, or pay rent if someone else already owns the property
+    /* Function that allows player to purchase property when they land on a property space, or pay rent if someone else already owns the property */
     protected void purchaseProperty(Player currentPlayer, int spaceNumber, int diceRoll) {
+
         if (isProperty(spaceNumber)) {
             Property property = getProperty(spaceNumber);
 
@@ -314,6 +332,7 @@ public class GameBoardSpaces {
                     if (success) {
                         currentPlayer.addProperty(property);
                         property.setOwner(currentPlayer);
+                        gameGUI.updatePlayerPanel(currentPlayer);   // Update Player Panel stats
                         JOptionPane.showMessageDialog(null, currentPlayer.getPlayerName() + " successfully purchased " + property.getName() + "!");
                     } 
                     else {
@@ -361,6 +380,7 @@ public class GameBoardSpaces {
             highestBidder.addProperty(property);
             property.setOwner(highestBidder);                               //sets as owner
             JOptionPane.showMessageDialog(null, highestBidder.getPlayerName() + " won the auction for $" + highestBid + "!");
+            gameGUI.updatePlayerPanel(highestBidder);  // Update player panel for Player that bid the highest
         } else {
             JOptionPane.showMessageDialog(null, "No one bid on the property. It remains unowned.");
         }

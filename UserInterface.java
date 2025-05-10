@@ -35,7 +35,8 @@ public class UserInterface {
       frame.setVisible(true);
     });
 
-    new GameGUI(pList);
+
+    SwingUtilities.invokeLater( () -> new GameGUI(pList) );
   }
   /*
     This function prompts the user for the number of players in the game,
@@ -118,7 +119,6 @@ public class UserInterface {
 
     return playerList;
   }
-
 
   // Function that prompts user to select their token
   public void chooseToken(PlayerToken tokenList, ArrayList<Player> pList, Player player) {

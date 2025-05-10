@@ -16,6 +16,7 @@ public class GameGUI extends JFrame {
     public GameGUI(ArrayList<Player> players) {
         this.players = players;
         this.boardSpaces = new GameBoardSpaces(players);
+        boardSpaces.setGameGUI(this);   // Set the GameGUI instance for later use in GameBoardSpaces, when updating player profiles
 
         // Randomly select the first player
         Random rand = new Random();
@@ -44,7 +45,6 @@ public class GameGUI extends JFrame {
             do {
                 currentPlayer.playerTurn();
                 updatePlayerPanel(currentPlayer);
-                updateControlPanel(this.controlPanel);
             } while (currentPlayer.getRolledDouble());
 
             rollButton.setEnabled(false); // Human's turn ends here
@@ -60,14 +60,7 @@ public class GameGUI extends JFrame {
 
         buildButton = new JButton("Build Property");
         buildButton.setFocusable(false);    //  disabled keyboard focus
-        
-        // Sets the clickability of build property button, dependent if the player owns any properties 
-        if ( players.get(currentPlayerIndex).getFullColorsets().isEmpty() ) { // if HashMap is empty, then player does not own a full set of properties within a color set
-            buildButton.setEnabled(false);
-        } 
-        else {
-            buildButton.setEnabled(true);
-        }
+        updateBuildButtonState();
 
         // Debug button (unchanged)
         JButton debugButton = new JButton("Debug");
@@ -118,7 +111,8 @@ public class GameGUI extends JFrame {
         return panel;
     }
 
-    private void updatePlayerPanel(Player player) {
+    // Function that updates the player panel, and can be called from other Java classes
+    public void updatePlayerPanel(Player player) {
         for (Component comp : playersPanel.getComponents()) {
             JPanel panel = (JPanel) comp;
             if (panel.getName().equals(player.getPlayerName())) {
@@ -138,8 +132,12 @@ public class GameGUI extends JFrame {
         }
     }
 
-    private void updateControlPanel(JPanel controlPanel) {
-        controlPanel.revalidate();
+    /*  Function that enables buildButton if player owns a Full Color Set */
+    private void updateBuildButtonState() {
+        boolean canBuild = !players.get(currentPlayerIndex).getFullColorsets().isEmpty();
+        buildButton.setEnabled(canBuild);
+        System.out.println("Checking buildButton enable state for player: " + players.get(currentPlayerIndex).getPlayerName());
+        System.out.println("buildButton " + (canBuild ? "ENABLED" : "DISABLED") + " - Full color sets: " + canBuild);
     }
 
     private void endTurn() {
@@ -151,6 +149,7 @@ public class GameGUI extends JFrame {
 
         Player currentPlayer = players.get(currentPlayerIndex);
         JOptionPane.showMessageDialog(this, "It's now " + currentPlayer.getPlayerName() + "'s turn!");
+        updateBuildButtonState();
     }
 
     private void handleBotTurns() {
@@ -186,7 +185,6 @@ public class GameGUI extends JFrame {
                 player.updateMoney(moneyChange);
                 player.setPosition(newPos);
                 updatePlayerPanel(player);
-                updateControlPanel(this.controlPanel);
                 boardSpaces.purchaseProperty(player, player.getPosition(), 1);
             } catch (NumberFormatException ex) {
                 JOptionPane.showMessageDialog(this, "Invalid input.");
