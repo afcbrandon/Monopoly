@@ -5,12 +5,12 @@ public class Bot extends Player {
     private int doubleRollsInARow = 0;
 
     public Bot(String name, GameBoardSpaces gBoardSpaces) {
-        super(name, gBoardSpaces, true); // Bot is set to true
+        super(name, true); // Bot is set to true
     }
 
     public void playerTurn() {
         if (this.isJailed) {
-            jailEscape();
+            // jailEscape();    // TODO: TEMPORARILY DISABLE
             return;
         }
 
@@ -24,7 +24,7 @@ public class Bot extends Player {
             move(diceRoll);
             JOptionPane.showMessageDialog(null, this.name + " moved to position " + this.position);
 
-            handleSpace(this.position);
+            // handleSpace(this.position); // TODO: TEMPORARILY DISABLE
 
             continueTurn = this.rolledDouble;
             turnCount++;
@@ -60,6 +60,8 @@ public class Bot extends Player {
         this.position = (this.position + spaces) % 40;
     }
 
+    //TODO: TEMPORARILY DISABLE ERRORS
+/* 
     public void handleSpace(int currentSpace) {
         String fieldType = gbSpace.spaceType(currentSpace);
 
@@ -114,4 +116,5 @@ public class Bot extends Player {
     public boolean getRolledDouble() {
         return this.rolledDouble;
     }
+*/
 }

@@ -20,18 +20,16 @@ public class Player {
     private HashMap<String, Integer> ownedFullColorSets;            // Variable that holds the total amount of FULL colorsets that the player owns
     private boolean isBot = false;
 
-
-    protected GameBoardSpaces gbSpace;
+    private GameBoardSpaces gbSpace;
 
     //Constructor for both humans and bots
-    public Player(String name, GameBoardSpaces gBoardSpaces, boolean isBot) {
+    public Player(String name, boolean isBot) {
         this.name = name;
         this.money = 1500;
         this.position = 1; // Starting at position 1 (Go space)
         this.isEliminated = false;
         this.isJailed = false;
         this.jailCounter = 0;
-        this.gbSpace = gBoardSpaces;
         this.rolledDouble = false;
         this.rolledDoubleCounter = 0;
         this.globalDiceRoll = 0;
@@ -82,6 +80,9 @@ public class Player {
     /*  ###############
         ### Setters ###
         ###############  */
+    public void setGBoardSpaces(GameBoardSpaces gBoardSpaces) {
+        this.gbSpace = gBoardSpaces;
+    }
 
     ///  Function that automatically eliminates player, if they player should quit
     public void setElimination() {
