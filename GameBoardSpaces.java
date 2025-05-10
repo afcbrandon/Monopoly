@@ -12,8 +12,9 @@ public class GameBoardSpaces {
     private List<ChanceCard> chanceDeck = new ArrayList<>();
     private GameGUI gameGUI;
 
-    public GameBoardSpaces(ArrayList<Player> players) {
+    public GameBoardSpaces(ArrayList<Player> players, GameGUI gameGUI) {
         this.allPlayers = players != null ? players : new ArrayList<>();
+        this.gameGUI = gameGUI;     //  Initialize gameGUI
         properties = new HashMap<>();
         initializeBoardSpaces();
         initializeChanceDeck();
@@ -28,12 +29,12 @@ public class GameBoardSpaces {
     }
 
     /*  ##################
-        ### Setters ###
+        ### Getters ###
         ##################  */
 
-    public void setGameGUI(GameGUI gGUI) {
-        this.gameGUI = gGUI;
-    }
+    /*  ##################
+        ### Setters ###
+        ##################  */
 
     /*  ##################
         ### Properties ###
@@ -281,6 +282,8 @@ public class GameBoardSpaces {
 
     /* Function that allows player to purchase property when they land on a property space, or pay rent if someone else already owns the property */
     protected void purchaseProperty(Player currentPlayer, int spaceNumber, int diceRoll) {
+
+        System.out.println("purchaseProperty called, gameGUI is: " + this.gameGUI);
 
         if (isProperty(spaceNumber)) {
             Property property = getProperty(spaceNumber);

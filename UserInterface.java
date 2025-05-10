@@ -80,7 +80,6 @@ public class UserInterface {
   private ArrayList<Player> createPlayers(int totalPlayers, int humanPlayers) {
     ArrayList<Player> playerList = new ArrayList<>();
     PlayerToken tokenList = new PlayerToken();
-    GameBoardSpaces gameBoardSpaces = new GameBoardSpaces(playerList);
 
     for (int i = 0; i < totalPlayers; i++) {
       Player player;
@@ -89,7 +88,8 @@ public class UserInterface {
       if (isBot) {
         String botName = "Bot " + (i - humanPlayers + 1);  // Bot 1, 2, ...
         System.out.println(botName + " has joined the game!");
-        player = new Bot(botName, gameBoardSpaces);
+        //player = new Bot(botName);
+        player = null;  // TODO: TEMPORARY CODE. TO BE REMOVED LATER
 
         char botToken = tokenList.getTokenList().get(0);
         tokenList.chooseToken(botToken);
@@ -103,7 +103,7 @@ public class UserInterface {
           playerName = uiScanner.nextLine().trim();
         }
 
-        player = new Player(playerName, gameBoardSpaces, false);
+        player = new Player(playerName, false);
 
         if (i == 7) {
           Character lastToken = tokenList.getLastToken();

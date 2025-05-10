@@ -15,8 +15,12 @@ public class GameGUI extends JFrame {
 
     public GameGUI(ArrayList<Player> players) {
         this.players = players;
-        this.boardSpaces = new GameBoardSpaces(players);
-        boardSpaces.setGameGUI(this);   // Set the GameGUI instance for later use in GameBoardSpaces, when updating player profiles
+        this.boardSpaces = new GameBoardSpaces(players, this);
+
+        // Goes through the list of players, and passes the SAME boardSpaces instance
+        for (Player p : players) {
+            p.setGBoardSpaces(this.boardSpaces);
+        }
 
         // Randomly select the first player
         Random rand = new Random();
@@ -41,7 +45,6 @@ public class GameGUI extends JFrame {
         rollButton.setFocusable(false);
         rollButton.addActionListener( _ -> {
             Player currentPlayer = players.get(currentPlayerIndex);
-
             do {
                 currentPlayer.playerTurn();
                 updatePlayerPanel(currentPlayer);
