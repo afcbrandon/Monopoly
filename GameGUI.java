@@ -64,6 +64,11 @@ public class GameGUI extends JFrame {
         buildButton = new JButton("Build Property");
         buildButton.setFocusable(false);    //  disabled keyboard focus
         updateBuildButtonState();
+        buildButton.addActionListener( _ -> {
+            Player player = players.get(currentPlayerIndex);
+
+            buildProperty();
+        });
 
         // Debug button (unchanged)
         JButton debugButton = new JButton("Debug");
@@ -129,6 +134,8 @@ public class GameGUI extends JFrame {
                         : boardSpaces.spaceType(pos);
                 posLabel.setText("Position: " + pos + " - " + desc);
 
+                updateBuildButtonState();
+
                 panel.setBackground(player.getIsEliminated() ? Color.RED : null);
                 break;
             }
@@ -141,6 +148,11 @@ public class GameGUI extends JFrame {
         buildButton.setEnabled(canBuild);
         System.out.println("Checking buildButton enable state for player: " + players.get(currentPlayerIndex).getPlayerName());
         System.out.println("buildButton " + (canBuild ? "ENABLED" : "DISABLED") + " - Full color sets: " + canBuild);
+    }
+
+    // Function for buildButton
+    private void buildProperty() {
+        System.out.println("Button Works!");
     }
 
     private void endTurn() {
