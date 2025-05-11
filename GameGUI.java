@@ -1,7 +1,9 @@
 import javax.swing.*;
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Random;
+import java.util.List;
 
 public class GameGUI extends JFrame {
     private ArrayList<Player> players;
@@ -65,9 +67,9 @@ public class GameGUI extends JFrame {
         buildButton.setFocusable(false);    //  disabled keyboard focus
         updateBuildButtonState();
         buildButton.addActionListener( _ -> {
-            Player player = players.get(currentPlayerIndex);
+            Player currentPlayer = players.get(currentPlayerIndex);
 
-            buildProperty();
+            buildPropertyButton(currentPlayer);
         });
 
         // Debug button (unchanged)
@@ -151,10 +153,181 @@ public class GameGUI extends JFrame {
     }
 
     // Function for buildButton
-    private void buildProperty() {
-        System.out.println("Button Works!");
+    private void buildPropertyButton(Player currentPlayer) {
+
+        JFrame buildJFrame = new JFrame();
+        buildJFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        buildJFrame.setResizable(false);
+
+        JPanel buildJPanel = new JPanel(new GridLayout(currentPlayer.getFullColorsets().size() + 1, 1));
+        HashMap<String,Integer> availColorSets = currentPlayer.getFullColorsets();
+
+        // Height and Width
+        final int WIDTH = 300;
+        final int HEIGHT = 100 * (availColorSets.size() + 1);
+
+        buildJPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+        JButton[] buttons = new JButton[availColorSets.size()];
+        String[] colorNames = new String[availColorSets.size()];
+
+        int index = 0;
+        for ( String cN : availColorSets.keySet() ) {
+            colorNames[index] = cN;
+            index++;
+        }
+
+        // Creates buttons with the name of their respective Color
+        for ( int i = 0; i < availColorSets.size(); i++ ) {
+            buttons[i] = new JButton(colorNames[i]);
+            buildJPanel.add(buttons[i]);
+        }
+
+        // Iterate through JButton Array
+        for ( Component component : buildJPanel.getComponents() ) {
+            // Check if component is a JButton
+            if ( component instanceof JButton ) {
+                JButton button = (JButton) component;
+                String buttonColorName = button.getText();
+
+                // Add actionListener
+                button.addActionListener( _ -> {
+                    propertyNamesButtons(buildJFrame, currentPlayer, buttonColorName);
+                });
+
+            }
+        }
+
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.addActionListener( _ -> {
+            buildJFrame.dispose();
+        });
+
+
+        buildJPanel.add(cancelButton);
+
+        buildJFrame.add(buildJPanel);
+        buildJFrame.pack(); // pack the frame
+
+        buildJFrame.setLocationRelativeTo(null);
+        buildJFrame.setAlwaysOnTop(true);
+        buildJFrame.setVisible(true);
+        
     }
 
+    // Called when player chooses a colorset to build on
+    private void propertyNamesButtons(JFrame parentFrame, Player currPlayer, String colorName) {
+
+        // hide the initial frame
+        parentFrame.setVisible(false);
+        System.out.println("ColorSet Frame set to Hidden!");
+
+        HashMap<String, List<String>> listOfColorProperties = new HashMap<String, List<String>>();
+        listOfColorProperties = currPlayer.getListOfColorSetPropertyNames(currPlayer, colorName);
+        int listSize = listOfColorProperties.get(colorName).size(); // variable that gets the size of the list for a given colorSet that contains the Properties
+        JFrame propertyJFrame = new JFrame();
+        JPanel propertyJPanel = new JPanel();
+        propertyJPanel.setLayout(new BoxLayout(propertyJPanel, BoxLayout.Y_AXIS));
+
+        
+        // Set panel size
+        final int WIDTH = 300;
+        final int HEIGHT = 50;
+        propertyJPanel.setPreferredSize( new Dimension(WIDTH, (listSize * HEIGHT) + (HEIGHT / 2) ) );
+
+        // Code to create buttons for properties
+        for ( int i = 0; i < listSize; i++) {
+            propertyJPanel.add( new JButton(listOfColorProperties.get(colorName).get(i)) );  // creates a button and gives it the name of the Property at index i
+        }
+
+        // Iterate through buttons and add actionListener for them
+        for ( Component component : propertyJPanel.getComponents() ) {
+            // Check if component is a JButton
+            if ( component instanceof JButton ) {
+                JButton button = (JButton) component;
+                button.setAlignmentX(CENTER_ALIGNMENT); // Align Buttons in the Center
+                button.setMinimumSize(new Dimension(WIDTH, HEIGHT));
+                button.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+                button.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE / 2));
+                String bttnPropertyName = button.getText();
+
+                // Add actionLister
+                button.addActionListener( _ -> {
+                    houseOrHotelButtons(propertyJFrame, currPlayer, bttnPropertyName);
+                });
+            }
+        }
+
+        JButton cancelButton = new JButton("Cancel");
+        cancelButton.setAlignmentX(CENTER_ALIGNMENT);
+        cancelButton.setMinimumSize(new Dimension(WIDTH, HEIGHT / 2));
+        cancelButton.setPreferredSize(new Dimension(WIDTH, HEIGHT / 2));
+        cancelButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
+        cancelButton.addActionListener( _ -> {
+            parentFrame.setVisible(true);
+            System.out.println("ColorSet Frame set to Visible!");
+            propertyJFrame.dispose();
+        });
+
+        propertyJPanel.add(cancelButton);
+        
+        propertyJFrame.add(propertyJPanel);
+        propertyJFrame.pack();  // pack the frame
+
+        propertyJFrame.setLocationRelativeTo(null);
+        propertyJFrame.setAlwaysOnTop(true);
+        propertyJFrame.setVisible(true);
+
+    }
+
+    private void houseOrHotelButtons(JFrame parentFrame, Player currPlayer, String propertyName) {
+
+        parentFrame.setVisible(false);
+        
+        JFrame houseHotelFrame = new JFrame();
+        JPanel houseHotelPanel = new JPanel();
+        houseHotelPanel.setLayout(new GridLayout(2, 1));
+        houseHotelPanel.setPreferredSize(new Dimension(300, 100));
+
+        JButton houseButton = new JButton("Build House");
+        JButton hotelButton = new JButton("Build Hotel");
+        JButton cancelButton = new JButton("Cancel");
+
+        houseButton.addActionListener( _ -> {
+            buildHouses(houseHotelFrame, propertyName);
+        });
+
+        hotelButton.addActionListener( _ -> {
+            buildHotel(houseHotelFrame, propertyName);
+        });
+
+        // Code Logic that decides which button to add. If player can build house then show house button, if player can build hotel then show hotel button
+
+        cancelButton.addActionListener( _ -> {
+            houseHotelFrame.dispose();
+            parentFrame.setVisible(true);
+        });
+
+        houseHotelPanel.add(cancelButton);
+        
+        houseHotelFrame.add(houseHotelPanel);
+        houseHotelFrame.pack();
+
+        houseHotelFrame.setLocationRelativeTo(parentFrame);
+        houseHotelFrame.setAlwaysOnTop(true);
+        houseHotelFrame.setVisible(true);
+    }
+
+    private void buildHouses(JFrame parentFrame, String propertyName) {
+
+    }
+
+    private void buildHotel(JFrame parentFrame, String propertyName) {
+
+    }
+
+
+    // Function that ends the player's turn
     private void endTurn() {
         do {
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();

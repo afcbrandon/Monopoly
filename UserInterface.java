@@ -35,9 +35,6 @@ public class UserInterface {
       frame.setVisible(true);
     });
 
-
-    //SwingUtilities.invokeLater( () -> new GameGUI(pList) );
-
     SwingUtilities.invokeLater( new Runnable() {
       public void run() {
         new GameGUI(pList);

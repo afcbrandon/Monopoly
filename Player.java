@@ -1,5 +1,6 @@
 import javax.swing.*;
 import java.util.Random;
+import java.util.List;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -18,6 +19,7 @@ public class Player {
     private ArrayList<Property> ownedProperties;
     private HashMap<String, Integer> totalColorSetProperties;     // Variable that holds the colors that a player owns, and the amount of properties in that color
     private HashMap<String, Integer> ownedFullColorSets;            // Variable that holds the total amount of FULL colorsets that the player owns
+    private HashMap<String, List<String>> colorsetPropertyNames;
     private boolean isBot = false;
 
     private GameBoardSpaces gbSpace;
@@ -36,6 +38,7 @@ public class Player {
         this.ownedProperties = new ArrayList<>();
         this.totalColorSetProperties = new HashMap<String, Integer>();
         this.ownedFullColorSets = new HashMap<String, Integer>();
+        this.colorsetPropertyNames = new HashMap<String, List<String>>();
         this.isBot = isBot;
     }
 
@@ -76,6 +79,54 @@ public class Player {
         //  TODO: Potential problem with checking to see if card is chance or chest card
         return this.hasOutOfJailCard;
     }
+
+    /*  Function that checks to see how many full colorsets the player owns. If the hashmap returned is empty, then player does not own any full colorsets */
+    public HashMap<String, Integer> getFullColorsets () {
+        HashMap<String, Integer> checkedStreets = new HashMap<>();
+
+        for ( String streetColor : totalColorSetProperties.keySet() ) {
+            int propertiesOwned = totalColorSetProperties.get(streetColor);
+            if ( checkFullColorSet(streetColor, propertiesOwned) == true ) {
+                checkedStreets.put(streetColor, propertiesOwned);
+            }
+        }
+
+        return checkedStreets;
+    }
+
+    // Function that gets the available properties of a colorset
+    public HashMap<String, List<String>> getListOfColorSetPropertyNames(Player player, String colorSet) {
+        return colorsetPropertyNames;
+    }
+
+    // Returns the number of houses in a property
+    public int getPropertyHouseNum(String propName) {
+        int count = 0;
+
+        for ( Property p : ownedProperties ) {
+            if ( p.getName().equals(propName) ) count = p.getNumHouses();
+        }
+
+        return count;
+    }
+
+    // Returns the number of hotels in a property
+    public int getPropertyHotelNum(String propName) {
+        int count = 0;
+
+        for ( Property p : ownedProperties ) {
+            if ( p.getName().equals(propName) ) count = p.getNumHotels();
+        }
+
+        return count;
+    }
+
+    // Returns a hashmap of the Properties of a colorset and the amount of hotels it has
+    public HashMap<String, Integer> getHotelsOfProperty(String propertyName) {
+        
+    }
+
+    // Returns a hashmap of the Properties of a colorset and the amount of Houses it has
 
     /*  ###############
         ### Setters ###
@@ -321,7 +372,7 @@ public class Player {
 
         for (Property p : ownedProperties) {
             if ( p.getName().equals(boughtProperty.getName()) ) {
-                updateColorsetBuy( p.getStreetColor() );
+                updateColorsetBuy( p.getStreetColor(), p.getName() );
 
                 System.out.println(this.name + " added " + p.getName() + " to their colorset");
                 System.out.println( "Total colorset properties for " + this.name );
@@ -334,13 +385,13 @@ public class Player {
     /*  Function that handles selling property to another player */
     public void sellProperty(Property soldProperty, Player newOwner) {
         
-        updateColorsetSell( soldProperty.getStreetColor() ); // property is removed from current player's HashMap totalColorSetProperties
+        updateColorsetSell( soldProperty.getStreetColor(), soldProperty.getName() ); // property is removed from current player's HashMap totalColorSetProperties
         ownedProperties.remove(soldProperty);   // Remove property from ArrayList ownedProperties
         newOwner.addProperty(soldProperty); // property is added to newOwner
     }
 
     /*  Function that increments the amount of properties in a colorset when player buys a property */
-    private void updateColorsetBuy(String streetColor) {
+    private void updateColorsetBuy(String streetColor, String streetName) {
 
         // Increment number of properties on a given Color Set
         if ( totalColorSetProperties.containsKey(streetColor) ) {
@@ -349,11 +400,14 @@ public class Player {
         else {
             totalColorSetProperties.put( streetColor, 1 );
         }
+
+        // adds to colorsetPropertyNames { key: streetColor   value: streetName }
+        this.colorsetPropertyNames.computeIfAbsent(streetColor, _ -> new ArrayList<>()).add(streetName);
         
     }
 
     /*  Function that decrements the amount of properties on a colorset when player sells a property */
-    private void updateColorsetSell(String streetColor) {
+    private void updateColorsetSell(String streetColor, String streetName) {
 
         totalColorSetProperties.put(streetColor, totalColorSetProperties.get(streetColor) - 1);
 
@@ -361,20 +415,9 @@ public class Player {
             totalColorSetProperties.remove(streetColor);
         }
 
-    }
+        //  removes from colorsetPropertyNames { key: streetColor   value: streetName }
+        colorsetPropertyNames.get(streetColor).remove(streetName);
 
-    /*  Function that checks to see how many full colorsets the player owns. If the hashmap returned is empty, then player does not own any full colorsets */
-    public HashMap<String, Integer> getFullColorsets () {
-        HashMap<String, Integer> checkedStreets = new HashMap<>();
-
-        for ( String streetColor : totalColorSetProperties.keySet() ) {
-            int propertiesOwned = totalColorSetProperties.get(streetColor);
-            if ( checkFullColorSet(streetColor, propertiesOwned) == true ) {
-                checkedStreets.put(streetColor, propertiesOwned);
-            }
-        }
-
-        return checkedStreets;
     }
 
     /*  Function that checks to see if player owns the full colorset in a Street Color. Returns false if they do not */
@@ -396,6 +439,9 @@ public class Player {
 
         return false;
     }
+
+    //  Function that checks 
+
 
     /*  #######################################
         ### Function for checking Passed Go ###
