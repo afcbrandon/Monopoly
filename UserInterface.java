@@ -36,7 +36,13 @@ public class UserInterface {
     });
 
 
-    SwingUtilities.invokeLater( () -> new GameGUI(pList) );
+    //SwingUtilities.invokeLater( () -> new GameGUI(pList) );
+
+    SwingUtilities.invokeLater( new Runnable() {
+      public void run() {
+        new GameGUI(pList);
+      }
+    });
   }
   /*
     This function prompts the user for the number of players in the game,
