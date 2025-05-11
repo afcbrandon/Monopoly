@@ -3,14 +3,19 @@ import java.util.Random;
 
 public class Bot extends Player {
     private int doubleRollsInARow = 0;
+    boolean hasAppliedCard = false;
 
     public Bot(String name, GameBoardSpaces gBoardSpaces) {
         super(name, true); // Bot is set to true
     }
 
+    public void setGameBoardSpaces(GameBoardSpaces gbSpaces) {
+        this.gbSpace = gbSpaces;
+    }
+
     public void playerTurn() {
         if (this.isJailed) {
-            // jailEscape();    // TODO: TEMPORARILY DISABLE
+             jailEscape();    // TODO: TEMPORARILY DISABLE
             return;
         }
 
@@ -24,7 +29,7 @@ public class Bot extends Player {
             move(diceRoll);
             JOptionPane.showMessageDialog(null, this.name + " moved to position " + this.position);
 
-            // handleSpace(this.position); // TODO: TEMPORARILY DISABLE
+             handleSpace(this.position); // TODO: TEMPORARILY DISABLE
 
             continueTurn = this.rolledDouble;
             turnCount++;
@@ -51,7 +56,7 @@ public class Bot extends Player {
         int die2 = rand.nextInt(6) + 1;
         this.rolledDouble = (die1 == die2);
 
-        int total = die1 + die2;
+        int total = 2;
         JOptionPane.showMessageDialog(null, this.name + " rolled a " + die1 + " and a " + die2 + " (Total: " + total + ")");
         return total;
     }
@@ -61,7 +66,7 @@ public class Bot extends Player {
     }
 
     //TODO: TEMPORARILY DISABLE ERRORS
-/* 
+
     public void handleSpace(int currentSpace) {
         String fieldType = gbSpace.spaceType(currentSpace);
 
@@ -79,13 +84,13 @@ public class Bot extends Player {
                 break;
 
             case "Chance":
-                ChanceCard drawnCard = gbSpace.drawChanceCard(this);
-                JOptionPane.showMessageDialog(null, this.name + " drew a Chance card: " + drawnCard.getDescription());
-                drawnCard.applyEffect(this, gbSpace);
+                ChanceCard drawnChanceCard = gbSpace.drawChanceCard(this);
+                drawnChanceCard.applyEffect(this, gbSpace);
                 break;
 
             case "Chest":
-                // You can add logic here to handle Community Chest cards
+                CommunityChestCard drawnCommunityCard = gbSpace.drawCommunityChestCard(this);
+                drawnCommunityCard.applyEffect(this, gbSpace);
                 break;
 
             case "Tax":
@@ -116,5 +121,5 @@ public class Bot extends Player {
     public boolean getRolledDouble() {
         return this.rolledDouble;
     }
-*/
+
 }
