@@ -10,6 +10,7 @@ public class GameBoardSpaces {
     private ArrayList<Player> allPlayers;
     private HashMap<Integer, Property> properties; // we will use the HashMap for fast lookup
     private List<ChanceCard> chanceDeck = new ArrayList<>();
+    private List<CommunityChestCard> chestDeck = new ArrayList<>();
     private GameGUI gameGUI;
 
     public GameBoardSpaces(ArrayList<Player> players, GameGUI gameGUI) {
@@ -170,6 +171,7 @@ public class GameBoardSpaces {
         return properties.containsKey(position) ? properties.get(position) : null;
     }
 
+
     public void initializeChanceDeck() {
         chanceDeck = new ArrayList<>();
 
@@ -197,8 +199,43 @@ public class GameBoardSpaces {
         }
 
         ChanceCard card = chanceDeck.removeFirst();
-        JOptionPane.showMessageDialog(null, "Chance Card: " + card.getDescription());
-        card.applyEffect(player, this);
+
+        JOptionPane.showMessageDialog(null, player.getPlayerName() + " drew a Chance card: " + card.getDescription());
+
+        return card;
+    }
+
+    public void initializeChestDeck() {
+        chestDeck.clear();
+
+        chestDeck.add(new CommunityChestCard("Advance to Go (Collect $200)"));
+        chestDeck.add(new CommunityChestCard("Bank error in your favor. Collect $200"));
+        chestDeck.add(new CommunityChestCard("Doctor’s fee. Pay $50"));
+        chestDeck.add(new CommunityChestCard("From sale of stock you get $50"));
+        chestDeck.add(new CommunityChestCard("Get Out of Jail Free"));
+        chestDeck.add(new CommunityChestCard("Go to Jail. Go directly to jail, do not pass Go, do not collect $200"));
+        chestDeck.add(new CommunityChestCard("Holiday fund matures. Receive $100"));
+        chestDeck.add(new CommunityChestCard("Income tax refund. Collect $20"));
+        chestDeck.add(new CommunityChestCard("It is your birthday. Collect $10 from every player"));
+        chestDeck.add(new CommunityChestCard("Life insurance matures. Collect $100"));
+        chestDeck.add(new CommunityChestCard("Pay hospital fees of $100"));
+        chestDeck.add(new CommunityChestCard("Pay school fees of $50"));
+        chestDeck.add(new CommunityChestCard("Receive $25 consultancy fee"));
+        chestDeck.add(new CommunityChestCard("You are assessed for street repairs. Pay $40 per house and $115 per hotel"));
+        chestDeck.add(new CommunityChestCard("You have won second prize in a beauty contest. Collect $10"));
+
+        Collections.shuffle(chestDeck);
+    }
+
+    public CommunityChestCard drawCommunityChestCard(Player player) {
+        if (chestDeck.isEmpty()) {
+            initializeChestDeck(); // Refill and reshuffle if empty
+        }
+
+        CommunityChestCard card = chestDeck.removeFirst();
+
+        JOptionPane.showMessageDialog(null, player.getPlayerName() + " drew a Community Chest card: " + card.getDescription());
+
 
         return card;
     }
@@ -275,7 +312,7 @@ public class GameBoardSpaces {
                         currentPlayer.transferAssetsTo(property.getOwner());
                     }
                 }
-                
+
             }
         }
     }
@@ -300,7 +337,7 @@ public class GameBoardSpaces {
 
             int price = property.getPrice();
 
-            // ✅ Handle bots automatically
+            //  Handle bots automatically
             if (currentPlayer instanceof Bot) {
                 if (currentPlayer.getMoney() >= price) {
                     boolean success = property.buyProperty(currentPlayer);
@@ -317,7 +354,7 @@ public class GameBoardSpaces {
                 }
             }
 
-            // ✅ Handle human players with a confirmation dialog
+            //  Handle human players with a confirmation dialog
             else {
                 int choice = JOptionPane.showConfirmDialog(
                         null,

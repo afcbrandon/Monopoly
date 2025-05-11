@@ -4,7 +4,7 @@ import java.util.Random;
 public class ChanceCard {
     private final String description;
 
-    //this is the constructor
+    // Constructor for ChanceCard
     public ChanceCard(String description) {
         this.description = description;
     }
@@ -13,7 +13,10 @@ public class ChanceCard {
         return description;
     }
 
-    public void applyEffect(Player player, GameBoardSpaces gbSpace) {
+    // Method to apply the effect of the Chance card
+    public void applyEffect(Player player, GameBoardSpaces gbSpace){
+
+        // Apply the effects based on the card description
         switch (description) {
             case "Advance to Boardwalk":
                 player.setPosition(39);  // Boardwalk is at position 39
@@ -120,5 +123,3 @@ public class ChanceCard {
         }
     }
 }
-
-

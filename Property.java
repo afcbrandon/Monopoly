@@ -103,6 +103,10 @@ public class Property {
 
     }
 
+    public int getSellValue() {
+        return this.price / 2; // or adjust if you have a different mortgage/sell-back rule
+    }
+
     /*  Function that increments number of houses on the property by 1 */
     public void addHouses() {
         this.numHouses++;

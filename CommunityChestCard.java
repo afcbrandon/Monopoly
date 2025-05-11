@@ -13,6 +13,7 @@ public class CommunityChestCard {
     }
 
     public void applyEffect(Player player, GameBoardSpaces gbSpace) {
+
         switch (description) {
             case "Advance to Go (Collect $200)":
                 player.setPosition(1);  // Go space is at position 1

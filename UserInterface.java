@@ -24,21 +24,25 @@ public class UserInterface {
     int totalPlayers = getNumberOfPlayers();
     int humanPlayers = playWithBots ? getNumberOfHumanPlayers(totalPlayers) : totalPlayers;
 
-    ArrayList<Player> pList = createPlayers(totalPlayers, humanPlayers);
+    ArrayList<Player> pList = createPlayers(totalPlayers, humanPlayers, null);
 
-    GameBoard monopolyBoard = new GameBoard("Monopoly Board Numbered.jpg");
     SwingUtilities.invokeLater(() -> {
       JFrame frame = new JFrame("Monopoly");
       frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      frame.setContentPane(monopolyBoard);
+      frame.setContentPane(new GameBoard("Monopoly Board Numbered.jpg"));  // Optional
       frame.setSize(800, 800);
       frame.setVisible(true);
     });
 
+
+
+    // 2 separate instances of invoking later
     SwingUtilities.invokeLater( new Runnable() {
       public void run() {
         new GameGUI(pList);
       }
+
+
     });
   }
   /*
@@ -80,7 +84,7 @@ public class UserInterface {
     Function that creates an ArrayList of players determined by the number of players
       Also calls chooseToken function to let each player choose their token
   */
-  private ArrayList<Player> createPlayers(int totalPlayers, int humanPlayers) {
+  private ArrayList<Player> createPlayers(int totalPlayers, int humanPlayers, GameBoardSpaces gameBoardSpaces) {
     ArrayList<Player> playerList = new ArrayList<>();
     PlayerToken tokenList = new PlayerToken();
 
@@ -91,8 +95,8 @@ public class UserInterface {
       if (isBot) {
         String botName = "Bot " + (i - humanPlayers + 1);  // Bot 1, 2, ...
         System.out.println(botName + " has joined the game!");
-        //player = new Bot(botName);
-        player = null;  // TODO: TEMPORARY CODE. TO BE REMOVED LATER
+        player = new Bot(botName, gameBoardSpaces);
+        //player = null;  // TODO: TEMPORARY CODE. TO BE REMOVED LATER
 
         char botToken = tokenList.getTokenList().get(0);
         tokenList.chooseToken(botToken);

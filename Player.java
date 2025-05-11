@@ -22,7 +22,7 @@ public class Player {
     private HashMap<String, List<String>> colorsetPropertyNames;
     private boolean isBot = false;
 
-    private GameBoardSpaces gbSpace;
+    protected GameBoardSpaces gbSpace;
 
     //Constructor for both humans and bots
     public Player(String name, boolean isBot) {
@@ -214,7 +214,7 @@ public class Player {
 
         ownedProperties.clear(); // Clear list
 
-        
+
         this.setElimination();
 
         JOptionPane.showMessageDialog(null,
@@ -292,10 +292,10 @@ public class Player {
     /*  #############################
         ### Functions for Player ###
         ############################  */
-    
+
     /* Function that is called at the start of a player's turn */
     public void playerTurn() {
-      
+
         // Player has option to leave jail, if jailed
         if (this.isJailed) {
             getOutOfJail();
@@ -326,15 +326,16 @@ public class Player {
         }
         else if (fieldType.equals("Chance")) {      //  Chance Card Space
             ChanceCard drawnCard = gbSpace.drawChanceCard(this); // Get a random Chance card
-            JOptionPane.showMessageDialog(null, this.name + " drew a Chance card: " + drawnCard.getDescription());
+
             drawnCard.applyEffect(this, gbSpace); // Apply the effect
         }
         else if (fieldType.equals("Chest")) {       //  Chest Card Space
-
+            CommunityChestCard drawnCommunityCard = gbSpace.drawCommunityChestCard(this);
+            drawnCommunityCard.applyEffect(this, gbSpace);
         }
         else if (fieldType.equals("Tax")) {     //  Tax Space
 
-            if (this.position == 5) {         //  Income Tax
+            if (this.position == 5) {         //  Income Tax.
                 String[] options = { "Pay $200", "Pay 10% of income" };
                 var selection = JOptionPane.showOptionDialog(null, "How would " + this.name +
                     " like to pay the income tax?", "Income Tax", 0, 1,
@@ -354,7 +355,7 @@ public class Player {
 
     }
 
-    
+
     /*  ##############################
         ### Functions for ColorSet ###
         ##############################  */
@@ -381,6 +382,8 @@ public class Player {
         }
 
     }
+
+
 
     /*  Function that handles selling property to another player */
     public void sellProperty(Property soldProperty, Player newOwner) {
@@ -482,7 +485,7 @@ public class Player {
 
             /* If the player successfully rolls double, then the player leaves jail, and the jail counter resets. */
             if (diceOne == diceTwo) {
-                JOptionPane.showMessageDialog(null, 
+                JOptionPane.showMessageDialog(null,
                     this.name + " rolled a " + diceOne + " and " + diceTwo + "!. Move " + result + " spaces.");
                 this.isJailed = false;
                 moveSpaces(result);
@@ -494,12 +497,12 @@ public class Player {
             }
 
             if (jailCounter == 3) { // Player has failed to roll a double after 3 turns. They must pay $50 and move the amount of spaces they rolled
-                
+
                 if ((this.money - 50) <= 0) { // Player has gone bankrupt and they are eliminated
                     JOptionPane.showMessageDialog(null, this.name + " has paid the $50 fine and has gone bankrupt. They are eliminated.");
                     this.isEliminated = true;
                 } else {    // Player leaves jail and moves the amount they previously rolled
-                    JOptionPane.showMessageDialog(null, 
+                    JOptionPane.showMessageDialog(null,
                         this.name + " failed to roll doubles for 3 turns in a row. Pay $50 and move " + result + " spaces.");
                     updateMoney(-50);
                     this.isJailed = false;
@@ -545,7 +548,7 @@ public class Player {
         int rollResult = diceOne + diceTwo;
         this.globalDiceRoll = rollResult;
 
-        JOptionPane.showMessageDialog(null, this.name + " rolled a "  + diceOne + " and a " + diceTwo + 
+        JOptionPane.showMessageDialog(null, this.name + " rolled a "  + diceOne + " and a " + diceTwo +
                 " summing up for a total of " + rollResult, "Dice Roll", JOptionPane.INFORMATION_MESSAGE);
         moveSpaces(rollResult);
 
