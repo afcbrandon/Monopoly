@@ -1,9 +1,7 @@
 import java.util.ArrayList;
 import java.util.Scanner;
 
-import javax.swing.JFrame;
 import javax.swing.SwingUtilities;
-
 /*
   Class that handles all UserInterface prompts within the console
  */
@@ -26,22 +24,11 @@ public class UserInterface {
 
     ArrayList<Player> pList = createPlayers(totalPlayers, humanPlayers, null);
 
-    SwingUtilities.invokeLater(() -> {
-      JFrame frame = new JFrame("Monopoly");
-      frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-      frame.setContentPane(new GameBoard("Monopoly Board Numbered.jpg"));  // Optional
-      frame.setSize(800, 800);
-      frame.setVisible(true);
-    });
-
-
-
     // 2 separate instances of invoking later
     SwingUtilities.invokeLater( new Runnable() {
       public void run() {
         new GameGUI(pList);
       }
-
 
     });
   }
@@ -96,7 +83,6 @@ public class UserInterface {
         String botName = "Bot " + (i - humanPlayers + 1);  // Bot 1, 2, ...
         System.out.println(botName + " has joined the game!");
         player = new Bot(botName, gameBoardSpaces);
-        //player = null;  // TODO: TEMPORARY CODE. TO BE REMOVED LATER
 
         char botToken = tokenList.getTokenList().get(0);
         tokenList.chooseToken(botToken);

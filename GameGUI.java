@@ -30,6 +30,13 @@ public class GameGUI extends JFrame {
         Random rand = new Random();
         this.currentPlayerIndex = rand.nextInt(players.size());
 
+        /* Code to Retrieve Monopoly Board */
+        JFrame frame = new JFrame("Monopoly");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setContentPane(new GameBoard("Monopoly Board Numbered.jpg"));
+        frame.setSize(800, 800);
+        frame.setVisible(true);
+
         // Set up the frame
         setTitle("Monopoly Game");
         if ( players.size() >= 6 ) {
