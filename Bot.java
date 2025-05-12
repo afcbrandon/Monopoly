@@ -56,7 +56,7 @@ public class Bot extends Player {
         int die2 = rand.nextInt(6) + 1;
         this.rolledDouble = (die1 == die2);
 
-        int total = 2;
+        int total = die1 + die2;
         JOptionPane.showMessageDialog(null, this.name + " rolled a " + die1 + " and a " + die2 + " (Total: " + total + ")");
         return total;
     }
