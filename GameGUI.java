@@ -377,7 +377,7 @@ public class GameGUI extends JFrame {
 
         parentFrame.setVisible(false);
         
-        JFrame houseHotelFrame = new JFrame("Build on " + propertyName);
+        JFrame houseHotelFrame = new JFrame("Manage " + propertyName);
         JPanel houseHotelPanel = new JPanel();
 
         houseHotelPanel.setLayout(new GridLayout(0, 1, 0, 10));
@@ -386,6 +386,7 @@ public class GameGUI extends JFrame {
 
         JButton houseButton = new JButton("Build House ($" + boardSpaces.getPropertyByName(propertyName).getHouseCost() + ")");
         JButton hotelButton = new JButton("Build Hotel ($" + boardSpaces.getPropertyByName(propertyName).getHotelCost() + ")");
+        JButton sellPropertyButton = new JButton("Sell Property");
         JButton cancelButton = new JButton("Cancel");
 
         // Get the property object from its name
@@ -433,6 +434,27 @@ public class GameGUI extends JFrame {
             });
         }
 
+        // Add Sell Property Button
+        if ( property.getOwner() == currPlayer ) {
+            houseHotelPanel.add(sellPropertyButton);
+            sellPropertyButton.addActionListener( _ -> {
+                showSellOptionsDialog(houseHotelFrame, currPlayer, propertyName);
+            });
+        }
+
+        // Message if no actions (e.g., already has hotel, or not owned)
+        if (!showHouseButton && !showHotelButton && (property.getOwner() != currPlayer || property.getNumHotels() > 0 && property.getOwner() == currPlayer)) {
+            String message = "No building actions available for " + propertyName + ".";
+            if (property.getOwner() != currPlayer) {
+                message = "You do not own " + propertyName + ".";
+            } else if (property.getNumHotels() > 0) {
+                message = propertyName + " already has a hotel.";
+            }
+            JLabel noBuildLabel = new JLabel(message, SwingConstants.CENTER);
+            houseHotelPanel.add(noBuildLabel);
+        }
+
+        // Cancel Button Action Listener
         cancelButton.addActionListener( _ -> {
             houseHotelFrame.dispose();
             parentFrame.setVisible(true);   // Show the property list frame again
@@ -443,7 +465,7 @@ public class GameGUI extends JFrame {
         houseHotelFrame.add(houseHotelPanel);
         houseHotelFrame.pack();
 
-        houseHotelFrame.setLocationRelativeTo(null);
+        houseHotelFrame.setLocationRelativeTo(parentFrame);
         houseHotelFrame.setAlwaysOnTop(true);
         houseHotelFrame.setVisible(true);
     }
@@ -610,51 +632,6 @@ public class GameGUI extends JFrame {
                         "Hotel Built", JOptionPane.INFORMATION_MESSAGE);
                 parentFrame.dispose();
 
-/*
-                // creates a new panel with message telling player they built the house
-                JPanel messagePanel = new JPanel();
-                messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
-            
-                // Run code that builds a property on the player space. Run after messagePanel is created so that a label can be added
-                if ( property.getOwner() == currPlayer ) {
-                    currPlayer.updateMoney(-property.getHotelCost());
-                    property.addHotel();
-                    updatePlayerPanel(currPlayer);  // update panel to reflect player's new money balance
-                    System.out.println(property.getName() + " Hotels: " + property.getNumHotels());
-                } else {
-                    System.out.println("ERROR! " + currPlayer.getPlayerName() + " does not own this property!");
-                }
-
-                // add a vertical gap before the label
-                messagePanel.add(Box.createVerticalStrut(10));
-
-                JLabel messageLabel = new JLabel(currPlayer.getPlayerName() + " built a hotel on " + propertyName);
-                messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // center the message label
-                messagePanel.add(messageLabel);
-                messagePanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-
-                // add a vertical gap between the label and the okButton
-                messagePanel.add(Box.createVerticalStrut(10));
-
-                // create an ok button that closes the frame
-                JButton okButton = new JButton("Ok");
-                okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-                okButton.addActionListener( _ -> {
-                    parentFrame.dispose();
-                });
-                messagePanel.add(okButton); // add ok button to messagePanel
-
-                // Replace the content pane of the parent frame
-                parentFrame.getContentPane().removeAll();
-                parentFrame.getContentPane().add(messagePanel, BorderLayout.CENTER);
-                parentFrame.getContentPane().revalidate();  // refresh the panel
-                parentFrame.getContentPane().repaint();
-                parentFrame.pack();
-
-                parentFrame.pack();
-                parentFrame.setVisible(true);
-*/
-
             });
         }
 
@@ -678,6 +655,231 @@ public class GameGUI extends JFrame {
         buildHotelFrame.setVisible(true);
 
     }
+
+    private void showSellOptionsDialog(JFrame parentFrame, Player seller, String propertyName) {
+
+        parentFrame.setVisible(false); // Hide the "Manage [Property Name]" frame
+
+        Property propertyToSell = boardSpaces.getPropertyByName(propertyName);
+        // This check should be redundant if sell button is only enabled for owned properties, but good for safety
+        if (propertyToSell == null || propertyToSell.getOwner() != seller) {
+            JOptionPane.showMessageDialog(parentFrame, "Error: You do not own this property or it's invalid.", "Sell Error", JOptionPane.ERROR_MESSAGE);
+            parentFrame.setVisible(true);
+            return;
+        }
+
+        JFrame sellOptionsFrame = new JFrame("Sell Options for " + propertyName);
+        JPanel sellOptionsPanel = new JPanel(new GridLayout(0, 1, 10, 10));
+        sellOptionsPanel.setBorder(BorderFactory.createEmptyBorder(15, 15, 15, 15));
+
+        JButton sellToBankButton = new JButton("Sell to Bank");
+        JButton sellToPlayerButton = new JButton("Sell to Another Player");
+        JButton cancelSellButton = new JButton("Cancel");
+
+        sellToBankButton.addActionListener(e -> {
+            sellOptionsFrame.dispose();
+            handleSellToBank(seller, propertyToSell, parentFrame); // parentFrame is the "Manage Property" dialog
+        });
+
+        sellToPlayerButton.addActionListener(e -> {
+            sellOptionsFrame.dispose();
+            handleSellToPlayer(seller, propertyToSell, parentFrame); // parentFrame is the "Manage Property" dialog
+        });
+
+        cancelSellButton.addActionListener(e -> {
+            sellOptionsFrame.dispose();
+            parentFrame.setVisible(true); // Re-show the "Manage [Property Name]" frame
+        });
+
+        sellOptionsPanel.add(new JLabel("How do you want to sell " + propertyName + "?", SwingConstants.CENTER));
+        sellOptionsPanel.add(sellToBankButton);
+        sellOptionsPanel.add(sellToPlayerButton);
+        sellOptionsPanel.add(cancelSellButton);
+
+        sellOptionsFrame.add(sellOptionsPanel);
+        sellOptionsFrame.pack();
+        sellOptionsFrame.setLocationRelativeTo(parentFrame);
+        sellOptionsFrame.setAlwaysOnTop(true);
+        sellOptionsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        sellOptionsFrame.addWindowListener(new java.awt.event.WindowAdapter() {
+            @Override
+            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
+                if (parentFrame != null) {
+                    parentFrame.setVisible(true);
+                }
+            }
+        });
+        sellOptionsFrame.setVisible(true);
+    }
+
+    private void handleSellToBank(Player seller, Property property, JFrame originalManagePropertyFrame) {
+        Bank bank = boardSpaces.getBank();
+        int totalMoneyGainedThisTransaction = 0;
+
+        // Step 1: Sell improvements on this specific property first
+        if (property.getNumHouses() > 0 || property.getNumHotels() > 0) {
+            int improvementsValue = property.calcImprovementsSellValue();
+            int confirmImprovements = JOptionPane.showConfirmDialog(null,
+                    "To sell " + property.getName() + " to the bank, all its improvements must be sold first for $" + improvementsValue + ".\n" +
+                    "Proceed with selling improvements?",
+                    "Sell Improvements to Bank", JOptionPane.YES_NO_OPTION);
+
+            if (confirmImprovements == JOptionPane.YES_OPTION) {
+                int moneyFromImprovements = property.clearPropertyAndReturnToBank(bank); // This updates bank and property
+                seller.updateMoney(moneyFromImprovements);
+                totalMoneyGainedThisTransaction += moneyFromImprovements;
+                updatePlayerPanel(seller); // Update GUI for seller
+                JOptionPane.showMessageDialog(null, "Sold improvements on " + property.getName() + " for $" + moneyFromImprovements + ".");
+            } else {
+                JOptionPane.showMessageDialog(null, "Sale of " + property.getName() + " to bank cancelled (improvements not sold).");
+                originalManagePropertyFrame.setVisible(true); // Re-show the "Manage Property" frame
+                return;
+            }
+        }
+
+        // Step 2: Sell the bare property
+        int propertySellPrice = property.getMortgageValue(); // Usually mortgage value or half original price
+                                                            // Using getMortgageValue() as it's defined.
+                                                            // If you want exactly half price: property.getPrice() / 2;
+        int confirmSellProperty = JOptionPane.showConfirmDialog(null,
+                "Sell " + property.getName() + " (unimproved) to the bank for $" + propertySellPrice + "?",
+                "Sell Property to Bank", JOptionPane.YES_NO_OPTION);
+
+        if (confirmSellProperty == JOptionPane.YES_OPTION) {
+            seller.updateMoney(propertySellPrice);
+            totalMoneyGainedThisTransaction += propertySellPrice;
+            
+            seller.removeProperty(property); // Player.java method needed - will handle colorset updates
+            property.setOwner(null);         // Property is now unowned
+            // property.setMortgaged(false); // Selling to bank typically clears mortgage status
+
+            updatePlayerPanel(seller);
+            updateBuildButtonState(); // Crucial, as player might lose a color set or ability to build
+
+            JOptionPane.showMessageDialog(null, property.getName() + " sold to the bank for $" + propertySellPrice + ".\n" +
+                    "Total gained from this transaction: $" + totalMoneyGainedThisTransaction);
+            originalManagePropertyFrame.dispose(); // Sale complete, close the "Manage Property" frame
+        } else {
+            JOptionPane.showMessageDialog(null, "Sale of " + property.getName() + " to bank cancelled.");
+            // If they cancelled selling property but sold improvements, improvements are gone.
+            originalManagePropertyFrame.setVisible(true); // Re-show to reflect (now unimproved) property
+        }
+    }
+
+    // In GameGUI.java
+private void handleSellToPlayer(Player seller, Property property, JFrame originalManagePropertyFrame) {
+    Bank bank = boardSpaces.getBank(); // Needed for selling improvements
+
+    // Step 1: Property MUST be unimproved to be sold to another player.
+    if (property.getNumHouses() > 0 || property.getNumHotels() > 0) {
+        int improvementsValue = property.calcImprovementsSellValue();
+        int confirmSellImprovements = JOptionPane.showConfirmDialog(null,
+                "Properties must be unimproved to sell to another player.\n" +
+                "You must first sell all improvements on " + property.getName() + " to the bank for $" + improvementsValue + ".\n" +
+                "Proceed with selling improvements to the bank?",
+                "Sell Improvements to Bank", JOptionPane.YES_NO_OPTION);
+
+        if (confirmSellImprovements == JOptionPane.YES_OPTION) {
+            int moneyFromImprovements = property.clearPropertyAndReturnToBank(bank);
+            seller.updateMoney(moneyFromImprovements);
+            updatePlayerPanel(seller);
+            JOptionPane.showMessageDialog(null, "Sold improvements on " + property.getName() + " for $" + moneyFromImprovements + ".");
+            // Now property is unimproved, can proceed
+        } else {
+            JOptionPane.showMessageDialog(null, "Sale to another player cancelled (improvements not sold to bank).");
+            originalManagePropertyFrame.setVisible(true);
+            return;
+        }
+    }
+
+    // Step 2: Select Buyer
+    List<Player> potentialBuyers = new ArrayList<>();
+    for (Player p : players) {
+        if (p != seller && !p.getIsEliminated()) {
+            potentialBuyers.add(p);
+        }
+    }
+
+    if (potentialBuyers.isEmpty()) {
+        JOptionPane.showMessageDialog(null, "No other active players to sell to.");
+        originalManagePropertyFrame.setVisible(true);
+        return;
+    }
+
+    String[] buyerNames = potentialBuyers.stream().map(Player::getPlayerName).toArray(String[]::new);
+    String selectedBuyerName = (String) JOptionPane.showInputDialog(null,
+            "Select player to sell " + property.getName() + " to:",
+            "Select Buyer", JOptionPane.QUESTION_MESSAGE, null, buyerNames, buyerNames[0]);
+
+    if (selectedBuyerName == null) { // User cancelled buyer selection
+        originalManagePropertyFrame.setVisible(true);
+        return;
+    }
+
+    Player buyer = null;
+    for (Player p : potentialBuyers) {
+        if (p.getPlayerName().equals(selectedBuyerName)) {
+            buyer = p;
+            break;
+        }
+    }
+
+    if (buyer == null) { // Should not happen
+        JOptionPane.showMessageDialog(null, "Error selecting buyer. Sale cancelled.");
+        originalManagePropertyFrame.setVisible(true);
+        return;
+    }
+
+    // Step 3: Seller sets the price
+    String priceString = JOptionPane.showInputDialog(null,
+            seller.getPlayerName() + ", enter the selling price for " + property.getName() + " to " + buyer.getPlayerName() + ":",
+            "Set Selling Price", JOptionPane.QUESTION_MESSAGE);
+
+    int agreedPrice;
+    try {
+        agreedPrice = Integer.parseInt(priceString);
+        if (agreedPrice < 0) {
+            JOptionPane.showMessageDialog(null, "Price cannot be negative. Sale cancelled.");
+            originalManagePropertyFrame.setVisible(true);
+            return;
+        }
+    } catch (NumberFormatException ex) {
+        JOptionPane.showMessageDialog(null, "Invalid price entered. Sale cancelled.");
+        originalManagePropertyFrame.setVisible(true);
+        return;
+    }
+
+    // Step 4: Buyer Confirmation
+    int confirmPurchase = JOptionPane.showConfirmDialog(null,
+            buyer.getPlayerName() + ", do you want to buy " + property.getName() + "\nfrom " + seller.getPlayerName() + " for $" + agreedPrice + "?\n" +
+            "Your current money: $" + buyer.getMoney(),
+            "Confirm Purchase", JOptionPane.YES_NO_OPTION);
+
+    if (confirmPurchase == JOptionPane.YES_OPTION) {
+        if (buyer.getMoney() >= agreedPrice) {
+            seller.updateMoney(agreedPrice);
+            buyer.updateMoney(-agreedPrice);
+
+            seller.removeProperty(property); // Updates seller's internal lists and color sets
+            buyer.addProperty(property);   // Updates buyer's internal lists and color sets
+            property.setOwner(buyer);      // Critical: Set new owner on the Property object
+
+            updatePlayerPanel(seller);
+            updatePlayerPanel(buyer);
+            updateBuildButtonState(); // For both players, as color sets might have changed status
+
+            JOptionPane.showMessageDialog(null,
+                    property.getName() + " sold by " + seller.getPlayerName() + " to " + buyer.getPlayerName() + " for $" + agreedPrice + ".");
+            originalManagePropertyFrame.dispose(); // Sale complete, close the "Manage Property" frame
+        } else {
+            JOptionPane.showMessageDialog(null, buyer.getPlayerName() + " does not have enough money ($" + agreedPrice + ") to buy " + property.getName() + ".");
+            originalManagePropertyFrame.setVisible(true); // Transaction failed, re-show "Manage Property"
+        }
+    } else {
+        JOptionPane.showMessageDialog(null, buyer.getPlayerName() + " declined to purchase " + property.getName() + ".");
+        originalManagePropertyFrame.setVisible(true); // Transaction failed, re-show "Manage Property"
+    }
+}
 
 
     // Function that ends the player's turn

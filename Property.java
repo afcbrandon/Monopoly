@@ -113,26 +113,26 @@ public class Property {
     // Function that removes all improvements(houses and hotels) from a property and surrenders them to the bank
     // Returns the half cash value of all the improvements returns
     public int clearPropertyAndReturnToBank(Bank bank) {
-        int valueReturnToBank = 0;
+        int valueReturnToBank = calcImprovementsSellValue();
 
         if ( this.numHotels > 0 ) {
             bank.returnHotels(this.numHotels);
-
             bank.returnHouses(4 * this.numHotels);  // When you sell a hotel, you must also return the 4 houses to the bank
-            valueReturnToBank += (this.costHotels / 2) * this.numHotels;
-            valueReturnToBank += (this.costHouses / 2) * 4 * this.numHotels; // Value of 4 houses is part of selling a hotel
-            System.out.println(name + ": Returned " + this.numHotels + " hotel(s) to the bank.");
+            System.out.println(name + ": Returned " + this.numHotels + " hotel(s) and " + (4 * this.numHotels) + " houses to the bank.");
             this.numHotels = 0;
-        }
-        if ( this.numHouses > 0 ) {
+            this.numHouses = 0;
+        } else if ( this.numHouses > 0 ) {
             bank.returnHouses(this.numHouses);
-            valueReturnToBank += (this.costHouses / 2) * this.numHouses;
             System.out.println(name + ": Returned " + this.numHouses + " house(s) to the bank.");
             this.numHouses = 0;
         }
 
-        this.rent = this.originalRent; // reset rent back to original
-        System.out.println(name + ": All Properties cleared. Rent reset to $" + this.rent);
+        if ( valueReturnToBank > 0 ) {
+            this.rent = this.originalRent; // reset rent back to original
+            System.out.println(name + ": All Properties cleared. Rent reset to $" + this.rent);
+        } else {
+            System.out.println(name + ": No improvements to clear.");
+        }
 
         return valueReturnToBank;
     }
@@ -170,6 +170,19 @@ public class Property {
     public void addHotel() {
         this.numHotels++;
         updateRentHotels();
+    }
+
+    public int calcImprovementsSellValue() {
+        int value = 0;
+
+        if ( this.numHotels > 0 ) {
+            value += (this.costHotels / 2) * this.numHotels;
+            value += (this.costHouses / 2) * 4 * this.costHotels;
+        } else if ( this.numHouses > 0 ) {
+            value += (this.costHouses / 2) * this.numHouses;
+        }
+
+        return value;
     }
 
     /*  ###########################################################################################

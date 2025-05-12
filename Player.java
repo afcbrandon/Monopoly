@@ -120,8 +120,6 @@ public class Player {
 
         return count;
     }
-
-    // Returns a hashmap of the Properties of a colorset and the amount of hotels it has
     
 
     // Returns a hashmap of the Properties of a colorset and the amount of Houses it has
@@ -303,13 +301,19 @@ public class Player {
             JOptionPane.showMessageDialog(null, "You have no more properties to sell.");
         }
     }
-    
-    public void sellHouse(Property property) {
-        // TODO code for selling a house
-    }
 
-    public void sellHotel() {
-        // TODO code for selling a hotel
+    // Function that removes property from this player
+    public void removeProperty( Property propertyToSell ) {
+        if ( ownedProperties.remove(propertyToSell) ) {
+            System.out.println(this.name + " is removing property: " + propertyToSell.getName());
+            if (propertyToSell.getStreetColor() != null && !propertyToSell.getStreetColor().isEmpty()) {
+                // updateColorsetSell handles decrementing counts in totalColorSetProperties
+                // and removing property name from colorsetPropertyNames list.
+                updateColorsetSell(propertyToSell.getStreetColor(), propertyToSell.getName());
+            }
+        } else {
+            System.out.println("Warning: Attempted to remove property '" + propertyToSell.getName() + "' not found in " + this.name + "'s portfolio.");
+        }
     }
 
     /*  #############################
