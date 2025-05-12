@@ -324,7 +324,7 @@ public class GameGUI extends JFrame {
                 }
             }
         }
-        
+
         JButton cancelButton = new JButton("Cancel");
         cancelButton.setAlignmentX(CENTER_ALIGNMENT);
         cancelButton.setMinimumSize(new Dimension(WIDTH, HEIGHT / 2));
@@ -535,6 +535,7 @@ public class GameGUI extends JFrame {
     private void showDebugPanel(Player player) {
         JPanel panel = new JPanel(new GridLayout(4, 2));
         JTextField moneyField = new JTextField();
+        moneyField.setText("0");    // set the moneyfield text to 0, for easier debugging
         JTextField posField = new JTextField();
 
         panel.add(new JLabel("Add/Subtract Money:"));
