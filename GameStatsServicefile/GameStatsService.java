@@ -17,7 +17,7 @@ public class GameStatsService {
         if (players != null) {
             for (Player player : players) {
                
-                createNewProfile(player.getPlayerId(), player.getName());
+                //createNewProfile(player.getPlayerId(), player.getName());
             }
         }
     }
