@@ -12,13 +12,16 @@ public class GameBoardSpaces {
     private List<ChanceCard> chanceDeck = new ArrayList<>();
     private List<CommunityChestCard> chestDeck = new ArrayList<>();
     private GameGUI gameGUI;
+    private Bank bank;
 
     public GameBoardSpaces(ArrayList<Player> players, GameGUI gameGUI) {
         this.allPlayers = players != null ? players : new ArrayList<>();
         this.gameGUI = gameGUI;     //  Initialize gameGUI
+        this.bank = new Bank();
         properties = new HashMap<>();
         initializeBoardSpaces();
         initializeChanceDeck();
+        initializeChestDeck();
     }
 
     /*  ##################
@@ -40,6 +43,11 @@ public class GameBoardSpaces {
         }
 
         return null;
+    }
+
+    // returns the bank, which manages how many hotels and houses a game has
+    public Bank getBank() {
+        return this.bank;
     }
 
     /*  ##################
@@ -124,7 +132,7 @@ public class GameBoardSpaces {
                                     50, 200, 200, 200));
     }
 
-    /// Function that checks, and returns, the type of the board space as a String
+    // Function that checks, and returns, the type of the board space as a String
     public String spaceType(int spaceNum) {
 
         switch (spaceNum) {

@@ -201,22 +201,35 @@ public class Player {
         JOptionPane.showMessageDialog(null,
                 this.name + " has gone bankrupt and transferred all assets to " + receiver.getPlayerName());
     }
+
+    // Function that surrenders assets to the bank if player is in debt to bank
     public void surrenderAssetsToBank() {
 
-        this.money = 0;
-
-
-        for (Property p : new ArrayList<>(ownedProperties)) {
-            p.setOwner(null);
+        int totalValueOfImprovementsReturned = 0;
+        if ( gbSpace != null && gbSpace.getBank() != null ) {
+            Bank bank = gbSpace.getBank();
+            for ( Property p : new ArrayList<>(ownedProperties) ) {
+                p.clearPropertyAndReturnToBank(bank);
+                p.setOwner(null);   // Property is now unowned
+            }
+        } else {    // This code is merely for good practice to catch an error. It should never run
+            for ( Property p : new ArrayList<>(ownedProperties) ) {
+                p.setNumHotels(0);
+                p.setNumHouses(0);
+                p.updateRentToOriginalRent();
+                p.setOwner(null);
+            }
         }
 
-        ownedProperties.clear(); // Clear list
-
+        this.money = 0; // Player has no more money
+        ownedProperties.clear();
+        totalColorSetProperties.clear();
+        ownedFullColorSets.clear();
+        colorsetPropertyNames.clear();
 
         this.setElimination();
-
         JOptionPane.showMessageDialog(null,
-                this.name + " has gone bankrupt and surrendered all assets to the bank.");
+                this.name + " has gone bankrupt and surrendered all their assets to the bank.");
     }
 
     // Will: leaving commented out. supposed to allow the player to decide which property to mortgage but got stuck trying to update
@@ -247,6 +260,10 @@ public class Player {
             }
         }
     } */
+
+    /*  #############################
+        ### Functions for Selling ###
+        #############################  */
 
     public void sellAssetsToBankInteractive() {
         while (!ownedProperties.isEmpty()) {
@@ -286,6 +303,14 @@ public class Player {
             JOptionPane.showMessageDialog(null, "You have no more properties to sell.");
         }
     }
+    
+    public void sellHouse(Property property) {
+        // TODO code for selling a house
+    }
+
+    public void sellHotel() {
+        // TODO code for selling a hotel
+    }
 
     /*  #############################
         ### Functions for Player ###
@@ -310,7 +335,9 @@ public class Player {
         String fieldType = gbSpace.spaceType(currentSpace);
 
         if (fieldType.equals("Go") || fieldType.equals("Parking")) {        //  Space is either Go or Free Parking
+            if ( fieldType.equals("Go")) {
 
+            }
         }
         else if (fieldType.equals("Jail")) {        //  Space is a Jail Space
             if (currentSpace == 31) {   // Go to Jail
@@ -318,9 +345,6 @@ public class Player {
                 this.isJailed = true;
                 this.position = 11;
             }
-
-            // If player landed on space 11, then they are most likely just visiting.
-
         }
         else if (fieldType.equals("Chance")) {      //  Chance Card Space
             ChanceCard drawnCard = gbSpace.drawChanceCard(this); // Get a random Chance card
@@ -380,8 +404,6 @@ public class Player {
         }
 
     }
-
-
 
     /*  Function that handles selling property to another player */
     public void sellProperty(Property soldProperty, Player newOwner) {
@@ -444,12 +466,6 @@ public class Player {
 
         return false;
     }
-
-    //  Function that calls buildHouse function from Property
-    public void buildHouse() {
-        
-    }
-
 
     /*  #######################################
         ### Function for checking Passed Go ###

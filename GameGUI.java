@@ -377,47 +377,65 @@ public class GameGUI extends JFrame {
 
         parentFrame.setVisible(false);
         
-        JFrame houseHotelFrame = new JFrame();
+        JFrame houseHotelFrame = new JFrame("Build on " + propertyName);
         JPanel houseHotelPanel = new JPanel();
-        houseHotelPanel.setLayout(new GridLayout(2, 1));
-        houseHotelPanel.setPreferredSize(new Dimension(300, 100));
 
-        JButton houseButton = new JButton("Build House");
-        JButton hotelButton = new JButton("Build Hotel");
+        houseHotelPanel.setLayout(new GridLayout(0, 1, 0, 10));
+        houseHotelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // Padding
+        //houseHotelPanel.setPreferredSize(new Dimension(300, 150));
+
+        JButton houseButton = new JButton("Build House ($" + boardSpaces.getPropertyByName(propertyName).getHouseCost() + ")");
+        JButton hotelButton = new JButton("Build Hotel ($" + boardSpaces.getPropertyByName(propertyName).getHotelCost() + ")");
         JButton cancelButton = new JButton("Cancel");
-
-        houseButton.addActionListener( _ -> {
-            buildHouses(houseHotelFrame, propertyName);
-        });
-
-        hotelButton.addActionListener( _ -> {
-            buildHotel(houseHotelFrame, propertyName);
-        });
-
-        // Code Logic that decides which button to add. If player can build house then show house button, if player can build hotel then show hotel button
 
         // Get the property object from its name
         Property property = boardSpaces.getPropertyByName(propertyName);
+        Bank bank = boardSpaces.getBank();
 
-        // If the selected property already has 4 houses, the max, then the build hotel button is displayed, otherwise the house button is displayed
-        if ( property.getNumHouses() == 4 ) {
-            houseHotelPanel.add(hotelButton);
-            System.out.println("Max number of houses built on " + propertyName + "! buildHotel button enabled!");
-        } else {
-            houseHotelPanel.add(houseButton);
+        boolean showHouseButton = false;
+        boolean showHotelButton = false;
 
-            // If property has no hotel, then player can build a hotel, otherwise disable the button
-            if ( property.getNumHotels() == 0 ) {
-                houseButton.setEnabled(true);
-            } else {
-                houseButton.setEnabled(false);
-                System.out.println(propertyName + " has max number of hotels! buildHotel button is disabled");
+        if ( property.getNumHotels() == 0 ) {   // If property does not have hotel
+            if ( property.getNumHouses() < 4 ) {
+                showHouseButton = true;
+                if ( !bank.canDispenseHouse() ) {   // Bank house no more houses
+                    houseButton.setText("Build House (None in Bank)");
+                    houseButton.setEnabled(false);
+                }
+                if ( currPlayer.getMoney() < property.getHouseCost() ) {
+                    houseButton.setEnabled(false);
+                    houseButton.setToolTipText("Not enough money"); // message when player hovers mouse over button
+                }
+            } else if ( property.getNumHouses() == 4 ) {
+                showHotelButton = true;
+                if ( !bank.canDispenseHotel() ) {   // Bank has no more hotels
+                    hotelButton.setText("Build Hotel (None in Bank)");
+                    hotelButton.setEnabled(false);
+                }
+                if ( currPlayer.getMoney() < property.getHotelCost() ) {
+                    hotelButton.setEnabled(false);
+                    hotelButton.setToolTipText("Not enough money"); // message when player hovers mouse over button
+                }
             }
+        }
+
+        if ( showHouseButton ) {
+            houseHotelPanel.add(houseButton);
+            houseButton.addActionListener( _ -> {
+                buildHouses(houseHotelFrame, propertyName);  // houseHotelFrame becomes the parentFrame for buildHotel dialog
+            });
+        }
+
+        if ( showHotelButton ) {
+            houseHotelPanel.add(hotelButton);
+            hotelButton.addActionListener( _ -> {
+                buildHotel(houseHotelFrame, propertyName);  // houseHotelFrame becomes the parentFrame for buildHotel dialog
+            });
         }
 
         cancelButton.addActionListener( _ -> {
             houseHotelFrame.dispose();
-            parentFrame.setVisible(true);
+            parentFrame.setVisible(true);   // Show the property list frame again
         });
 
         houseHotelPanel.add(cancelButton);
@@ -434,159 +452,165 @@ public class GameGUI extends JFrame {
 
         Player currPlayer = players.get(currentPlayerIndex);
         Property property = boardSpaces.getPropertyByName(propertyName);
+        Bank bank = boardSpaces.getBank();
 
         parentFrame.setVisible(false);  // hide the parent frame
 
-        final int WIDTH = 400;
-        final int HEIGHT = 100;
+        final int WIDTH = 450;
+        final int HEIGHT = 120;
 
-        JFrame buildHouseFrame = new JFrame();
+        JFrame buildHouseFrame = new JFrame("Build House on " + propertyName);
         JPanel buildHousePanel = new JPanel();
         buildHousePanel.setLayout(new BoxLayout(buildHousePanel, BoxLayout.Y_AXIS));
-        buildHousePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // create padding
+        buildHousePanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));     // create padding
+        buildHousePanel.add(Box.createVerticalStrut(10));   // Add a vertical gap before question label
 
-        // Add a vertical gap before question label
-        buildHousePanel.add(Box.createVerticalStrut(10));
-
-        JLabel questionLabel = new JLabel("Do you want to build a house on " + propertyName + " for $" + property.getHouseCost() + "?");
+        JLabel questionLabel = new JLabel("Build a house on " + propertyName + " for $" + property.getHouseCost() + "?");
         questionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);    // center the question label
         buildHousePanel.add(questionLabel);
-
-        // add a vertical gap between questionLabel and the two buttons
-        buildHousePanel.add(Box.createVerticalStrut(10));
+        buildHousePanel.add(Box.createVerticalStrut(10));   // add a vertical gap between questionLabel and the two buttons
 
         JButton yesButton = new JButton("Yes");
-        JButton cancelButton = new JButton("Cancel");
+        JButton noButton = new JButton("No");
 
         // Center buttons and set a preferred size
-        Dimension buttonSize = new Dimension(WIDTH - 40, 30);   // Adjusted button width
+        Dimension buttonSize = new Dimension(WIDTH - 60, 30);   // Adjusted button width
         yesButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         yesButton.setPreferredSize(buttonSize);
         yesButton.setMaximumSize(buttonSize);
-        cancelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        cancelButton.setPreferredSize(buttonSize);
-        cancelButton.setMaximumSize(buttonSize);
+        noButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        noButton.setPreferredSize(buttonSize);
+        noButton.setMaximumSize(buttonSize);
 
         if ( currPlayer.getMoney() < property.getHouseCost() ) {
-            yesButton.setText("Not enough money to build a house $(" + property.getHouseCost() + ")");
+            yesButton.setText("Not enough money ($" + property.getHouseCost() + ")");
             yesButton.setEnabled(false);
-        } else {
+        } else if ( property.getNumHotels() > 0 ) {
+            yesButton.setText("Property has a hotel. Cannot add houses.");
+            yesButton.setEnabled(false);
+        } else if ( property.getNumHouses() >= 4 ) {
+            yesButton.setText("Max houses built. Build hotel Instead");
+            yesButton.setEnabled(false);
+        } else if ( !bank.canDispenseHouse() ) {
+            yesButton.setText("No houses available from the bank!");
+            yesButton.setEnabled(false);
+        }
+        else {
             // Actions Listener for yesButton
             yesButton.addActionListener( _ -> {
                 
                 buildHouseFrame.dispose();
 
-                // creates a new panel with message telling player they built the house
-                JPanel messagePanel = new JPanel();
-                messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
-            
-                // Run code that builds a property on the player space. Run after messagePanel is created so that a label can be added
-                if ( property.getOwner() == currPlayer ) {
-                    currPlayer.updateMoney(-property.getHouseCost());
-                    property.addHouse();
-                    updatePlayerPanel(currPlayer);  // update player panel to reflect player's new money balance
-                    System.out.println(property.getName() + " Houses: " + property.getNumHouses());
-                } else {
-                    System.out.println("ERROR! " + currPlayer.getPlayerName() + " does not own this property!");
-                }
+                currPlayer.updateMoney(-property.getHouseCost());
+                property.setNumHouses(property.getNumHouses() + 1); // Update the house count of property
+                bank.dispenseHouse();   // get a house from the bank
 
-                // add a vertical gap before the label
-                messagePanel.add(Box.createVerticalStrut(10));
+                updatePlayerPanel(currPlayer);
+                updateBuildButtonState();
 
-                JLabel messageLabel = new JLabel(currPlayer.getPlayerName() + " built a house on " + propertyName);
-                messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // center the message label
-                messagePanel.add(messageLabel);
-                messagePanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+                System.out.println(currPlayer.getPlayerName() + " built a house on " + property.getName() +
+                                    ". Houses: " + property.getNumHouses() +
+                                    ". Bank Houses: " + bank.getAvailableHouses());
 
-                // add a vertical gap between the label and the okButton
-                messagePanel.add(Box.createVerticalStrut(10));
-
-                // create an ok button that closes the frame
-                JButton okButton = new JButton("Ok");
-                okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-                okButton.addActionListener( _ -> {
-                    parentFrame.dispose();
-                });
-                messagePanel.add(okButton); // add ok button to messagePanel
-
-                // Replace the content pane of the parent frame
-                parentFrame.getContentPane().removeAll();
-                parentFrame.getContentPane().add(messagePanel, BorderLayout.CENTER);
-                parentFrame.getContentPane().revalidate();  // refresh the panel
-                parentFrame.getContentPane().repaint();
-                parentFrame.pack();
-
-                parentFrame.pack();
-                parentFrame.setVisible(true);
-
+                JOptionPane.showMessageDialog(null, 
+                        currPlayer.getPlayerName() + " built a house on " + propertyName + "!",
+                        "House Built", JOptionPane.INFORMATION_MESSAGE);
+                parentFrame.dispose();
             });
         }
 
         // Action Listener for no Button
-        cancelButton.addActionListener( _ -> {
-
+        noButton.addActionListener( _ -> {
             buildHouseFrame.dispose();
             parentFrame.setVisible(true);
         });
 
-        buildHousePanel.add(yesButton);
-        buildHousePanel.add(cancelButton);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        buttonPanel.add(yesButton);
+        buttonPanel.add(noButton);
 
-        buildHousePanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        buildHousePanel.add(buttonPanel);
+        buildHousePanel.add(Box.createVerticalStrut(10));
 
         buildHouseFrame.getContentPane().add(buildHousePanel);  // Add the panel to the frame's pane
         buildHouseFrame.pack();
-        buildHouseFrame.setLocationRelativeTo(null);
+        buildHouseFrame.setLocationRelativeTo(parentFrame);
+        buildHouseFrame.setAlwaysOnTop(true);
         buildHouseFrame.setVisible(true);
-
     }
 
     private void buildHotel(JFrame parentFrame, String propertyName) {
 
         Player currPlayer = players.get(currentPlayerIndex);
         Property property = boardSpaces.getPropertyByName(propertyName);
+        Bank bank = boardSpaces.getBank();
 
         parentFrame.setVisible(false);  // hide the parent frame
 
-        final int WIDTH = 400;
-        final int HEIGHT = 100;
+        final int WIDTH = 450;
+        final int HEIGHT = 120;
 
-        JFrame buildHotelFrame = new JFrame();
+        JFrame buildHotelFrame = new JFrame("Build Hotel on " + propertyName);
         JPanel buildHotelPanel = new JPanel();
         buildHotelPanel.setLayout(new BoxLayout(buildHotelPanel, BoxLayout.Y_AXIS));
         buildHotelPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10)); // create padding
+        buildHotelPanel.add(Box.createVerticalStrut(10)); // Add a vertical gap before question label
 
-        // Add a vertical gap before question label
-        buildHotelPanel.add(Box.createVerticalStrut(10));
-
-        JLabel questionLabel = new JLabel("Do you want to build a hotel on " + propertyName + " for $" + property.getHotelCost() + "?");
+        JLabel questionLabel = new JLabel("Build hotel on " + propertyName + " for $" + property.getHotelCost() + "? (Returns 4 houses to the bank)");
         questionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);    // center the question label
         buildHotelPanel.add(questionLabel);
-
-        // add a vertical gap between questionLabel and the two buttons
-        buildHotelPanel.add(Box.createVerticalStrut(10));
+        buildHotelPanel.add(Box.createVerticalStrut(10));  // add a vertical gap between questionLabel and the two buttons
 
         JButton yesButton = new JButton("Yes");
-        JButton cancelButton = new JButton("Cancel");
+        JButton noButton = new JButton("No");
 
         // Center buttons and set a preferred size
-        Dimension buttonSize = new Dimension(WIDTH - 40, 30);   // Adjusted button width
+        Dimension buttonSize = new Dimension(WIDTH - 60, 30);   // Adjusted button width
         yesButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         yesButton.setPreferredSize(buttonSize);
         yesButton.setMaximumSize(buttonSize);
-        cancelButton.setAlignmentX(Component.CENTER_ALIGNMENT);
-        cancelButton.setPreferredSize(buttonSize);
-        cancelButton.setMaximumSize(buttonSize);
+        noButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        noButton.setPreferredSize(buttonSize);
+        noButton.setMaximumSize(buttonSize);
 
-        if ( currPlayer.getMoney() < property.getHotelCost() ) {
-            yesButton.setText("Not enough money to build a hotel $(" + property.getHotelCost() + ")");
+        if ( property.getNumHouses() != 4 ) {
+            yesButton.setText("Must have 4 houses to build a hotel.");
             yesButton.setEnabled(false);
-        } else {
+        } else if ( property.getNumHotels() > 0 ) {
+            yesButton.setText("Hotel already built on this property.");
+            yesButton.setEnabled(false);
+        } else if ( currPlayer.getMoney() < property.getHotelCost() ) {
+            yesButton.setText("Not enough money ($" + property.getHotelCost() + ")");
+            yesButton.setEnabled(false);
+        } else if ( !bank.canDispenseHotel() ) {
+            yesButton.setText("No hotels available from the bank!");
+            yesButton.setEnabled(false);
+        } 
+        else {
             // Actions Listener for yesButton
             yesButton.addActionListener( _ -> {
                 
                 buildHotelFrame.dispose();
 
+                currPlayer.updateMoney(-property.getHotelCost());
+                
+                property.setNumHotels(1);   // this sets numHouses to 0 and updates rent
+                bank.returnHouses(4);   // return 4 houses back to the bank
+                bank.dispenseHotel();   // get a hotel from the bank
+
+                updatePlayerPanel(currPlayer);
+                updateBuildButtonState();
+
+                System.out.println(currPlayer.getPlayerName() + " built a hotel on " + property.getName() +
+                                    ". Bank Houses: " + bank.getAvailableHouses() +
+                                    ", Bank Hotels: " + bank.getAvailableHotels());
+
+                JOptionPane.showMessageDialog(null, 
+                        currPlayer.getPlayerName() + " built a hotel on " + propertyName + "!",
+                        "Hotel Built", JOptionPane.INFORMATION_MESSAGE);
+                parentFrame.dispose();
+
+/*
                 // creates a new panel with message telling player they built the house
                 JPanel messagePanel = new JPanel();
                 messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
@@ -629,25 +653,28 @@ public class GameGUI extends JFrame {
 
                 parentFrame.pack();
                 parentFrame.setVisible(true);
+*/
 
             });
         }
 
         // Action Listener for no Button
-        cancelButton.addActionListener( _ -> {
-
+        noButton.addActionListener( _ -> {
             buildHotelFrame.dispose();
             parentFrame.setVisible(true);
         });
 
-        buildHotelPanel.add(yesButton);
-        buildHotelPanel.add(cancelButton);
+        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
+        buttonPanel.add(yesButton);
+        buttonPanel.add(noButton);
 
-        buildHotelPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+        buildHotelPanel.add(buttonPanel);
+        buildHotelPanel.add(Box.createVerticalStrut(10));
 
         buildHotelFrame.getContentPane().add(buildHotelPanel);  // Add the panel to the frame's pane
         buildHotelFrame.pack();
-        buildHotelFrame.setLocationRelativeTo(null);
+        buildHotelFrame.setLocationRelativeTo(parentFrame);
+        buildHotelFrame.setAlwaysOnTop(true);
         buildHotelFrame.setVisible(true);
 
     }

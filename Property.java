@@ -14,7 +14,6 @@ public class Property {
     private Player owner;
     private boolean isMortgaged;
 
-
     // Constructor used by spaces with no street color "Railroads" and utilities
     public Property(String name, int price, int rent, int mortgageValue) {
         this.name = name;
@@ -83,6 +82,59 @@ public class Property {
     /* Function that sets the owner */
     public void setOwner(Player owner) {
         this.owner = owner;
+    }
+
+    public void setNumHouses(int numHouses) {
+        this.numHouses = numHouses;
+
+        if ( this.numHotels == 0 ) {
+            if ( this.numHouses == 0 ) {
+                this.rent = this.originalRent;  // set rent of property back to original rent if no property is upon it
+            } else {
+                updateRentHouses(); // update the rent based on the amount of houses on said property
+            }
+        }
+    }
+
+    public void setNumHotels(int numHotels) {
+        this.numHotels = numHotels;
+        if ( this.numHotels > 0 ) {
+            this.numHouses = 0; // Hotel replaces houses
+            updateRentHotels();
+        } else {
+            setNumHouses(this.numHouses);   // Triggers code that updates the rent of a property depending on the number of houses left
+        }
+    }
+
+    /*  ######################
+        ### Bank Functions ###
+        ###################### */
+
+    // Function that removes all improvements(houses and hotels) from a property and surrenders them to the bank
+    // Returns the half cash value of all the improvements returns
+    public int clearPropertyAndReturnToBank(Bank bank) {
+        int valueReturnToBank = 0;
+
+        if ( this.numHotels > 0 ) {
+            bank.returnHotels(this.numHotels);
+
+            bank.returnHouses(4 * this.numHotels);  // When you sell a hotel, you must also return the 4 houses to the bank
+            valueReturnToBank += (this.costHotels / 2) * this.numHotels;
+            valueReturnToBank += (this.costHouses / 2) * 4 * this.numHotels; // Value of 4 houses is part of selling a hotel
+            System.out.println(name + ": Returned " + this.numHotels + " hotel(s) to the bank.");
+            this.numHotels = 0;
+        }
+        if ( this.numHouses > 0 ) {
+            bank.returnHouses(this.numHouses);
+            valueReturnToBank += (this.costHouses / 2) * this.numHouses;
+            System.out.println(name + ": Returned " + this.numHouses + " house(s) to the bank.");
+            this.numHouses = 0;
+        }
+
+        this.rent = this.originalRent; // reset rent back to original
+        System.out.println(name + ": All Properties cleared. Rent reset to $" + this.rent);
+
+        return valueReturnToBank;
     }
 
     /*  ##########################
@@ -444,5 +496,7 @@ public class Property {
             default:    // DO NOTHING
         }
     }
+
+
 
 }
