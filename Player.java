@@ -52,34 +52,45 @@ public class Player {
     public String getPlayerName() {
         return this.name;
     }
+
     // function that returns the player's current money
     public int getMoney() {
         return this.money;
     }
+
     // Function that returns the player's position on the board
     public int getPosition() {
         return this.position;
     }
+
     // ***BRANDON*** Function that sets the player token
     public void setToken(Character token) {
         this.playerToken = token;
     }
+    
     // ***BRANDON*** Function the returns the player token
     public Character getToken() {
         return this.playerToken;
     }
+    
     // Function that returns the boolean value of rolledDouble, which is used to determine if player can roll again
     public boolean getRolledDouble() {
         return this.rolledDouble;
     }
+    
     /*  Function that returns whether a player is in jail */
     public boolean getIsJailed() {
         return this.isJailed;
     }
+    
     /*  Function that returns whether a player has a Get Out Of Jail card */
     public boolean hasOutOfJailCard() {
-        //  TODO: Potential problem with checking to see if card is chance or chest card
         return this.hasOutOfJailCard;
+    }
+    
+    // Funciton that returns the jailCounter of a player
+    public int getJailCounter() {
+        return this.jailCounter;
     }
 
     /*  Function that checks to see how many full colorsets the player owns. If the hashmap returned is empty, then player does not own any full colorsets */
@@ -177,7 +188,14 @@ public class Player {
     public void setOutOfJailCard(boolean hasCard){
         this.hasOutOfJailCard = hasCard;
     }
+    
+    public void setJailCounter(int jailCounter) {
+        this.jailCounter = jailCounter;
 
+        if ( this.jailCounter <= 0 ) {  // if jailCounter is set to 0 via debug, then player is no longer in jail
+            this.isJailed = false;
+        }
+    }
 
     /*  #############################################################################################
         ### Functions for Player  when they have run out of money and must surrender their assets ###
@@ -387,6 +405,10 @@ public class Player {
     public void resetRolledDouble() {
         this.rolledDouble = false;
         // Keep rolledDoubleCounter as is, it resets naturally when a non-double is rolled or jail happens.
+    }
+
+    public void resetRolledDoubleCounter() {
+        this.rolledDoubleCounter = 0;
     }
 
 

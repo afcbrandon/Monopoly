@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.swing.border.Border;
+
 import java.awt.*;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -846,28 +848,97 @@ public class GameGUI extends JFrame {
     }
 
     private void showDebugPanel(Player player) {
-        JPanel panel = new JPanel(new GridLayout(4, 2));
-        JTextField moneyField = new JTextField();
-        moneyField.setText("0");    // set the moneyfield text to 0, for easier debugging
-        JTextField posField = new JTextField();
+        JPanel panel = new JPanel(new GridLayout(0, 2, 5, 5)); // Flexible rows, 2 cols, with gaps
+        panel.setBorder(BorderFactory.createEmptyBorder(10,10,10,10));
 
-        panel.add(new JLabel("Add/Subtract Money:"));
+        // Money Field - Show current money, allow setting a new total
+        JTextField moneyField = new JTextField(String.valueOf(player.getMoney()));
+
+        // Position Field - Show current position
+        JTextField posField = new JTextField(String.valueOf(player.getPosition()));
+
+        // Jail Status Controls
+        JCheckBox jailedCheckbox = new JCheckBox("Is Jailed", player.getIsJailed());
+        JTextField jailTurnsField = new JTextField(String.valueOf(player.getJailCounter()));
+        JCheckBox getOutOfJailCardCheckbox = new JCheckBox("Has Get Out of Jail Free Card", player.hasOutOfJailCard());
+
+        panel.add(new JLabel("Set Money Total:"));
         panel.add(moneyField);
-        panel.add(new JLabel("Move to Position (1-40):"));
+        panel.add(new JLabel("Set Position (1-40):"));
         panel.add(posField);
+        panel.add(jailedCheckbox);
+        panel.add(new JLabel("")); // Spacer for grid alignment
+        panel.add(new JLabel("Set Jail Turns Count:"));
+        panel.add(jailTurnsField);
+        panel.add(getOutOfJailCardCheckbox);
+        panel.add(new JLabel("")); // Spacer
 
-        int result = JOptionPane.showConfirmDialog(this, panel, "Debug Tool", JOptionPane.OK_CANCEL_OPTION);
+        int result = JOptionPane.showConfirmDialog(
+            playerGUIFrame, // Parent component
+            panel,
+            "Debug Tool - " + player.getPlayerName(),
+            JOptionPane.OK_CANCEL_OPTION,
+            JOptionPane.PLAIN_MESSAGE // Use a plain message icon
+        );
+
         if (result == JOptionPane.OK_OPTION) {
             try {
-                int moneyChange = Integer.parseInt(moneyField.getText());
-                int newPos = Integer.parseInt(posField.getText());
+                // --- Money ---
+                int newMoney = Integer.parseInt(moneyField.getText());
+                player.setMoney(newMoney); // Directly set money. updateMoney() handles elimination.
+                                        // For debug, direct set is often preferred.
 
-                player.updateMoney(moneyChange);
-                player.setPosition(newPos);
+                // --- Position ---
+                int newPos = Integer.parseInt(posField.getText());
+                if (newPos >= 1 && newPos <= 40) {
+                    player.setPosition(newPos);
+                    // CRITICAL: After setting position, call handleLandingOnSpace.
+                    // This will correctly process "Go to Jail" if newPos is 31,
+                    // or any other space's landing effect.
+                    player.handleLandingOnSpace(player.getPosition());
+                } else if (!posField.getText().trim().equals(String.valueOf(player.getPosition()))) {
+                    // Only show error if they tried to change it to something invalid
+                    JOptionPane.showMessageDialog(playerGUIFrame, "Invalid position entered ("+newPos+"). Position not changed from " + player.getPosition() + ".", "Input Error", JOptionPane.WARNING_MESSAGE);
+                }
+
+                // --- Jailed Status ---
+                boolean newJailedStatus = jailedCheckbox.isSelected();
+                if (player.getIsJailed() != newJailedStatus) { // Only update if changed
+                    player.setJailed(newJailedStatus);
+                    if (newJailedStatus) { // If setting to JAILED via debug:
+                        player.setPosition(11); // Ensure they are at the jail spot
+                        player.resetRolledDoubleCounter(); // Prevent accidental triple double on release
+                        if (player.getJailCounter() == 0) { // If they were not already serving time
+                            player.setJailCounter(0); // Or 1, depending on how you count turns in jail
+                        }
+                    } else { // If unjailing via debug
+                        player.setJailCounter(0);
+                    }
+                }
+
+                // --- Jail Turns ---
+                int newJailTurns = Integer.parseInt(jailTurnsField.getText());
+                if (newJailTurns >= 0 && newJailTurns <= 3) { // Basic validation
+                    if(player.getJailCounter() != newJailTurns) {
+                        player.setJailCounter(newJailTurns);
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(playerGUIFrame, "Invalid jail turns entered. Must be 0-3.", "Input Error", JOptionPane.WARNING_MESSAGE);
+                }
+
+
+                // --- Get Out of Jail Free Card ---
+                boolean newCardStatus = getOutOfJailCardCheckbox.isSelected();
+                if (player.hasOutOfJailCard() != newCardStatus) {
+                    player.setOutOfJailCard(newCardStatus);
+                }
+
+                // Update UI to reflect all changes
                 updatePlayerPanel(player);
-                boardSpaces.purchaseProperty(player, player.getPosition(), 1);
+                updateManageAssetsButtonState();
+
             } catch (NumberFormatException ex) {
-                JOptionPane.showMessageDialog(this, "Invalid input.");
+                JOptionPane.showMessageDialog(playerGUIFrame, "Invalid numeric input for money, position, or jail turns.", "Input Error", JOptionPane.ERROR_MESSAGE);
             }
         }
     }
