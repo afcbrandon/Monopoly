@@ -9,6 +9,7 @@ import java.util.List;
 
 public class GameGUI extends JFrame {
     private ArrayList<Player> players;
+    private JFrame playerGUIFrame;
     private JPanel playersPanel;
     private JPanel controlPanel;
     private JButton rollButton;
@@ -21,6 +22,9 @@ public class GameGUI extends JFrame {
         this.players = players;
         this.boardSpaces = new GameBoardSpaces(players, this);
 
+        this.playerGUIFrame = new JFrame("Monopoly Game");
+        this.playerGUIFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+
         // Goes through the list of players, and passes the SAME boardSpaces instance
         for (Player p : players) {
             p.setGBoardSpaces(this.boardSpaces);
@@ -31,25 +35,26 @@ public class GameGUI extends JFrame {
         this.currentPlayerIndex = rand.nextInt(players.size());
 
         /* Code to Retrieve Monopoly Board */
-        JFrame frame = new JFrame("Monopoly");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setContentPane(new GameBoard("Monopoly Board Numbered.jpg"));
-        frame.setSize(800, 800);
-        frame.setVisible(true);
-
-        // Set up the frame
-        setTitle("Monopoly Game");
+        JFrame boardFrame = new JFrame("Monopoly");
+        final int gameWIDTH = 800;
+        final int gameHEIGHT = 800;
+        boardFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        boardFrame.setContentPane(new GameBoard("Monopoly Board Numbered.jpg"));
+        boardFrame.setSize(gameWIDTH, gameHEIGHT);
+        boardFrame.setLocationRelativeTo(null);
+        boardFrame.setVisible(true);
+        
+        // Set up the panel size
         if ( players.size() >= 6 ) {
-            setSize(300, 800);
+            this.playerGUIFrame.setPreferredSize(new Dimension(300, 800));
         }
         else if (players.size() >= 4 ) {
-            setSize(300, 600);
+            this.playerGUIFrame.setPreferredSize(new Dimension(300, 600));
         }
         else {
-            setSize(300, 400);
+            this.playerGUIFrame.setPreferredSize(new Dimension(300, 400));
         }
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLayout(new BorderLayout());
+        this.playerGUIFrame.setLayout(new BorderLayout());
 
         // Initialize buttons
         rollButton = new JButton("Roll Dice");
@@ -104,11 +109,23 @@ public class GameGUI extends JFrame {
         controlPanel.add(buildButton);
         controlPanel.add(debugButton);
 
-        add(playersPanel, BorderLayout.CENTER);
-        add(controlPanel, BorderLayout.SOUTH);
+        playerGUIFrame.add(playersPanel, BorderLayout.CENTER);
+        playerGUIFrame.add(controlPanel, BorderLayout.SOUTH);
 
-        setLocationRelativeTo(null);
-        setVisible(true);
+        // Get location and dimensions of boardFrame
+        Point boardFrameLocation = boardFrame.getLocation();
+        int boardFrameWIDTH = boardFrame.getWidth();
+        int boardFrameX = boardFrameLocation.x;
+        int boardFrameY = boardFrameLocation.y;
+
+        // Calculate position for playerGUIFrame (to the right of boardFrame)
+        int guiFrameX = boardFrameX + boardFrameWIDTH; 
+        int guiFrameY = boardFrameY;    // align top of frames
+
+        playerGUIFrame.pack();  // Pack the playerGUI Frame
+
+        playerGUIFrame.setLocation(guiFrameX, guiFrameY);
+        playerGUIFrame.setVisible(true);
 
         startGame(); // Begin game logic
     }
@@ -350,7 +367,7 @@ public class GameGUI extends JFrame {
         propertyJFrame.add(propertyJPanel);
         propertyJFrame.pack();  // pack the frame
 
-        propertyJFrame.setLocationRelativeTo(parentFrame);
+        propertyJFrame.setLocationRelativeTo(null);
         propertyJFrame.setAlwaysOnTop(true);
         propertyJFrame.setVisible(true);
 
@@ -408,7 +425,7 @@ public class GameGUI extends JFrame {
         houseHotelFrame.add(houseHotelPanel);
         houseHotelFrame.pack();
 
-        houseHotelFrame.setLocationRelativeTo(parentFrame);
+        houseHotelFrame.setLocationRelativeTo(null);
         houseHotelFrame.setAlwaysOnTop(true);
         houseHotelFrame.setVisible(true);
     }
@@ -519,7 +536,7 @@ public class GameGUI extends JFrame {
 
         buildHouseFrame.getContentPane().add(buildHousePanel);  // Add the panel to the frame's pane
         buildHouseFrame.pack();
-        buildHouseFrame.setLocationRelativeTo(parentFrame);
+        buildHouseFrame.setLocationRelativeTo(null);
         buildHouseFrame.setVisible(true);
 
     }
@@ -630,7 +647,7 @@ public class GameGUI extends JFrame {
 
         buildHotelFrame.getContentPane().add(buildHotelPanel);  // Add the panel to the frame's pane
         buildHotelFrame.pack();
-        buildHotelFrame.setLocationRelativeTo(parentFrame);
+        buildHotelFrame.setLocationRelativeTo(null);
         buildHotelFrame.setVisible(true);
 
     }
