@@ -66,6 +66,12 @@ public class Property {
     public int getNumHotels() {
         return this.numHotels;
     }
+    public int getHouseCost() {
+        return this.costHouses;
+    }
+    public int getHotelCost() {
+        return this.costHotels;
+    }
     public int getMortgageValue(){
         return this.mortgageValue;
     }
@@ -111,6 +117,7 @@ public class Property {
     /* Function that increments the number of hotels on the property by 1 */
     public void addHotel() {
         this.numHotels++;
+        updateRentHotels();
     }
 
     /*  ###########################################################################################
