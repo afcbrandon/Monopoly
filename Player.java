@@ -1,4 +1,6 @@
 import javax.swing.*;
+import javax.xml.crypto.KeySelector.Purpose;
+
 import java.util.Random;
 import java.util.List;
 import java.util.ArrayList;
@@ -120,8 +122,6 @@ public class Player {
 
         return count;
     }
-
-    // Returns a hashmap of the Properties of a colorset and the amount of hotels it has
     
 
     // Returns a hashmap of the Properties of a colorset and the amount of Houses it has
@@ -201,22 +201,35 @@ public class Player {
         JOptionPane.showMessageDialog(null,
                 this.name + " has gone bankrupt and transferred all assets to " + receiver.getPlayerName());
     }
+
+    // Function that surrenders assets to the bank if player is in debt to bank
     public void surrenderAssetsToBank() {
 
-        this.money = 0;
-
-
-        for (Property p : new ArrayList<>(ownedProperties)) {
-            p.setOwner(null);
+        int totalValueOfImprovementsReturned = 0;
+        if ( gbSpace != null && gbSpace.getBank() != null ) {
+            Bank bank = gbSpace.getBank();
+            for ( Property p : new ArrayList<>(ownedProperties) ) {
+                p.clearPropertyAndReturnToBank(bank);
+                p.setOwner(null);   // Property is now unowned
+            }
+        } else {    // This code is merely for good practice to catch an error. It should never run
+            for ( Property p : new ArrayList<>(ownedProperties) ) {
+                p.setNumHotels(0);
+                p.setNumHouses(0);
+                p.updateRentToOriginalRent();
+                p.setOwner(null);
+            }
         }
 
-        ownedProperties.clear(); // Clear list
-
+        this.money = 0; // Player has no more money
+        ownedProperties.clear();
+        totalColorSetProperties.clear();
+        ownedFullColorSets.clear();
+        colorsetPropertyNames.clear();
 
         this.setElimination();
-
         JOptionPane.showMessageDialog(null,
-                this.name + " has gone bankrupt and surrendered all assets to the bank.");
+                this.name + " has gone bankrupt and surrendered all their assets to the bank.");
     }
 
     // Will: leaving commented out. supposed to allow the player to decide which property to mortgage but got stuck trying to update
@@ -247,6 +260,10 @@ public class Player {
             }
         }
     } */
+
+    /*  #############################
+        ### Functions for Selling ###
+        #############################  */
 
     public void sellAssetsToBankInteractive() {
         while (!ownedProperties.isEmpty()) {
@@ -287,6 +304,20 @@ public class Player {
         }
     }
 
+    // Function that removes property from this player
+    public void removeProperty( Property propertyToSell ) {
+        if ( ownedProperties.remove(propertyToSell) ) {
+            System.out.println(this.name + " is removing property: " + propertyToSell.getName());
+            if (propertyToSell.getStreetColor() != null && !propertyToSell.getStreetColor().isEmpty()) {
+                // updateColorsetSell handles decrementing counts in totalColorSetProperties
+                // and removing property name from colorsetPropertyNames list.
+                updateColorsetSell(propertyToSell.getStreetColor(), propertyToSell.getName());
+            }
+        } else {
+            System.out.println("Warning: Attempted to remove property '" + propertyToSell.getName() + "' not found in " + this.name + "'s portfolio.");
+        }
+    }
+
     /*  #############################
         ### Functions for Player ###
         ############################  */
@@ -310,7 +341,9 @@ public class Player {
         String fieldType = gbSpace.spaceType(currentSpace);
 
         if (fieldType.equals("Go") || fieldType.equals("Parking")) {        //  Space is either Go or Free Parking
+            if ( fieldType.equals("Go")) {
 
+            }
         }
         else if (fieldType.equals("Jail")) {        //  Space is a Jail Space
             if (currentSpace == 31) {   // Go to Jail
@@ -318,9 +351,6 @@ public class Player {
                 this.isJailed = true;
                 this.position = 11;
             }
-
-            // If player landed on space 11, then they are most likely just visiting.
-
         }
         else if (fieldType.equals("Chance")) {      //  Chance Card Space
             ChanceCard drawnCard = gbSpace.drawChanceCard(this); // Get a random Chance card
@@ -353,6 +383,12 @@ public class Player {
 
     }
 
+    // Function that resets the rolledDouble flag
+    public void resetRolledDouble() {
+        this.rolledDouble = false;
+        // Keep rolledDoubleCounter as is, it resets naturally when a non-double is rolled or jail happens.
+    }
+
 
     /*  ##############################
         ### Functions for ColorSet ###
@@ -380,8 +416,6 @@ public class Player {
         }
 
     }
-
-
 
     /*  Function that handles selling property to another player */
     public void sellProperty(Property soldProperty, Player newOwner) {
@@ -445,11 +479,96 @@ public class Player {
         return false;
     }
 
-    //  Function that calls buildHouse function from Property
-    public void buildHouse() {
-        
+    // Returns a boolean if player owns the full colorses. True if they own fullcolorset, false if they do not
+    public boolean ownsFullColorSet(String streetColor) {
+
+        if ( streetColor == null || streetColor.isEmpty() || !totalColorSetProperties.containsKey(streetColor) ) {
+            return false;
+        } 
+
+        int propertiesOwned = totalColorSetProperties.get(streetColor);
+        int requiredProperties;
+
+        switch (streetColor) {
+            case "Light Blue":
+            case "Pink":
+            case "Orange":
+            case "Red":
+            case "Yellow":
+            case "Green":
+                requiredProperties = 3;
+                break;
+            case "Purple":
+            case "Dark Blue":
+                requiredProperties = 2;
+                break;
+            default:
+                return false;   //  Not a buildable color set
+        }
+
+        return propertiesOwned == requiredProperties;
     }
 
+    // Function that determines if the player can currently build on a specific property within a full color set they own.
+    public boolean canBuildOnProperty(Property property, GameBoardSpaces boardSpaces) {
+
+        if (property == null || property.getOwner() != this || property.getStreetColor() == null) {
+            return false; // Not owned or not a colored property
+        }
+
+        String color = property.getStreetColor();
+        if (!ownsFullColorSet(color)) {
+            return false; // Don't own the full set
+        }
+
+        // Check property limits
+        if (property.getNumHotels() > 0) {
+            return false; // Already has a hotel
+        }
+
+        // Check Bank inventory
+        Bank bank = boardSpaces.getBank();
+        boolean needsHouse = property.getNumHouses() < 4;
+        boolean needsHotel = property.getNumHouses() == 4;
+
+        if (needsHotel && !bank.canDispenseHotel()) {
+            return false; // Needs a hotel, but none available
+        }
+        if (needsHouse && !bank.canDispenseHouse()) {
+            // If it needs a house (has < 4) but bank has none, cannot build house.
+            // If it needs a hotel (has 4) bank check is done above.
+            return false;
+        }
+
+        // Check even building rule
+        int minHousesInSet = 5; // Start high (5 represents a hotel)
+        int maxHousesInSet = -1; // Start low
+        List<Property> propertiesInSet = new ArrayList<>();
+
+        // Find min/max houses in the set
+        for (Property p : ownedProperties) {
+            if (color.equals(p.getStreetColor())) {
+                propertiesInSet.add(p);
+                int currentImprovements = (p.getNumHotels() > 0) ? 5 : p.getNumHouses();
+                minHousesInSet = Math.min(minHousesInSet, currentImprovements);
+                maxHousesInSet = Math.max(maxHousesInSet, currentImprovements);
+            }
+        }
+
+        // Determine current property's improvement level
+        int thisPropertyImprovements = (property.getNumHotels() > 0) ? 5 : property.getNumHouses();
+
+        // Cannot build if this property already has the max number of improvements in the set,
+        // unless all properties in the set have the same max (e.g., all have 4 houses ready for hotels).
+        // More simply: Can only build on properties that currently have the minimum number of houses in the set.
+        if (thisPropertyImprovements > minHousesInSet) {
+            return false; // Must build on properties with fewer houses first
+        }
+
+        // If this property has the minimum number of houses, and it's less than 5 (i.e., not a hotel yet),
+        // then building is allowed (subject to bank inventory check already done).
+        return thisPropertyImprovements < 5;
+     }
 
     /*  #######################################
         ### Function for checking Passed Go ###

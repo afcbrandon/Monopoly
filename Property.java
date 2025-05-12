@@ -14,7 +14,6 @@ public class Property {
     private Player owner;
     private boolean isMortgaged;
 
-
     // Constructor used by spaces with no street color "Railroads" and utilities
     public Property(String name, int price, int rent, int mortgageValue) {
         this.name = name;
@@ -85,6 +84,59 @@ public class Property {
         this.owner = owner;
     }
 
+    public void setNumHouses(int numHouses) {
+        this.numHouses = numHouses;
+
+        if ( this.numHotels == 0 ) {
+            if ( this.numHouses == 0 ) {
+                this.rent = this.originalRent;  // set rent of property back to original rent if no property is upon it
+            } else {
+                updateRentHouses(); // update the rent based on the amount of houses on said property
+            }
+        }
+    }
+
+    public void setNumHotels(int numHotels) {
+        this.numHotels = numHotels;
+        if ( this.numHotels > 0 ) {
+            this.numHouses = 0; // Hotel replaces houses
+            updateRentHotels();
+        } else {
+            setNumHouses(this.numHouses);   // Triggers code that updates the rent of a property depending on the number of houses left
+        }
+    }
+
+    /*  ######################
+        ### Bank Functions ###
+        ###################### */
+
+    // Function that removes all improvements(houses and hotels) from a property and surrenders them to the bank
+    // Returns the half cash value of all the improvements returns
+    public int clearPropertyAndReturnToBank(Bank bank) {
+        int valueReturnToBank = calcImprovementsSellValue();
+
+        if ( this.numHotels > 0 ) {
+            bank.returnHotels(this.numHotels);
+            bank.returnHouses(4 * this.numHotels);  // When you sell a hotel, you must also return the 4 houses to the bank
+            System.out.println(name + ": Returned " + this.numHotels + " hotel(s) and " + (4 * this.numHotels) + " houses to the bank.");
+            this.numHotels = 0;
+            this.numHouses = 0;
+        } else if ( this.numHouses > 0 ) {
+            bank.returnHouses(this.numHouses);
+            System.out.println(name + ": Returned " + this.numHouses + " house(s) to the bank.");
+            this.numHouses = 0;
+        }
+
+        if ( valueReturnToBank > 0 ) {
+            this.rent = this.originalRent; // reset rent back to original
+            System.out.println(name + ": All Properties cleared. Rent reset to $" + this.rent);
+        } else {
+            System.out.println(name + ": No improvements to clear.");
+        }
+
+        return valueReturnToBank;
+    }
+
     /*  ##########################
         ### Property Functions ###
         ########################## */
@@ -118,6 +170,19 @@ public class Property {
     public void addHotel() {
         this.numHotels++;
         updateRentHotels();
+    }
+
+    public int calcImprovementsSellValue() {
+        int value = 0;
+
+        if ( this.numHotels > 0 ) {
+            value += (this.costHotels / 2) * this.numHotels;
+            value += (this.costHouses / 2) * 4 * this.numHotels;
+        } else if ( this.numHouses > 0 ) {
+            value += (this.costHouses / 2) * this.numHouses;
+        }
+
+        return value;
     }
 
     /*  ###########################################################################################
@@ -444,5 +509,7 @@ public class Property {
             default:    // DO NOTHING
         }
     }
+
+
 
 }
