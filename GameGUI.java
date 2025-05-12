@@ -146,9 +146,10 @@ public class GameGUI extends JFrame {
 
     /*  Function that enables buildButton if player owns a Full Color Set */
     private void updateBuildButtonState() {
-        boolean canBuild = !players.get(currentPlayerIndex).getFullColorsets().isEmpty();
+        Player currPlayer = players.get(currentPlayerIndex);
+        boolean canBuild = !currPlayer.getFullColorsets().isEmpty(); // returns false if hashmap that checks if player owns a full colorset is empty
         buildButton.setEnabled(canBuild);
-        System.out.println("Checking buildButton enable state for player: " + players.get(currentPlayerIndex).getPlayerName());
+        System.out.println("Checking buildButton enable state for player: " + currPlayer.getPlayerName());
         System.out.println("buildButton " + (canBuild ? "ENABLED" : "DISABLED") + " - Full color sets: " + canBuild);
     }
 
@@ -253,6 +254,7 @@ public class GameGUI extends JFrame {
 
                 // Add actionLister
                 button.addActionListener( _ -> {
+                    System.out.println("Selected button for " + bttnPropertyName);
                     houseOrHotelButtons(propertyJFrame, currPlayer, bttnPropertyName);
                 });
             }
@@ -303,6 +305,8 @@ public class GameGUI extends JFrame {
 
         // Code Logic that decides which button to add. If player can build house then show house button, if player can build hotel then show hotel button
 
+        houseHotelPanel.add(houseButton);
+
         cancelButton.addActionListener( _ -> {
             houseHotelFrame.dispose();
             parentFrame.setVisible(true);
@@ -319,6 +323,85 @@ public class GameGUI extends JFrame {
     }
 
     private void buildHouses(JFrame parentFrame, String propertyName) {
+        Player currPlayer = players.get(currentPlayerIndex);
+
+        parentFrame.setVisible(false);  // hide the parent frame
+
+        final int WIDTH = 350;
+        final int HEIGHT = 100;
+
+        JFrame buildHouseFrame = new JFrame();
+        JPanel buildHousePanel = new JPanel();
+        buildHousePanel.setLayout(new BoxLayout(buildHousePanel, BoxLayout.Y_AXIS));
+
+        // Add a vertical gap before question label
+        buildHousePanel.add(Box.createVerticalStrut(10));
+
+        JLabel questionLabel = new JLabel("Do you want to build a house on " + propertyName + "?");
+        questionLabel.setAlignmentX(Component.CENTER_ALIGNMENT);    // center the question label
+        buildHousePanel.add(questionLabel);
+
+        // add a vertical gap between questionLabel and the two buttons
+        buildHousePanel.add(Box.createVerticalStrut(10));
+
+        JButton yesButton = new JButton("Yes");
+        JButton noButton = new JButton("No");
+
+        // Actions Listener for yesButton
+        yesButton.addActionListener( _ -> {
+
+            buildHouseFrame.dispose();
+        
+            // create a new panel with message telling player they built the house
+            JPanel messagePanel = new JPanel();
+            messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
+
+            // add a vertical gap before the label
+            messagePanel.add(Box.createVerticalStrut(10));
+
+            JLabel messageLabel = new JLabel(currPlayer.getPlayerName() + " built a house on " + propertyName);
+            messageLabel.setAlignmentX(Component.CENTER_ALIGNMENT); // center the message label
+            messagePanel.add(messageLabel);
+            messagePanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+            // add a vertical gap between the label and the okButton
+            messagePanel.add(Box.createVerticalStrut(10));
+
+            // create an ok button that closes the frame
+            JButton okButton = new JButton("Ok");
+            okButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+            okButton.addActionListener( _ -> {
+                parentFrame.dispose();
+            });
+            messagePanel.add(okButton); // add ok button to messagePanel
+
+            // Replace the content pane of the parent frame
+            parentFrame.getContentPane().removeAll();
+            parentFrame.getContentPane().add(messagePanel, BorderLayout.CENTER);
+            parentFrame.getContentPane().revalidate();  // refresh the panel
+            parentFrame.getContentPane().repaint();
+            parentFrame.pack();
+
+            parentFrame.pack();
+            parentFrame.setVisible(true);
+
+        });
+
+        // Action Listener for no Button
+        noButton.addActionListener( _ -> {
+
+            buildHouseFrame.dispose();
+            parentFrame.setVisible(true);
+        });
+
+        buildHousePanel.add(yesButton);
+        buildHousePanel.add(noButton);
+        buildHousePanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+        buildHouseFrame.getContentPane().add(buildHousePanel);  // Add the panel to the frame's pane
+        buildHouseFrame.pack();
+        buildHouseFrame.setLocationRelativeTo(parentFrame);
+        buildHouseFrame.setVisible(true);
 
     }
 

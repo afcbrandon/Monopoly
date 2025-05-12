@@ -122,9 +122,7 @@ public class Player {
     }
 
     // Returns a hashmap of the Properties of a colorset and the amount of hotels it has
-    public HashMap<String, Integer> getHotelsOfProperty(String propertyName) {
-        
-    }
+    
 
     // Returns a hashmap of the Properties of a colorset and the amount of Houses it has
 
@@ -424,7 +422,7 @@ public class Player {
     }
 
     /*  Function that checks to see if player owns the full colorset in a Street Color. Returns false if they do not */
-    private boolean checkFullColorSet(String streetColor, Integer totalPropertiesOwned) {
+    public boolean checkFullColorSet(String streetColor, Integer totalPropertiesOwned) {
 
         switch (streetColor) {
             case "Light Blue":
@@ -433,10 +431,14 @@ public class Player {
             case "Red":
             case "Yellow":
             case "Green":
-                if ( totalColorSetProperties.get(streetColor) == 3 ) return true;
+                if ( totalColorSetProperties.get(streetColor) == 3 ) 
+                return true; 
+                break;
             case "Purple":
             case "Dark Blue":
-                if ( totalColorSetProperties.get(streetColor) == 2 ) return true;
+                if ( totalColorSetProperties.get(streetColor) == 2 ) 
+                return true; 
+                break;
             default:    // Do Nothing
         }
 
