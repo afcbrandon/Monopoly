@@ -177,7 +177,7 @@ public class Property {
 
         if ( this.numHotels > 0 ) {
             value += (this.costHotels / 2) * this.numHotels;
-            value += (this.costHouses / 2) * 4 * this.costHotels;
+            value += (this.costHouses / 2) * 4 * this.numHotels;
         } else if ( this.numHouses > 0 ) {
             value += (this.costHouses / 2) * this.numHouses;
         }

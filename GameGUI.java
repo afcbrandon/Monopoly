@@ -1,8 +1,7 @@
 import javax.swing.*;
-import javax.swing.border.Border;
-
 import java.awt.*;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.Random;
 import java.util.List;
@@ -14,14 +13,16 @@ public class GameGUI extends JFrame {
     private JPanel controlPanel;
     private JButton rollButton;
     private JButton endTurnButton;
-    private JButton buildButton;
+    //  private JButton buildButton;
+    private JButton manageAssetsButton;
     private int currentPlayerIndex;
     private GameBoardSpaces boardSpaces;
+    private Bank bank;
 
     public GameGUI(ArrayList<Player> players) {
         this.players = players;
         this.boardSpaces = new GameBoardSpaces(players, this);
-
+        this.bank = this.boardSpaces.getBank();
         this.playerGUIFrame = new JFrame("Monopoly Game");
         this.playerGUIFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
@@ -56,40 +57,67 @@ public class GameGUI extends JFrame {
         }
         this.playerGUIFrame.setLayout(new BorderLayout());
 
-        // Initialize buttons
+        // --- Control Panel Buttons ---
         rollButton = new JButton("Roll Dice");
         rollButton.setFocusable(false);
-        rollButton.addActionListener( _ -> {
+        rollButton.addActionListener( e -> {
             Player currentPlayer = players.get(currentPlayerIndex);
-            do {
-                currentPlayer.playerTurn();
-                updatePlayerPanel(currentPlayer);
-            } while (currentPlayer.getRolledDouble());
 
-            rollButton.setEnabled(false); // Human's turn ends here
+            if ( !currentPlayer.getIsJailed() ) {
+                currentPlayer.playerRoll(); // Perform one roll actions
+                updatePlayerPanel(currentPlayer);   // Update after roll
+                currentPlayer.handleLandingOnSpace(currentPlayer.getPosition());
+                updatePlayerPanel(currentPlayer); // Update panel again after landing action
+
+                // Disable roll button if they didn't roll doubles, enable end turn
+                if ( !currentPlayer.getRolledDouble() || currentPlayer.getIsJailed() ) {
+                    rollButton.setEnabled(false);
+                    endTurnButton.setEnabled(true);
+                } else {
+                    // Rolled doubles, can roll again
+                    rollButton.setEnabled(true);
+                    endTurnButton.setEnabled(false);
+                    JOptionPane.showMessageDialog(playerGUIFrame, "You rolled doubles! Roll again.", "Doubles!", JOptionPane.INFORMATION_MESSAGE);
+                }
+            } else {
+                // If jailed, rolling is handled within the getOutOfJail logic
+                currentPlayer.getOutOfJail();
+                updatePlayerPanel(currentPlayer);
+                // After attempting to get out of jail, enable end turn
+                rollButton.setEnabled(false);
+                endTurnButton.setEnabled(true);
+            }
+
+            updateManageAssetsButtonState();    // Update asset button state
+
         });
 
         endTurnButton = new JButton("End Turn");
         endTurnButton.setFocusable(false);
-        endTurnButton.addActionListener( _ -> {
+        endTurnButton.setEnabled(false);
+        endTurnButton.addActionListener( e -> {
             endTurn();
-            rollButton.setEnabled(!(players.get(currentPlayerIndex) instanceof Bot)); // Only enable for humans
-            handleBotTurns(); // If it's a bot, take turns automatically
+            // Set the button state for the next player
+            Player newCurrentPlayer = players.get(currentPlayerIndex);
+            if ( newCurrentPlayer instanceof Bot && !newCurrentPlayer.getIsEliminated() ) {
+                handleBotTurns();   // Only call if the new current player is an active bot
+            }
+
         });
 
-        buildButton = new JButton("Build Property");
-        buildButton.setFocusable(false);    //  disabled keyboard focus
-        updateBuildButtonState();
-        buildButton.addActionListener( _ -> {
+        // Manage Assets Button
+        manageAssetsButton = new JButton("Manage Assets");
+        manageAssetsButton.setFocusable(false);
+        manageAssetsButton.addActionListener( e -> {
             Player currentPlayer = players.get(currentPlayerIndex);
-
-            buildPropertyButton(currentPlayer);
+            showManageAssetsDialog(currentPlayer);
         });
+        updateManageAssetsButtonState(); // Set initial state
 
-        // Debug button (unchanged)
+        // Debug button
         JButton debugButton = new JButton("Debug");
         debugButton.setFocusable(false);
-        debugButton.addActionListener( _ -> {
+        debugButton.addActionListener( e -> {
             Player currentPlayer = players.get(currentPlayerIndex);
             showDebugPanel(currentPlayer);
         });
@@ -106,28 +134,26 @@ public class GameGUI extends JFrame {
         this.controlPanel = new JPanel(new GridLayout(0, 1));
         controlPanel.add(rollButton);
         controlPanel.add(endTurnButton);
-        controlPanel.add(buildButton);
+        controlPanel.add(manageAssetsButton);
         controlPanel.add(debugButton);
 
         playerGUIFrame.add(playersPanel, BorderLayout.CENTER);
         playerGUIFrame.add(controlPanel, BorderLayout.SOUTH);
 
-        // Get location and dimensions of boardFrame
+        // Position player GUI next to board
         Point boardFrameLocation = boardFrame.getLocation();
         int boardFrameWIDTH = boardFrame.getWidth();
         int boardFrameX = boardFrameLocation.x;
         int boardFrameY = boardFrameLocation.y;
+        int guiFrameX = boardFrameX + boardFrameWIDTH + 10; // Add 10px gap
+        int guiFrameY = boardFrameY;
 
-        // Calculate position for playerGUIFrame (to the right of boardFrame)
-        int guiFrameX = boardFrameX + boardFrameWIDTH; 
-        int guiFrameY = boardFrameY;    // align top of frames
-
-        playerGUIFrame.pack();  // Pack the playerGUI Frame
-
+        playerGUIFrame.pack();
         playerGUIFrame.setLocation(guiFrameX, guiFrameY);
         playerGUIFrame.setVisible(true);
 
-        startGame(); // Begin game logic
+        startGame(); // begin the game logic
+
     }
 
     private JPanel createPlayerProfilePanel(Player player) {
@@ -147,30 +173,102 @@ public class GameGUI extends JFrame {
         return panel;
     }
 
-    // Function that updates the player panel, and can be called from other Java classes
-    public void updatePlayerPanel(Player player) {
-        for (Component comp : playersPanel.getComponents()) {
-            JPanel panel = (JPanel) comp;
-            if (panel.getName().equals(player.getPlayerName())) {
-                JLabel moneyLabel = (JLabel) panel.getComponent(2);
-                JLabel posLabel = (JLabel) panel.getComponent(3);
-
-                moneyLabel.setText("Money: $" + player.getMoney());
-                int pos = player.getPosition();
-                String desc = boardSpaces.isProperty(pos)
-                        ? boardSpaces.getProperty(pos).getName()
-                        : boardSpaces.spaceType(pos);
-                posLabel.setText("Position: " + pos + " - " + desc);
-
-                updateBuildButtonState();
-
-                panel.setBackground(player.getIsEliminated() ? Color.RED : null);
-                break;
-            }
-        }
+    private void updateManageAssetsButtonState() {
+        Player currentPlayer = players.get(currentPlayerIndex);
+        boolean canManage = !(currentPlayer instanceof Bot) 
+                                && !currentPlayer.getIsEliminated() 
+                                && !currentPlayer.getOwnedProperties().isEmpty();
+        manageAssetsButton.setEnabled(canManage);
     }
 
-    /*  Function that enables buildButton if player owns a Full Color Set */
+    private void showManageAssetsDialog(Player player) {
+        JFrame manageFrame = new JFrame("Manage Assets for " + player.getPlayerName());
+        manageFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        manageFrame.setAlwaysOnTop(true);
+
+        JPanel mainPanel = new JPanel();
+        mainPanel.setLayout(new BoxLayout(mainPanel, BoxLayout.Y_AXIS));
+        mainPanel.setBorder(BorderFactory.createEmptyBorder(10, 10, 10, 10));
+
+        List<Property> ownedProps = new ArrayList<>(player.getOwnedProperties());
+        // Sort properties for consistent display (e.g., by name or color)
+        ownedProps.sort(Comparator.comparing(Property::getName));
+
+        if ( ownedProps.isEmpty() ) {
+            mainPanel.add(new JLabel("You do not own any properties."));
+        } else {
+            // Create a scroll pane in case the list is long
+            JPanel propertiesListPanel = new JPanel();
+            propertiesListPanel.setLayout(new BoxLayout(propertiesListPanel, BoxLayout.Y_AXIS));
+
+            for (Property prop : ownedProps) {
+                JPanel propPanel = new JPanel(new FlowLayout(FlowLayout.LEFT));
+                propPanel.setBorder(BorderFactory.createMatteBorder(0, 0, 1, 0, Color.LIGHT_GRAY)); // Separator line
+
+                // Property Label (with color indicator if possible)
+                String propLabelText = prop.getName();
+                if ( prop.getStreetColor() != null ) {
+                     propLabelText += " (" + prop.getStreetColor() + ")";
+                }
+                 if ( prop.getNumHotels() > 0 ) {
+                     propLabelText += " [Hotel]";
+                 } else if ( prop.getNumHouses() > 0 ) {
+                     propLabelText += " [" + prop.getNumHouses() + " House" + (prop.getNumHouses() > 1 ? "s" : "") + "]";
+                 }
+                JLabel propLabel = new JLabel(propLabelText);
+                propLabel.setPreferredSize(new Dimension(200, 20)); // Give label consistent width
+                propPanel.add(propLabel);
+
+                // --- Build/Improve Button ---
+                JButton buildImproveButton = new JButton("Build/Improve");
+                boolean canBuildOnThisProperty = false;
+                if ( prop.getStreetColor() != null && player.ownsFullColorSet(prop.getStreetColor()) ) {
+                    // Check if this specific property is eligible for the *next* build action
+                    // (based on even building rules and house/hotel limits)
+                    canBuildOnThisProperty = player.canBuildOnProperty(prop, boardSpaces); // Need this helper method in Player
+                }
+                buildImproveButton.setEnabled(canBuildOnThisProperty);
+                buildImproveButton.addActionListener(e -> {
+                    // This dialog should close before opening the next one
+                    manageFrame.dispose();
+                    // Call the existing flow, which handles house/hotel choice
+                    houseOrHotelButtons(null, player, prop.getName()); // Pass null as parent, it's not needed here
+                });
+                propPanel.add(buildImproveButton);
+
+
+                // --- Sell Button ---
+                JButton sellButton = new JButton("Sell");
+                sellButton.setEnabled(true); // Always possible to initiate selling owned property
+                sellButton.addActionListener(e -> {
+                    // This dialog should close before opening the next one
+                    manageFrame.dispose();
+                    showSellOptionsDialog(null, player, prop.getName()); // Pass null as parent
+                });
+                propPanel.add(sellButton);
+
+                propertiesListPanel.add(propPanel);
+            }
+             JScrollPane scrollPane = new JScrollPane(propertiesListPanel);
+             scrollPane.setPreferredSize(new Dimension(450, 300)); // Adjust size as needed
+             mainPanel.add(scrollPane);
+        }
+
+        JButton closeButton = new JButton("Close");
+        closeButton.addActionListener(e -> manageFrame.dispose());
+        JPanel closePanel = new JPanel(new FlowLayout(FlowLayout.CENTER)); // Panel to center the close button
+        closePanel.add(closeButton);
+        mainPanel.add(closePanel);
+
+
+        manageFrame.add(mainPanel);
+        manageFrame.pack();
+        manageFrame.setLocationRelativeTo(playerGUIFrame); // Position relative to the main player GUI
+        manageFrame.setVisible(true);
+    }
+
+/*
+    // Function that enables buildButton if player owns a Full Color Set
     private void updateBuildButtonState() {
         Player currPlayer = players.get(currentPlayerIndex);
         boolean canBuild = !currPlayer.getFullColorsets().isEmpty(); // returns false if hashmap that checks if player owns a full colorset is empty
@@ -178,206 +276,52 @@ public class GameGUI extends JFrame {
         System.out.println("Checking buildButton enable state for player: " + currPlayer.getPlayerName());
         System.out.println("buildButton " + (canBuild ? "ENABLED" : "DISABLED") + " - Full color sets: " + canBuild);
     }
+*/
 
-    // Function for buildButton
-    private void buildPropertyButton(Player currentPlayer) {
+    // Function that updates the player panel, and can be called from other Java classes
+    public void updatePlayerPanel(Player player) {
+        for (Component comp : playersPanel.getComponents()) {
+            if (comp instanceof JPanel) {
+                 JPanel panel = (JPanel) comp;
+                 if (panel.getName() != null && panel.getName().equals(player.getPlayerName())) {
+                     // Ensure components exist and are JLabels before casting
+                     if (panel.getComponentCount() > 3) {
+                         Component moneyComp = panel.getComponent(2);
+                         Component posComp = panel.getComponent(3);
 
-        JFrame buildJFrame = new JFrame();
-        buildJFrame.setDefaultCloseOperation(DISPOSE_ON_CLOSE);
-        buildJFrame.setResizable(false);
-
-        JPanel buildJPanel = new JPanel(new GridLayout(currentPlayer.getFullColorsets().size() + 1, 1));
-        HashMap<String,Integer> availColorSets = currentPlayer.getFullColorsets();
-
-        // Height and Width
-        final int WIDTH = 300;
-        final int HEIGHT = 100 * (availColorSets.size() + 1);
-
-        buildJPanel.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-
-        JButton[] buttons = new JButton[availColorSets.size()];
-        String[] colorNames = new String[availColorSets.size()];
-
-        int index = 0;
-        for ( String cN : availColorSets.keySet() ) {
-            colorNames[index] = cN;
-            index++;
-        }
-
-        // Creates buttons with the name of their respective Color
-        for ( int i = 0; i < availColorSets.size(); i++ ) {
-            buttons[i] = new JButton(colorNames[i]);
-            buildJPanel.add(buttons[i]);
-        }
-
-        // Iterate through JButton Array
-        for ( Component component : buildJPanel.getComponents() ) {
-            // Check if component is a JButton
-            if ( component instanceof JButton ) {
-                JButton button = (JButton) component;
-                String buttonColorName = button.getText();
-
-                // Add actionListener
-                button.addActionListener( _ -> {
-                    propertyNamesButtons(buildJFrame, currentPlayer, buttonColorName);
-                });
-
+                         if (moneyComp instanceof JLabel) {
+                             ((JLabel) moneyComp).setText("Money: $" + player.getMoney());
+                         }
+                         if (posComp instanceof JLabel) {
+                             int pos = player.getPosition();
+                             String desc = boardSpaces.isProperty(pos)
+                                 ? boardSpaces.getProperty(pos).getName()
+                                 : boardSpaces.spaceType(pos);
+                             ((JLabel) posComp).setText("Position: " + pos + " - " + desc);
+                         }
+                     }
+                     // Update background for eliminated players
+                     panel.setBackground(player.getIsEliminated() ? Color.LIGHT_GRAY : playerGUIFrame.getBackground()); // Use default background
+                     break; // Found the player, exit loop
+                 }
             }
         }
-
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.addActionListener( _ -> {
-            buildJFrame.dispose();
-        });
-
-
-        buildJPanel.add(cancelButton);
-
-        buildJFrame.add(buildJPanel);
-        buildJFrame.pack(); // pack the frame
-
-        buildJFrame.setLocationRelativeTo(null);
-        buildJFrame.setAlwaysOnTop(true);
-        buildJFrame.setVisible(true);
-        
+        // Update button states after updating panel info
+        if (player == players.get(currentPlayerIndex)) {
+             updateManageAssetsButtonState();
+             // Also update roll/end turn buttons based on current player state
+             boolean canRoll = !player.getIsEliminated() && !(player instanceof Bot) && !endTurnButton.isEnabled(); // Can roll if turn not ended
+             rollButton.setEnabled(canRoll);
+        }
     }
 
-    // Called when player chooses a colorset to build on
-    private void propertyNamesButtons(JFrame parentFrame, Player currPlayer, String colorName) {
+    private void houseOrHotelButtons(JFrame parentFrameToDispose, Player currPlayer, String propertyName) {
 
-        // hide the initial frame
-        parentFrame.setVisible(false);
-        System.out.println("ColorSet Frame set to Hidden!");
-
-        List<String> propertyNamesInSet = currPlayer.getListOfColorSetPropertyNames(currPlayer, colorName).get(colorName);
-
-        if (propertyNamesInSet == null || propertyNamesInSet.isEmpty()) {
-            JOptionPane.showMessageDialog(parentFrame, "Error: No properties found for this color set.", "Error", JOptionPane.ERROR_MESSAGE);
-            parentFrame.setVisible(true); // Show the parent frame again
-            return;
+        if ( parentFrameToDispose != null ) {
+            parentFrameToDispose.setVisible(false);
         }
-
-        // Get the Property objects and find the minimum number of houses in this set
-        List<Property> propertiesInThisColorSet = new ArrayList<>();
-        int minHousesInSet = 5; // Max houses is 4, hotel is the 5th "house". 
-
-        for ( String propName : propertyNamesInSet ) {
-            Property prop = boardSpaces.getPropertyByName(propName);
-            if ( prop.getOwner() == currPlayer ) {  // Ensures that the current player owns the property
-                propertiesInThisColorSet.add(prop);
-                if ( prop.getNumHotels() == 0 && prop.getNumHouses() < minHousesInSet ) {   // only consider houses if no hotel
-                    minHousesInSet = prop.getNumHouses();
-                } else if ( prop.getNumHotels() == 1 ) { // If there's a hotel, then the property basically has 5 houses
-                    minHousesInSet = Math.min(minHousesInSet, 5);   // Hotel means the property is "full" of houses
-                }
-            }
-        }
-
-        // If all properties in the set have a hotel, minHousesInSet might still be 5.
-        // Or if all have 4 houses and are eligible for a hotel, minHousesInSet would be 4.
-
-        // Create an object of Jframe and of JPanel
-        JFrame propertyJFrame = new JFrame();
-        JPanel propertyJPanel = new JPanel();
-        propertyJPanel.setLayout(new BoxLayout(propertyJPanel, BoxLayout.Y_AXIS));
         
-        // Set panel size
-        final int WIDTH = 300;
-        final int HEIGHT = 50;
-        propertyJPanel.setPreferredSize( new Dimension(WIDTH, (propertyNamesInSet.size() * HEIGHT) + (HEIGHT / 2) ) );
-
-        // Code to create buttons for properties
-        for ( String propNameFromList : propertyNamesInSet ) {
-            propertyJPanel.add( new JButton(propNameFromList) );
-        }
-
-        // Iterate through buttons and add actionListener for them
-        for ( Component component : propertyJPanel.getComponents() ) {
-            if ( component instanceof JButton ) {
-                JButton button = (JButton) component;
-                button.setAlignmentX(CENTER_ALIGNMENT);
-                button.setMinimumSize(new Dimension(WIDTH, HEIGHT));
-                button.setPreferredSize(new Dimension(WIDTH, HEIGHT));
-                button.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE / 2));
-                String bttnPropertyName = button.getText();
-
-                Property property = boardSpaces.getPropertyByName(bttnPropertyName);
-                boolean enableButton = false;
-
-                if (property != null && property.getOwner() == currPlayer) {
-                    if (property.getNumHotels() == 1) {
-                        // Already has a hotel, cannot build more houses.
-                        enableButton = false;
-                        System.out.println("Button for " + bttnPropertyName + " disabled: has a hotel.");
-                    } else if (property.getNumHouses() == 4) {
-                        // Has 4 houses, can only build a hotel next (handled by houseOrHotelButtons).
-                        // For the purpose of "building another house", this property is not eligible.
-                        // However, it *should* be selectable if the goal is to build a hotel.
-                        // The current context is selecting a property to build *something*.
-                        // The houseOrHotelButtons will differentiate. So, if it has 4 houses, it's a candidate for a hotel.
-                        // Let's assume this screen leads to choosing house OR hotel.
-                        // If it has 4 houses, it means it has the min # of houses (if others also have 4) or more.
-                        // The condition for enabling should be that its current house count allows it to be the "next" to build on.
-                        if (property.getNumHouses() == minHousesInSet) {
-                             enableButton = true; // Can be selected to potentially build a hotel
-                        } else {
-                             enableButton = false; // If it has 4 houses but others have less, can't select it.
-                             System.out.println("Button for " + bttnPropertyName + " disabled: has 4 houses, but others in set have fewer (" + minHousesInSet + ").");
-                        }
-                    } else if (property.getNumHouses() > minHousesInSet) {
-                        // This property has more houses than the minimum in the set.
-                        // Player must build on properties with fewer houses first.
-                        enableButton = false;
-                        System.out.println("Button for " + bttnPropertyName + " disabled: has " + property.getNumHouses() + " houses, set minimum is " + minHousesInSet + ".");
-                    } else {
-                        // property.getNumHouses() == minHousesInSet and < 4
-                        // This property is eligible for the next house.
-                        enableButton = true;
-                    }
-                } else {
-                    // Property not found or not owned by current player (should not happen if getListOfColorSetPropertyNames is correct)
-                    enableButton = false;
-                    System.out.println("Button for " + bttnPropertyName + " disabled: property not found or not owned by player.");
-                }
-
-                button.setEnabled(enableButton);
-
-                if (enableButton) {
-                    button.addActionListener( _ -> {
-                        System.out.println("Selected button for " + bttnPropertyName);
-                        houseOrHotelButtons(propertyJFrame, currPlayer, bttnPropertyName);
-                    });
-                }
-            }
-        }
-
-        JButton cancelButton = new JButton("Cancel");
-        cancelButton.setAlignmentX(CENTER_ALIGNMENT);
-        cancelButton.setMinimumSize(new Dimension(WIDTH, HEIGHT / 2));
-        cancelButton.setPreferredSize(new Dimension(WIDTH, HEIGHT / 2));
-        cancelButton.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE));
-        cancelButton.addActionListener( _ -> {
-            parentFrame.setVisible(true);
-            System.out.println("ColorSet Frame set to Visible!");
-            propertyJFrame.dispose();
-        });
-
-        propertyJPanel.add(cancelButton);
-        
-        propertyJFrame.add(propertyJPanel);
-        propertyJFrame.pack();  // pack the frame
-
-        propertyJFrame.setLocationRelativeTo(null);
-        propertyJFrame.setAlwaysOnTop(true);
-        propertyJFrame.setVisible(true);
-
-    }
-
-    private void houseOrHotelButtons(JFrame parentFrame, Player currPlayer, String propertyName) {
-
-        parentFrame.setVisible(false);
-        
-        JFrame houseHotelFrame = new JFrame("Manage " + propertyName);
+        JFrame houseHotelFrame = new JFrame("Build on " + propertyName);
         JPanel houseHotelPanel = new JPanel();
 
         houseHotelPanel.setLayout(new GridLayout(0, 1, 0, 10));
@@ -457,26 +401,24 @@ public class GameGUI extends JFrame {
         // Cancel Button Action Listener
         cancelButton.addActionListener( _ -> {
             houseHotelFrame.dispose();
-            parentFrame.setVisible(true);   // Show the property list frame again
         });
-
         houseHotelPanel.add(cancelButton);
         
         houseHotelFrame.add(houseHotelPanel);
         houseHotelFrame.pack();
 
-        houseHotelFrame.setLocationRelativeTo(parentFrame);
+        houseHotelFrame.setLocationRelativeTo(playerGUIFrame);
         houseHotelFrame.setAlwaysOnTop(true);
         houseHotelFrame.setVisible(true);
     }
 
-    private void buildHouses(JFrame parentFrame, String propertyName) {
+    private void buildHouses(JFrame frameToDispose, String propertyName) {
 
         Player currPlayer = players.get(currentPlayerIndex);
         Property property = boardSpaces.getPropertyByName(propertyName);
         Bank bank = boardSpaces.getBank();
 
-        parentFrame.setVisible(false);  // hide the parent frame
+        frameToDispose.setVisible(false);  // hide the parent frame
 
         final int WIDTH = 450;
         final int HEIGHT = 120;
@@ -528,7 +470,7 @@ public class GameGUI extends JFrame {
                 bank.dispenseHouse();   // get a house from the bank
 
                 updatePlayerPanel(currPlayer);
-                updateBuildButtonState();
+                updateManageAssetsButtonState();    // update main button state
 
                 System.out.println(currPlayer.getPlayerName() + " built a house on " + property.getName() +
                                     ". Houses: " + property.getNumHouses() +
@@ -537,14 +479,12 @@ public class GameGUI extends JFrame {
                 JOptionPane.showMessageDialog(null, 
                         currPlayer.getPlayerName() + " built a house on " + propertyName + "!",
                         "House Built", JOptionPane.INFORMATION_MESSAGE);
-                parentFrame.dispose();
             });
         }
 
         // Action Listener for no Button
         noButton.addActionListener( _ -> {
             buildHouseFrame.dispose();
-            parentFrame.setVisible(true);
         });
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
@@ -556,18 +496,18 @@ public class GameGUI extends JFrame {
 
         buildHouseFrame.getContentPane().add(buildHousePanel);  // Add the panel to the frame's pane
         buildHouseFrame.pack();
-        buildHouseFrame.setLocationRelativeTo(parentFrame);
+        buildHouseFrame.setLocationRelativeTo(playerGUIFrame);
         buildHouseFrame.setAlwaysOnTop(true);
         buildHouseFrame.setVisible(true);
     }
 
-    private void buildHotel(JFrame parentFrame, String propertyName) {
+    private void buildHotel(JFrame frameToDispose, String propertyName) {
 
         Player currPlayer = players.get(currentPlayerIndex);
         Property property = boardSpaces.getPropertyByName(propertyName);
         Bank bank = boardSpaces.getBank();
 
-        parentFrame.setVisible(false);  // hide the parent frame
+        frameToDispose.setVisible(false);  // hide the parent frame
 
         final int WIDTH = 450;
         final int HEIGHT = 120;
@@ -621,7 +561,7 @@ public class GameGUI extends JFrame {
                 bank.dispenseHotel();   // get a hotel from the bank
 
                 updatePlayerPanel(currPlayer);
-                updateBuildButtonState();
+                updateManageAssetsButtonState();
 
                 System.out.println(currPlayer.getPlayerName() + " built a hotel on " + property.getName() +
                                     ". Bank Houses: " + bank.getAvailableHouses() +
@@ -630,15 +570,12 @@ public class GameGUI extends JFrame {
                 JOptionPane.showMessageDialog(null, 
                         currPlayer.getPlayerName() + " built a hotel on " + propertyName + "!",
                         "Hotel Built", JOptionPane.INFORMATION_MESSAGE);
-                parentFrame.dispose();
-
             });
         }
 
         // Action Listener for no Button
         noButton.addActionListener( _ -> {
             buildHotelFrame.dispose();
-            parentFrame.setVisible(true);
         });
 
         JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, 10, 0));
@@ -650,21 +587,23 @@ public class GameGUI extends JFrame {
 
         buildHotelFrame.getContentPane().add(buildHotelPanel);  // Add the panel to the frame's pane
         buildHotelFrame.pack();
-        buildHotelFrame.setLocationRelativeTo(parentFrame);
+        buildHotelFrame.setLocationRelativeTo(playerGUIFrame);
         buildHotelFrame.setAlwaysOnTop(true);
         buildHotelFrame.setVisible(true);
 
     }
 
-    private void showSellOptionsDialog(JFrame parentFrame, Player seller, String propertyName) {
+    private void showSellOptionsDialog(JFrame frameToDispose, Player seller, String propertyName) {
 
-        parentFrame.setVisible(false); // Hide the "Manage [Property Name]" frame
+        if ( frameToDispose != null ) {
+            frameToDispose.dispose();
+        }
 
         Property propertyToSell = boardSpaces.getPropertyByName(propertyName);
         // This check should be redundant if sell button is only enabled for owned properties, but good for safety
         if (propertyToSell == null || propertyToSell.getOwner() != seller) {
-            JOptionPane.showMessageDialog(parentFrame, "Error: You do not own this property or it's invalid.", "Sell Error", JOptionPane.ERROR_MESSAGE);
-            parentFrame.setVisible(true);
+            JOptionPane.showMessageDialog(frameToDispose, "Error: You do not own this property or it's invalid.", "Sell Error", JOptionPane.ERROR_MESSAGE);
+            frameToDispose.setVisible(true);
             return;
         }
 
@@ -678,17 +617,16 @@ public class GameGUI extends JFrame {
 
         sellToBankButton.addActionListener(e -> {
             sellOptionsFrame.dispose();
-            handleSellToBank(seller, propertyToSell, parentFrame); // parentFrame is the "Manage Property" dialog
+            handleSellToBank(seller, propertyToSell, null); // parentFrame is the "Manage Property" dialog
         });
 
         sellToPlayerButton.addActionListener(e -> {
             sellOptionsFrame.dispose();
-            handleSellToPlayer(seller, propertyToSell, parentFrame); // parentFrame is the "Manage Property" dialog
+            handleSellToPlayer(seller, propertyToSell, null); // parentFrame is the "Manage Property" dialog
         });
 
         cancelSellButton.addActionListener(e -> {
             sellOptionsFrame.dispose();
-            parentFrame.setVisible(true); // Re-show the "Manage [Property Name]" frame
         });
 
         sellOptionsPanel.add(new JLabel("How do you want to sell " + propertyName + "?", SwingConstants.CENTER));
@@ -698,21 +636,13 @@ public class GameGUI extends JFrame {
 
         sellOptionsFrame.add(sellOptionsPanel);
         sellOptionsFrame.pack();
-        sellOptionsFrame.setLocationRelativeTo(parentFrame);
+        sellOptionsFrame.setLocationRelativeTo(playerGUIFrame);
         sellOptionsFrame.setAlwaysOnTop(true);
         sellOptionsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        sellOptionsFrame.addWindowListener(new java.awt.event.WindowAdapter() {
-            @Override
-            public void windowClosing(java.awt.event.WindowEvent windowEvent) {
-                if (parentFrame != null) {
-                    parentFrame.setVisible(true);
-                }
-            }
-        });
         sellOptionsFrame.setVisible(true);
     }
 
-    private void handleSellToBank(Player seller, Property property, JFrame originalManagePropertyFrame) {
+    private void handleSellToBank(Player seller, Property property, JFrame frameToClose) {
         Bank bank = boardSpaces.getBank();
         int totalMoneyGainedThisTransaction = 0;
 
@@ -729,10 +659,12 @@ public class GameGUI extends JFrame {
                 seller.updateMoney(moneyFromImprovements);
                 totalMoneyGainedThisTransaction += moneyFromImprovements;
                 updatePlayerPanel(seller); // Update GUI for seller
-                JOptionPane.showMessageDialog(null, "Sold improvements on " + property.getName() + " for $" + moneyFromImprovements + ".");
+                JOptionPane.showMessageDialog(playerGUIFrame, "Sold improvements on " + property.getName() + " for $" + moneyFromImprovements + ".");
+                if ( frameToClose != null ) {
+                    frameToClose.dispose();
+                }
             } else {
-                JOptionPane.showMessageDialog(null, "Sale of " + property.getName() + " to bank cancelled (improvements not sold).");
-                originalManagePropertyFrame.setVisible(true); // Re-show the "Manage Property" frame
+                JOptionPane.showMessageDialog(playerGUIFrame, "Sale of " + property.getName() + " to bank cancelled (improvements not sold).");
                 return;
             }
         }
@@ -754,20 +686,20 @@ public class GameGUI extends JFrame {
             // property.setMortgaged(false); // Selling to bank typically clears mortgage status
 
             updatePlayerPanel(seller);
-            updateBuildButtonState(); // Crucial, as player might lose a color set or ability to build
+            updateManageAssetsButtonState();; // Crucial, as player might lose a color set or ability to build
 
-            JOptionPane.showMessageDialog(null, property.getName() + " sold to the bank for $" + propertySellPrice + ".\n" +
+            JOptionPane.showMessageDialog(playerGUIFrame, property.getName() + " sold to the bank for $" + propertySellPrice + ".\n" +
                     "Total gained from this transaction: $" + totalMoneyGainedThisTransaction);
-            originalManagePropertyFrame.dispose(); // Sale complete, close the "Manage Property" frame
+            if ( frameToClose != null ) {
+                frameToClose.dispose();
+            }
         } else {
-            JOptionPane.showMessageDialog(null, "Sale of " + property.getName() + " to bank cancelled.");
+            JOptionPane.showMessageDialog(playerGUIFrame, "Sale of " + property.getName() + " to bank cancelled.");
             // If they cancelled selling property but sold improvements, improvements are gone.
-            originalManagePropertyFrame.setVisible(true); // Re-show to reflect (now unimproved) property
         }
     }
 
-    // In GameGUI.java
-private void handleSellToPlayer(Player seller, Property property, JFrame originalManagePropertyFrame) {
+    private void handleSellToPlayer(Player seller, Property property, JFrame frameToClose) {
     Bank bank = boardSpaces.getBank(); // Needed for selling improvements
 
     // Step 1: Property MUST be unimproved to be sold to another player.
@@ -783,11 +715,10 @@ private void handleSellToPlayer(Player seller, Property property, JFrame origina
             int moneyFromImprovements = property.clearPropertyAndReturnToBank(bank);
             seller.updateMoney(moneyFromImprovements);
             updatePlayerPanel(seller);
-            JOptionPane.showMessageDialog(null, "Sold improvements on " + property.getName() + " for $" + moneyFromImprovements + ".");
+            JOptionPane.showMessageDialog(playerGUIFrame, "Sold improvements on " + property.getName() + " for $" + moneyFromImprovements + ".");
             // Now property is unimproved, can proceed
         } else {
-            JOptionPane.showMessageDialog(null, "Sale to another player cancelled (improvements not sold to bank).");
-            originalManagePropertyFrame.setVisible(true);
+            JOptionPane.showMessageDialog(playerGUIFrame, "Sale to another player cancelled (improvements not sold to bank).");
             return;
         }
     }
@@ -802,7 +733,6 @@ private void handleSellToPlayer(Player seller, Property property, JFrame origina
 
     if (potentialBuyers.isEmpty()) {
         JOptionPane.showMessageDialog(null, "No other active players to sell to.");
-        originalManagePropertyFrame.setVisible(true);
         return;
     }
 
@@ -812,7 +742,6 @@ private void handleSellToPlayer(Player seller, Property property, JFrame origina
             "Select Buyer", JOptionPane.QUESTION_MESSAGE, null, buyerNames, buyerNames[0]);
 
     if (selectedBuyerName == null) { // User cancelled buyer selection
-        originalManagePropertyFrame.setVisible(true);
         return;
     }
 
@@ -826,7 +755,6 @@ private void handleSellToPlayer(Player seller, Property property, JFrame origina
 
     if (buyer == null) { // Should not happen
         JOptionPane.showMessageDialog(null, "Error selecting buyer. Sale cancelled.");
-        originalManagePropertyFrame.setVisible(true);
         return;
     }
 
@@ -840,17 +768,15 @@ private void handleSellToPlayer(Player seller, Property property, JFrame origina
         agreedPrice = Integer.parseInt(priceString);
         if (agreedPrice < 0) {
             JOptionPane.showMessageDialog(null, "Price cannot be negative. Sale cancelled.");
-            originalManagePropertyFrame.setVisible(true);
             return;
         }
     } catch (NumberFormatException ex) {
         JOptionPane.showMessageDialog(null, "Invalid price entered. Sale cancelled.");
-        originalManagePropertyFrame.setVisible(true);
         return;
     }
 
     // Step 4: Buyer Confirmation
-    int confirmPurchase = JOptionPane.showConfirmDialog(null,
+    int confirmPurchase = JOptionPane.showConfirmDialog(playerGUIFrame,
             buyer.getPlayerName() + ", do you want to buy " + property.getName() + "\nfrom " + seller.getPlayerName() + " for $" + agreedPrice + "?\n" +
             "Your current money: $" + buyer.getMoney(),
             "Confirm Purchase", JOptionPane.YES_NO_OPTION);
@@ -866,33 +792,43 @@ private void handleSellToPlayer(Player seller, Property property, JFrame origina
 
             updatePlayerPanel(seller);
             updatePlayerPanel(buyer);
-            updateBuildButtonState(); // For both players, as color sets might have changed status
+            updateManageAssetsButtonState();; // For both players, as color sets might have changed status
 
-            JOptionPane.showMessageDialog(null,
+            JOptionPane.showMessageDialog(playerGUIFrame,
                     property.getName() + " sold by " + seller.getPlayerName() + " to " + buyer.getPlayerName() + " for $" + agreedPrice + ".");
-            originalManagePropertyFrame.dispose(); // Sale complete, close the "Manage Property" frame
+            if ( frameToClose != null ) {
+                frameToClose.dispose();
+            }
         } else {
-            JOptionPane.showMessageDialog(null, buyer.getPlayerName() + " does not have enough money ($" + agreedPrice + ") to buy " + property.getName() + ".");
-            originalManagePropertyFrame.setVisible(true); // Transaction failed, re-show "Manage Property"
+            JOptionPane.showMessageDialog(playerGUIFrame, buyer.getPlayerName() + " does not have enough money ($" + agreedPrice + ") to buy " + property.getName() + ".");
         }
     } else {
-        JOptionPane.showMessageDialog(null, buyer.getPlayerName() + " declined to purchase " + property.getName() + ".");
-        originalManagePropertyFrame.setVisible(true); // Transaction failed, re-show "Manage Property"
+        JOptionPane.showMessageDialog(playerGUIFrame, buyer.getPlayerName() + " declined to purchase " + property.getName() + ".");
     }
 }
 
 
     // Function that ends the player's turn
     private void endTurn() {
+         // Reset double roll status for the player whose turn just ended
+        players.get(currentPlayerIndex).resetRolledDouble();
+
         do {
             currentPlayerIndex = (currentPlayerIndex + 1) % players.size();
         } while (players.get(currentPlayerIndex).getIsEliminated());
 
-        checkWinner();
+        checkWinner(); // Check if the game ends
+
+        if (!playerGUIFrame.isVisible()) return; // Exit if game window closed by winner check
 
         Player currentPlayer = players.get(currentPlayerIndex);
-        JOptionPane.showMessageDialog(this, "It's now " + currentPlayer.getPlayerName() + "'s turn!");
-        updateBuildButtonState();
+        JOptionPane.showMessageDialog(playerGUIFrame, "It's now " + currentPlayer.getPlayerName() + "'s turn!");
+
+        // Update button states for the NEW current player
+        updateManageAssetsButtonState();
+        boolean nextIsHuman = !(currentPlayer instanceof Bot);
+        rollButton.setEnabled(nextIsHuman && !currentPlayer.getIsEliminated()); // Enable roll if human and not out
+        endTurnButton.setEnabled(false); // End turn always disabled at start
     }
 
     private void handleBotTurns() {
