@@ -634,8 +634,11 @@ public class Player {
                 JOptionPane.showMessageDialog(null,
                     this.name + " rolled a " + diceOne + " and " + diceTwo + "!. Move " + result + " spaces.");
                 this.isJailed = false;
+                this.rolledDouble = true;   // Indicate a double was rolled for this turn's action
+                this.rolledDoubleCounter = 1;
                 moveSpaces(result);
                 this.jailCounter = 0;
+                //  handleLandingOnSpace() will be called by GameG
             }
             else {  /* If the player fails to roll doubles, then the jailCounter increments by 1. */
                 JOptionPane.showMessageDialog(null, this.name + " failed to roll doubles. Stay in Jail for 1 more turn.");
@@ -659,17 +662,28 @@ public class Player {
         }
         // Player chooses to pay $50 fine
         else if (userOption == 1) {
-            JOptionPane.showMessageDialog(null, this.name + " paid $50 to escape jail.");
-            updateMoney(-50);
-            this.isJailed = false;
-            playerRoll();
+            if ( this.money >= 50 ) {
+                JOptionPane.showMessageDialog(null, this.name + " paid $50 to escape jail.");
+                updateMoney(-50);
+                this.isJailed = false;
+                this.jailCounter = 0;
+                this.rolledDouble = false;
+                this.rolledDoubleCounter = 0;
+                playerRoll();
+                //  handleLandingOnSpace will be called by GameGUI
+            }
         }
         // Player has Get Out of Jail Free card
         else {
-            JOptionPane.showMessageDialog(null, this.name + " used their 'Get Out of Jail Free' card!");
-            this.isJailed = false;  // The player is no longer in jail
-            this.removeOutOfJailCard();  // Remove the card from the player's inventory
-            playerRoll(); // Roll the dice to continue the game
+            if ( hasOutOfJailCard() ) {
+                JOptionPane.showMessageDialog(null, this.name + " used their 'Get Out of Jail Free' card!");
+                this.isJailed = false;  // The player is no longer in jail
+                this.removeOutOfJailCard();  // Remove the card from the player's inventory
+                this.rolledDouble = false;
+                this.rolledDoubleCounter = 0;
+                playerRoll(); // Roll the dice to continue the game
+                // handleLandingOnSpace() will be called by GameGUI
+            }
         }
 
     }

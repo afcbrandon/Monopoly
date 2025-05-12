@@ -85,9 +85,26 @@ public class GameGUI extends JFrame {
                 // If jailed, rolling is handled within the getOutOfJail logic
                 currentPlayer.getOutOfJail();
                 updatePlayerPanel(currentPlayer);
-                // After attempting to get out of jail, enable end turn
-                rollButton.setEnabled(false);
-                endTurnButton.setEnabled(true);
+
+                if ( !currentPlayer.getIsJailed() ) {
+                    currentPlayer.handleLandingOnSpace(currentPlayer.getPosition());
+                    updatePlayerPanel(currentPlayer);
+
+                    if ( currentPlayer.getRolledDouble() && !currentPlayer.isJailed ) {
+                        // Player got out AND their roll was a double
+                        rollButton.setEnabled(true);
+                        endTurnButton.setEnabled(false);
+                        JOptionPane.showMessageDialog(playerGUIFrame, "You got out of jail AND rolled doubles! Roll again.", "Doubles!", JOptionPane.INFORMATION_MESSAGE);
+                    } else {
+                        // Player got out, but it wasn't via doubles, OR they landed in jail again
+                        rollButton.setEnabled(false);
+                        endTurnButton.setEnabled(true);
+                    }
+                } else {
+                    // Player is still in jail
+                    rollButton.setEnabled(false);
+                    endTurnButton.setEnabled(true);
+                }
             }
 
             updateManageAssetsButtonState();    // Update asset button state
@@ -702,112 +719,112 @@ public class GameGUI extends JFrame {
     }
 
     private void handleSellToPlayer(Player seller, Property property, JFrame frameToClose) {
-    Bank bank = boardSpaces.getBank(); // Needed for selling improvements
+        Bank bank = boardSpaces.getBank(); // Needed for selling improvements
 
-    // Step 1: Property MUST be unimproved to be sold to another player.
-    if (property.getNumHouses() > 0 || property.getNumHotels() > 0) {
-        int improvementsValue = property.calcImprovementsSellValue();
-        int confirmSellImprovements = JOptionPane.showConfirmDialog(null,
-                "Properties must be unimproved to sell to another player.\n" +
-                "You must first sell all improvements on " + property.getName() + " to the bank for $" + improvementsValue + ".\n" +
-                "Proceed with selling improvements to the bank?",
-                "Sell Improvements to Bank", JOptionPane.YES_NO_OPTION);
+        // Step 1: Property MUST be unimproved to be sold to another player.
+        if (property.getNumHouses() > 0 || property.getNumHotels() > 0) {
+            int improvementsValue = property.calcImprovementsSellValue();
+            int confirmSellImprovements = JOptionPane.showConfirmDialog(null,
+                    "Properties must be unimproved to sell to another player.\n" +
+                    "You must first sell all improvements on " + property.getName() + " to the bank for $" + improvementsValue + ".\n" +
+                    "Proceed with selling improvements to the bank?",
+                    "Sell Improvements to Bank", JOptionPane.YES_NO_OPTION);
 
-        if (confirmSellImprovements == JOptionPane.YES_OPTION) {
-            int moneyFromImprovements = property.clearPropertyAndReturnToBank(bank);
-            seller.updateMoney(moneyFromImprovements);
-            updatePlayerPanel(seller);
-            JOptionPane.showMessageDialog(playerGUIFrame, "Sold improvements on " + property.getName() + " for $" + moneyFromImprovements + ".");
-            // Now property is unimproved, can proceed
-        } else {
-            JOptionPane.showMessageDialog(playerGUIFrame, "Sale to another player cancelled (improvements not sold to bank).");
+            if (confirmSellImprovements == JOptionPane.YES_OPTION) {
+                int moneyFromImprovements = property.clearPropertyAndReturnToBank(bank);
+                seller.updateMoney(moneyFromImprovements);
+                updatePlayerPanel(seller);
+                JOptionPane.showMessageDialog(playerGUIFrame, "Sold improvements on " + property.getName() + " for $" + moneyFromImprovements + ".");
+                // Now property is unimproved, can proceed
+            } else {
+                JOptionPane.showMessageDialog(playerGUIFrame, "Sale to another player cancelled (improvements not sold to bank).");
+                return;
+            }
+        }
+
+        // Step 2: Select Buyer
+        List<Player> potentialBuyers = new ArrayList<>();
+        for (Player p : players) {
+            if (p != seller && !p.getIsEliminated()) {
+                potentialBuyers.add(p);
+            }
+        }
+
+        if (potentialBuyers.isEmpty()) {
+            JOptionPane.showMessageDialog(null, "No other active players to sell to.");
             return;
         }
-    }
 
-    // Step 2: Select Buyer
-    List<Player> potentialBuyers = new ArrayList<>();
-    for (Player p : players) {
-        if (p != seller && !p.getIsEliminated()) {
-            potentialBuyers.add(p);
-        }
-    }
+        String[] buyerNames = potentialBuyers.stream().map(Player::getPlayerName).toArray(String[]::new);
+        String selectedBuyerName = (String) JOptionPane.showInputDialog(null,
+                "Select player to sell " + property.getName() + " to:",
+                "Select Buyer", JOptionPane.QUESTION_MESSAGE, null, buyerNames, buyerNames[0]);
 
-    if (potentialBuyers.isEmpty()) {
-        JOptionPane.showMessageDialog(null, "No other active players to sell to.");
-        return;
-    }
-
-    String[] buyerNames = potentialBuyers.stream().map(Player::getPlayerName).toArray(String[]::new);
-    String selectedBuyerName = (String) JOptionPane.showInputDialog(null,
-            "Select player to sell " + property.getName() + " to:",
-            "Select Buyer", JOptionPane.QUESTION_MESSAGE, null, buyerNames, buyerNames[0]);
-
-    if (selectedBuyerName == null) { // User cancelled buyer selection
-        return;
-    }
-
-    Player buyer = null;
-    for (Player p : potentialBuyers) {
-        if (p.getPlayerName().equals(selectedBuyerName)) {
-            buyer = p;
-            break;
-        }
-    }
-
-    if (buyer == null) { // Should not happen
-        JOptionPane.showMessageDialog(null, "Error selecting buyer. Sale cancelled.");
-        return;
-    }
-
-    // Step 3: Seller sets the price
-    String priceString = JOptionPane.showInputDialog(null,
-            seller.getPlayerName() + ", enter the selling price for " + property.getName() + " to " + buyer.getPlayerName() + ":",
-            "Set Selling Price", JOptionPane.QUESTION_MESSAGE);
-
-    int agreedPrice;
-    try {
-        agreedPrice = Integer.parseInt(priceString);
-        if (agreedPrice < 0) {
-            JOptionPane.showMessageDialog(null, "Price cannot be negative. Sale cancelled.");
+        if (selectedBuyerName == null) { // User cancelled buyer selection
             return;
         }
-    } catch (NumberFormatException ex) {
-        JOptionPane.showMessageDialog(null, "Invalid price entered. Sale cancelled.");
-        return;
-    }
 
-    // Step 4: Buyer Confirmation
-    int confirmPurchase = JOptionPane.showConfirmDialog(playerGUIFrame,
-            buyer.getPlayerName() + ", do you want to buy " + property.getName() + "\nfrom " + seller.getPlayerName() + " for $" + agreedPrice + "?\n" +
-            "Your current money: $" + buyer.getMoney(),
-            "Confirm Purchase", JOptionPane.YES_NO_OPTION);
+        Player buyer = null;
+        for (Player p : potentialBuyers) {
+            if (p.getPlayerName().equals(selectedBuyerName)) {
+                buyer = p;
+                break;
+            }
+        }
 
-    if (confirmPurchase == JOptionPane.YES_OPTION) {
-        if (buyer.getMoney() >= agreedPrice) {
-            seller.updateMoney(agreedPrice);
-            buyer.updateMoney(-agreedPrice);
+        if (buyer == null) { // Should not happen
+            JOptionPane.showMessageDialog(null, "Error selecting buyer. Sale cancelled.");
+            return;
+        }
 
-            seller.removeProperty(property); // Updates seller's internal lists and color sets
-            buyer.addProperty(property);   // Updates buyer's internal lists and color sets
-            property.setOwner(buyer);      // Critical: Set new owner on the Property object
+        // Step 3: Seller sets the price
+        String priceString = JOptionPane.showInputDialog(null,
+                seller.getPlayerName() + ", enter the selling price for " + property.getName() + " to " + buyer.getPlayerName() + ":",
+                "Set Selling Price", JOptionPane.QUESTION_MESSAGE);
 
-            updatePlayerPanel(seller);
-            updatePlayerPanel(buyer);
-            updateManageAssetsButtonState();; // For both players, as color sets might have changed status
+        int agreedPrice;
+        try {
+            agreedPrice = Integer.parseInt(priceString);
+            if (agreedPrice < 0) {
+                JOptionPane.showMessageDialog(null, "Price cannot be negative. Sale cancelled.");
+                return;
+            }
+        } catch (NumberFormatException ex) {
+            JOptionPane.showMessageDialog(null, "Invalid price entered. Sale cancelled.");
+            return;
+        }
 
-            JOptionPane.showMessageDialog(playerGUIFrame,
-                    property.getName() + " sold by " + seller.getPlayerName() + " to " + buyer.getPlayerName() + " for $" + agreedPrice + ".");
-            if ( frameToClose != null ) {
-                frameToClose.dispose();
+        // Step 4: Buyer Confirmation
+        int confirmPurchase = JOptionPane.showConfirmDialog(playerGUIFrame,
+                buyer.getPlayerName() + ", do you want to buy " + property.getName() + "\nfrom " + seller.getPlayerName() + " for $" + agreedPrice + "?\n" +
+                "Your current money: $" + buyer.getMoney(),
+                "Confirm Purchase", JOptionPane.YES_NO_OPTION);
+
+        if (confirmPurchase == JOptionPane.YES_OPTION) {
+            if (buyer.getMoney() >= agreedPrice) {
+                seller.updateMoney(agreedPrice);
+                buyer.updateMoney(-agreedPrice);
+
+                seller.removeProperty(property); // Updates seller's internal lists and color sets
+                buyer.addProperty(property);   // Updates buyer's internal lists and color sets
+                property.setOwner(buyer);      // Critical: Set new owner on the Property object
+
+                updatePlayerPanel(seller);
+                updatePlayerPanel(buyer);
+                updateManageAssetsButtonState();; // For both players, as color sets might have changed status
+
+                JOptionPane.showMessageDialog(playerGUIFrame,
+                        property.getName() + " sold by " + seller.getPlayerName() + " to " + buyer.getPlayerName() + " for $" + agreedPrice + ".");
+                if ( frameToClose != null ) {
+                    frameToClose.dispose();
+                }
+            } else {
+                JOptionPane.showMessageDialog(playerGUIFrame, buyer.getPlayerName() + " does not have enough money ($" + agreedPrice + ") to buy " + property.getName() + ".");
             }
         } else {
-            JOptionPane.showMessageDialog(playerGUIFrame, buyer.getPlayerName() + " does not have enough money ($" + agreedPrice + ") to buy " + property.getName() + ".");
+            JOptionPane.showMessageDialog(playerGUIFrame, buyer.getPlayerName() + " declined to purchase " + property.getName() + ".");
         }
-    } else {
-        JOptionPane.showMessageDialog(playerGUIFrame, buyer.getPlayerName() + " declined to purchase " + property.getName() + ".");
     }
-}
 
 
     // Function that ends the player's turn
