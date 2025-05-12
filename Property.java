@@ -5,6 +5,7 @@ public class Property {
     private String streetColor;
     private int price;
     private int rent;
+    private int originalRent;
     private int numHouses;
     private int numHotels;
     private int costHouses;
@@ -19,6 +20,7 @@ public class Property {
         this.name = name;
         this.price = price;
         this.rent = rent;
+        this.originalRent = rent;
         this.mortgageValue = mortgageValue;
         this.isMortgaged = false;
     }
@@ -29,6 +31,7 @@ public class Property {
         this.streetColor = streetColor;
         this.price = price;
         this.rent = rent;
+        this.originalRent = rent;
         this.numHouses = 0;
         this.numHotels = 0;
         this.costHouses = costHouses;
@@ -95,31 +98,29 @@ public class Property {
         return false;// They cant buy property bc they dont have enough money
     }
 
-    public void buildHouses() {
-
-    }
-
-    private void buildHotel() {
-
-    }
-
     public int getSellValue() {
         return this.price / 2; // or adjust if you have a different mortgage/sell-back rule
     }
 
     /*  Function that increments number of houses on the property by 1 */
-    public void addHouses() {
+    public void addHouse() {
         this.numHouses++;
+        updateRentHouses();
     }
 
     /* Function that increments the number of hotels on the property by 1 */
-    public void addHotels() {
-        this.numHouses++;
+    public void addHotel() {
+        this.numHotels++;
     }
 
     /*  ###########################################################################################
         ### Function that updates the rent based on the amount of houses/hotels on the property ###
         ###########################################################################################  */
+
+    // Function that resets rent to original price ( when player sells property)
+    public void updateRentToOriginalRent() {
+        this.rent = this.originalRent;
+    }
 
     /* Function that updates the rent based on the amount of houses on a property space */
     public void updateRentHouses() {

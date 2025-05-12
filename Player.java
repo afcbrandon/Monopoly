@@ -445,7 +445,10 @@ public class Player {
         return false;
     }
 
-    //  Function that checks 
+    //  Function that calls buildHouse function from Property
+    public void buildHouse() {
+        
+    }
 
 
     /*  #######################################

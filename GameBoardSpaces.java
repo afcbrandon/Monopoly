@@ -32,6 +32,15 @@ public class GameBoardSpaces {
     /*  ##################
         ### Getters ###
         ##################  */
+    public Property getPropertyByName(String name) {
+        for (Property p : properties.values()) {
+            if (p.getName().equals(name)) {
+                return p;
+            }
+        }
+
+        return null;
+    }
 
     /*  ##################
         ### Setters ###

@@ -223,43 +223,108 @@ public class GameGUI extends JFrame {
         parentFrame.setVisible(false);
         System.out.println("ColorSet Frame set to Hidden!");
 
-        HashMap<String, List<String>> listOfColorProperties = new HashMap<String, List<String>>();
-        listOfColorProperties = currPlayer.getListOfColorSetPropertyNames(currPlayer, colorName);
-        int listSize = listOfColorProperties.get(colorName).size(); // variable that gets the size of the list for a given colorSet that contains the Properties
+        List<String> propertyNamesInSet = currPlayer.getListOfColorSetPropertyNames(currPlayer, colorName).get(colorName);
+
+        if (propertyNamesInSet == null || propertyNamesInSet.isEmpty()) {
+            JOptionPane.showMessageDialog(parentFrame, "Error: No properties found for this color set.", "Error", JOptionPane.ERROR_MESSAGE);
+            parentFrame.setVisible(true); // Show the parent frame again
+            return;
+        }
+
+        // Get the Property objects and find the minimum number of houses in this set
+        List<Property> propertiesInThisColorSet = new ArrayList<>();
+        int minHousesInSet = 5; // Max houses is 4, hotel is the 5th "house". 
+
+        for ( String propName : propertyNamesInSet ) {
+            Property prop = boardSpaces.getPropertyByName(propName);
+            if ( prop.getOwner() == currPlayer ) {  // Ensures that the current player owns the property
+                propertiesInThisColorSet.add(prop);
+                if ( prop.getNumHotels() == 0 && prop.getNumHouses() < minHousesInSet ) {   // only consider houses if no hotel
+                    minHousesInSet = prop.getNumHouses();
+                } else if ( prop.getNumHotels() == 1 ) { // If there's a hotel, then the property basically has 5 houses
+                    minHousesInSet = Math.min(minHousesInSet, 5);   // Hotel means the property is "full" of houses
+                }
+            }
+        }
+
+        // If all properties in the set have a hotel, minHousesInSet might still be 5.
+        // Or if all have 4 houses and are eligible for a hotel, minHousesInSet would be 4.
+
+        // Create an object of Jframe and of JPanel
         JFrame propertyJFrame = new JFrame();
         JPanel propertyJPanel = new JPanel();
         propertyJPanel.setLayout(new BoxLayout(propertyJPanel, BoxLayout.Y_AXIS));
-
         
         // Set panel size
         final int WIDTH = 300;
         final int HEIGHT = 50;
-        propertyJPanel.setPreferredSize( new Dimension(WIDTH, (listSize * HEIGHT) + (HEIGHT / 2) ) );
+        propertyJPanel.setPreferredSize( new Dimension(WIDTH, (propertyNamesInSet.size() * HEIGHT) + (HEIGHT / 2) ) );
 
         // Code to create buttons for properties
-        for ( int i = 0; i < listSize; i++) {
-            propertyJPanel.add( new JButton(listOfColorProperties.get(colorName).get(i)) );  // creates a button and gives it the name of the Property at index i
+        for ( String propNameFromList : propertyNamesInSet ) {
+            propertyJPanel.add( new JButton(propNameFromList) );
         }
 
         // Iterate through buttons and add actionListener for them
         for ( Component component : propertyJPanel.getComponents() ) {
-            // Check if component is a JButton
             if ( component instanceof JButton ) {
                 JButton button = (JButton) component;
-                button.setAlignmentX(CENTER_ALIGNMENT); // Align Buttons in the Center
+                button.setAlignmentX(CENTER_ALIGNMENT);
                 button.setMinimumSize(new Dimension(WIDTH, HEIGHT));
                 button.setPreferredSize(new Dimension(WIDTH, HEIGHT));
                 button.setMaximumSize(new Dimension(Short.MAX_VALUE, Short.MAX_VALUE / 2));
                 String bttnPropertyName = button.getText();
 
-                // Add actionLister
-                button.addActionListener( _ -> {
-                    System.out.println("Selected button for " + bttnPropertyName);
-                    houseOrHotelButtons(propertyJFrame, currPlayer, bttnPropertyName);
-                });
+                Property property = boardSpaces.getPropertyByName(bttnPropertyName);
+                boolean enableButton = false;
+
+                if (property != null && property.getOwner() == currPlayer) {
+                    if (property.getNumHotels() == 1) {
+                        // Already has a hotel, cannot build more houses.
+                        enableButton = false;
+                        System.out.println("Button for " + bttnPropertyName + " disabled: has a hotel.");
+                    } else if (property.getNumHouses() == 4) {
+                        // Has 4 houses, can only build a hotel next (handled by houseOrHotelButtons).
+                        // For the purpose of "building another house", this property is not eligible.
+                        // However, it *should* be selectable if the goal is to build a hotel.
+                        // The current context is selecting a property to build *something*.
+                        // The houseOrHotelButtons will differentiate. So, if it has 4 houses, it's a candidate for a hotel.
+                        // Let's assume this screen leads to choosing house OR hotel.
+                        // If it has 4 houses, it means it has the min # of houses (if others also have 4) or more.
+                        // The condition for enabling should be that its current house count allows it to be the "next" to build on.
+                        if (property.getNumHouses() == minHousesInSet) {
+                             enableButton = true; // Can be selected to potentially build a hotel
+                        } else {
+                             enableButton = false; // If it has 4 houses but others have less, can't select it.
+                             System.out.println("Button for " + bttnPropertyName + " disabled: has 4 houses, but others in set have fewer (" + minHousesInSet + ").");
+                        }
+                    } else if (property.getNumHouses() > minHousesInSet) {
+                        // This property has more houses than the minimum in the set.
+                        // Player must build on properties with fewer houses first.
+                        enableButton = false;
+                        System.out.println("Button for " + bttnPropertyName + " disabled: has " + property.getNumHouses() + " houses, set minimum is " + minHousesInSet + ".");
+                    } else {
+                        // property.getNumHouses() == minHousesInSet and < 4
+                        // This property is eligible for the next house.
+                        enableButton = true;
+                    }
+                } else {
+                    // Property not found or not owned by current player (should not happen if getListOfColorSetPropertyNames is correct)
+                    enableButton = false;
+                    System.out.println("Button for " + bttnPropertyName + " disabled: property not found or not owned by player.");
+                }
+
+                button.setEnabled(enableButton);
+
+                if (enableButton) {
+                    button.addActionListener( _ -> {
+                        System.out.println("Selected button for " + bttnPropertyName);
+                        houseOrHotelButtons(propertyJFrame, currPlayer, bttnPropertyName);
+                    });
+                }
             }
         }
-
+        
         JButton cancelButton = new JButton("Cancel");
         cancelButton.setAlignmentX(CENTER_ALIGNMENT);
         cancelButton.setMinimumSize(new Dimension(WIDTH, HEIGHT / 2));
@@ -276,7 +341,7 @@ public class GameGUI extends JFrame {
         propertyJFrame.add(propertyJPanel);
         propertyJFrame.pack();  // pack the frame
 
-        propertyJFrame.setLocationRelativeTo(null);
+        propertyJFrame.setLocationRelativeTo(parentFrame);
         propertyJFrame.setAlwaysOnTop(true);
         propertyJFrame.setVisible(true);
 
@@ -305,7 +370,24 @@ public class GameGUI extends JFrame {
 
         // Code Logic that decides which button to add. If player can build house then show house button, if player can build hotel then show hotel button
 
-        houseHotelPanel.add(houseButton);
+        // Get the property object from its name
+        Property property = boardSpaces.getPropertyByName(propertyName);
+
+        // If the selected property already has 4 houses, the max, then the build hotel button is displayed, otherwise the house button is displayed
+        if ( property.getNumHouses() == 4 ) {
+            houseHotelPanel.add(hotelButton);
+            System.out.println("Max number of houses built on " + propertyName + "! buildHotel button enabled!");
+        } else {
+            houseHotelPanel.add(houseButton);
+
+            // If property has no hotel, then player can build a hotel, otherwise disable the button
+            if ( property.getNumHotels() == 0 ) {
+                houseButton.setEnabled(true);
+            } else {
+                houseButton.setEnabled(false);
+                System.out.println(propertyName + " has max number of hotels! buildHotel button is disabled");
+            }
+        }
 
         cancelButton.addActionListener( _ -> {
             houseHotelFrame.dispose();
@@ -349,12 +431,25 @@ public class GameGUI extends JFrame {
 
         // Actions Listener for yesButton
         yesButton.addActionListener( _ -> {
-
+            
+            Property property = boardSpaces.getPropertyByName(propertyName);
             buildHouseFrame.dispose();
-        
-            // create a new panel with message telling player they built the house
+
+            // creates a new panel with message telling player they built the house
             JPanel messagePanel = new JPanel();
             messagePanel.setLayout(new BoxLayout(messagePanel, BoxLayout.Y_AXIS));
+        
+            // Run code that builds a property on the player space. Run after messagePanel is created so that a label can be added
+            if ( property != null ) {
+                if ( property.getOwner() == currPlayer ) {
+                    property.addHouse();
+                    System.out.println(property.getName() + " Houses: " + property.getNumHouses());
+                } else {
+                    System.out.println("ERROR! " + currPlayer.getPlayerName() + " does not own this property!");
+                }
+            } else {
+                System.out.println("ERROR! Property is null! Could not build!");
+            }
 
             // add a vertical gap before the label
             messagePanel.add(Box.createVerticalStrut(10));
